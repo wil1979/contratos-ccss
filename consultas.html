@@ -2,87 +2,522 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Consultas de Nombramientos</title>
-  <link rel="stylesheet" href="style.css">
-  
+  <style>
+    :root {
+      --primary-color: #0d47a1;
+      --secondary-color: #1976d2;
+      --success-color: #4caf50;
+      --warning-color: #ff9800;
+      --error-color: #f44336;
+      --light-bg: #f5f5f5;
+      --dark-text: #333;
+      --light-text: #fff;
+      --border-color: #ddd;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--light-bg);
+      padding: 20px;
+      color: var(--dark-text);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    
+    h2 {
+      color: var(--primary-color);
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2rem;
+      font-weight: 600;
+      padding-bottom: 10px;
+      border-bottom: 3px solid var(--secondary-color);
+    }
+    
+    .usuario-info {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .usuario-info h3 {
+      margin-bottom: 5px;
+      font-size: 1.2rem;
+    }
+    
+    .filtros {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .filtros label {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+      display: block;
+    }
+    
+    .filtros select {
+      padding: 10px 15px;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 1rem;
+      min-width: 150px;
+      transition: border-color 0.3s;
+    }
+    
+    .filtros select:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+    }
+    
+    .filtros button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1rem;
+    }
+    
+    #btnFiltrar {
+      background: var(--secondary-color);
+      color: white;
+    }
+    
+    #btnFiltrar:hover {
+      background: #0d47a1;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    #btnExportarPDF {
+      background: #e91e63;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    #btnExportarPDF:hover {
+      background: #c2185b;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .tabla-container {
+      position: relative;
+      overflow-x: auto;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    #tablaNombramientos {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    #tablaNombramientos th {
+      background: var(--primary-color);
+      color: var(--light-text);
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+    
+    #tablaNombramientos td {
+      padding: 12px 15px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+    
+    #tablaNombramientos tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+    
+    #tablaNombramientos tr:hover {
+      background-color: #e3f2fd;
+      transition: background-color 0.3s;
+    }
+    
+    .acciones {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    
+    .btn-editar, .btn-guardar, .btn-cancelar {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    
+    .btn-editar {
+      background: #ff9800;
+      color: white;
+    }
+    
+    .btn-editar:hover {
+      background: #f57c00;
+    }
+    
+    .btn-guardar {
+      background: #4caf50;
+      color: white;
+      display: none;
+    }
+    
+    .btn-guardar:hover {
+      background: #388e3c;
+    }
+    
+    .btn-cancelar {
+      background: #f44336;
+      color: white;
+      display: none;
+    }
+    
+    .btn-cancelar:hover {
+      background: #d32f2f;
+    }
+    
+    .editable {
+      padding: 6px 10px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+    
+    .editable:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+    }
+    
+    .cargando {
+      text-align: center;
+      padding: 20px;
+      font-size: 1.1rem;
+      color: var(--secondary-color);
+      font-weight: 500;
+    }
+    
+    .error {
+      background: #ffebee;
+      color: var(--error-color);
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid var(--error-color);
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+    
+    .sin-datos {
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 1.2rem;
+      color: #666;
+      background: #fff3e0;
+      border-radius: 8px;
+      margin: 20px 0;
+      border: 2px dashed #ffb74d;
+    }
+    
+    /* Modal de Confirmación */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-contenido {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+    
+    .modal-titulo {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      border-bottom: 2px solid var(--secondary-color);
+      padding-bottom: 10px;
+    }
+    
+    #mensajeConfirmacion {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+    
+    .modal-botones {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    
+    .btn-modal {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-aceptar {
+      background: var(--success-color);
+      color: white;
+    }
+    
+    .btn-aceptar:hover {
+      background: #388e3c;
+      transform: translateY(-2px);
+    }
+    
+    .btn-cancelar-modal {
+      background: #757575;
+      color: white;
+    }
+    
+    .btn-cancelar-modal:hover {
+      background: #616161;
+      transform: translateY(-2px);
+    }
+    
+    /* Botón flotante */
+    .btn-flotante-inicio {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--primary-color);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 100;
+    }
+    
+    .btn-flotante-inicio:hover {
+      background: var(--secondary-color);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .filtros {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .filtros select {
+        min-width: 100%;
+      }
+      
+      .acciones {
+        flex-direction: column;
+        gap: 5px;
+      }
+      
+      .btn-flotante-inicio {
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+      }
+    }
+    
+    /* Animaciones */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .container {
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    /* Estilos para impresión */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      
+      .filtros, .btn-flotante-inicio, .acciones, #btnExportarPDF, #btnFiltrar {
+        display: none !important;
+      }
+      
+      .container {
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      #tablaNombramientos {
+        border: 1px solid #000;
+      }
+      
+      #tablaNombramientos th, #tablaNombramientos td {
+        border: 1px solid #000 !important;
+        padding: 8px;
+      }
+      
+      .usuario-info {
+        background: #0d47a1;
+        color: white;
+        page-break-after: avoid;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h2>Consultas de Nombramientos</h2>
+  <div class="container">
+    <h2>Consultas de Nombramientos</h2>
 
-  <div class="filtros">
-    <label for="mes">Mes:</label>
-    <select id="mes">
-      <option value="1">Enero</option>
-      <option value="2">Febrero</option>
-      <option value="3">Marzo</option>
-      <option value="4">Abril</option>
-      <option value="5">Mayo</option>
-      <option value="6">Junio</option>
-      <option value="7">Julio</option>
-      <option value="8">Agosto</option>
-      <option value="9">Septiembre</option>
-      <option value="10">Octubre</option>
-      <option value="11">Noviembre</option>
-      <option value="12">Diciembre</option>
-    </select>
-
-    <label for="anio">Año:</label>
-    <select id="anio">
-      <!-- Se llenará dinámicamente con JavaScript -->
-    </select>
-
-    <button id="btnFiltrar">Filtrar</button>
-    <button id="btnExportarPDF">📄 Exportar PDF</button>
-  </div>
-
-  <div class="tabla-container">
-    <div id="mensajeError" class="error" style="display:none;"></div>
-    <table id="tablaNombramientos">
-      <thead>
-        <tr>
-          <th>Cédula Sustituido</th>
-          <th>Funcionario Sustituido</th>
-          <th>Área</th>
-          <th>Código Área</th>
-          <th>Inicio</th>
-          <th>Final</th>
-          <th>Horario</th>
-          <th>Días</th>
-          <th>Salario</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="tablaRegistros">
-        <tr><td colspan="11" class="cargando">Cargando datos del mes actual...</td></tr>
-      </tbody>
-    </table>
-    <div id="mensajeSinDatos" class="sin-datos" style="display:none;">
-      📭 No se encontraron nombramientos para este mes y año.
+    <!-- Información del usuario activo -->
+    <div class="usuario-info" id="usuarioInfo">
+      <h3>Usuario Activo: <span id="nombreUsuario">Cargando...</span></h3>
+      <p>Rol: <span id="rolUsuario">Administrador</span></p>
     </div>
-  </div>
 
-  <!-- Modal de Confirmación -->
-  <div id="modalConfirmacion" class="modal">
-    <div class="modal-contenido">
-      <h3 class="modal-titulo">Confirmar Cambios</h3>
-      <p id="mensajeConfirmacion">¿Está seguro que desea guardar los cambios realizados?</p>
-      <div class="modal-botones">
-        <button id="btnAceptar" class="btn-modal btn-aceptar">Aceptar</button>
-        <button id="btnCancelarModal" class="btn-modal btn-cancelar-modal">Cancelar</button>
+    <div class="filtros">
+      <div>
+        <label for="mes">Mes:</label>
+        <select id="mes">
+          <option value="1">Enero</option>
+          <option value="2">Febrero</option>
+          <option value="3">Marzo</option>
+          <option value="4">Abril</option>
+          <option value="5">Mayo</option>
+          <option value="6">Junio</option>
+          <option value="7">Julio</option>
+          <option value="8">Agosto</option>
+          <option value="9">Septiembre</option>
+          <option value="10">Octubre</option>
+          <option value="11">Noviembre</option>
+          <option value="12">Diciembre</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="anio">Año:</label>
+        <select id="anio">
+          <!-- Se llenará dinámicamente con JavaScript -->
+        </select>
+      </div>
+
+      <button id="btnFiltrar">Filtrar</button>
+      <button id="btnExportarPDF">📄 Exportar PDF</button>
+    </div>
+
+    <div class="tabla-container">
+      <div id="mensajeError" class="error" style="display:none;"></div>
+      <table id="tablaNombramientos">
+        <thead>
+          <tr>
+            <th>Cédula Sustituido</th>
+            <th>Funcionario Sustituido</th>
+            <th>Área</th>
+            <th>Código Área</th>
+            <th>Inicio</th>
+            <th>Final</th>
+            <th>Horario</th>
+            <th>Días</th>
+            <th>Salario</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaRegistros">
+          <tr><td colspan="11" class="cargando">Cargando datos del mes actual...</td></tr>
+        </tbody>
+      </table>
+      <div id="mensajeSinDatos" class="sin-datos" style="display:none;">
+        📭 No se encontraron nombramientos para este mes y año.
       </div>
     </div>
-  </div>
 
-  <!-- 🎯 Botón flotante "Inicio" -->
-  <a href="dashboard.html" class="btn-flotante-inicio" title="Ir al Dashboard">
-    🏠 Inicio
-  </a>
+    <!-- Modal de Confirmación -->
+    <div id="modalConfirmacion" class="modal">
+      <div class="modal-contenido">
+        <h3 class="modal-titulo">Confirmar Cambios</h3>
+        <p id="mensajeConfirmacion">¿Está seguro que desea guardar los cambios realizados?</p>
+        <div class="modal-botones">
+          <button id="btnAceptar" class="btn-modal btn-aceptar">Aceptar</button>
+          <button id="btnCancelarModal" class="btn-modal btn-cancelar-modal">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 Botón flotante "Inicio" -->
+    <a href="dashboard.html" class="btn-flotante-inicio" title="Ir al Dashboard">
+      🏠 Inicio
+    </a>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, query } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
     // 🔹 Configuración Firebase
     const firebaseConfig = {
@@ -98,19 +533,20 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Verificar autenticación
-    try {
-      const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
-      if(!usuario) {
-        window.location.href = "login.html";
-      }
-    } catch (e) {
-      console.warn("No se pudo verificar el usuario activo");
+    // Verificar sesión
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!usuario) {
+      window.location.href = "login.html";
+    } else {
+      // Mostrar información del usuario activo
+      document.getElementById("nombreUsuario").textContent = usuario.nombre || "Usuario";
+      document.getElementById("rolUsuario").textContent = usuario.rol || "Usuario";
     }
 
     // Variables globales
     let documentoActual = null;
     let filaActual = null;
+    let datosOriginales = null;
 
     // 🔹 Extrae mes y año directamente del string YYYY-MM-DD (evita zona horaria)
     function extraerMesYAnioDeFechaString(fechaStr) {
@@ -234,6 +670,21 @@
       filaActual = fila;
       documentoActual = docId;
       
+      // Guardar valores originales
+      const celdas = fila.querySelectorAll('td');
+      datosOriginales = {
+        personaSustituirCedula: celdas[0].textContent,
+        personaSustituirNombre: celdas[1].textContent,
+        area: celdas[2].textContent,
+        codArea: celdas[3].textContent,
+        inicio: celdas[4].textContent,
+        final: celdas[5].textContent,
+        horario: celdas[6].textContent,
+        dias: celdas[7].textContent,
+        salario: celdas[8].textContent.replace('₡', '').replace(/\./g, '').replace(',', '.'),
+        estado: celdas[9].textContent.includes('✅')
+      };
+      
       // Cambiar los botones
       const btnEditar = fila.querySelector('.btn-editar');
       const btnGuardar = fila.querySelector('.btn-guardar');
@@ -244,42 +695,16 @@
       btnCancelar.style.display = 'inline-block';
       
       // Convertir celdas en campos editables
-      const celdas = fila.querySelectorAll('td');
-      
-      // Cédula Sustituido (índice 0) - editable
       hacerEditable(celdas[0], 'personaSustituirCedula');
-      // Funcionario Sustituido (índice 1) - editable
       hacerEditable(celdas[1], 'personaSustituirNombre');
-      // Área (índice 2) - editable
       hacerEditable(celdas[2], 'area');
-      // Código Área (índice 3) - editable
       hacerEditable(celdas[3], 'codArea');
-      // Inicio (índice 4) - editable como fecha
       hacerEditableFecha(celdas[4], 'inicio');
-      // Final (índice 5) - editable como fecha
       hacerEditableFecha(celdas[5], 'final');
-      // Horario (índice 6) - editable como dos campos separados
       hacerEditableHorario(celdas[6]);
-      // Días (índice 7) - editable como número
       hacerEditableNumero(celdas[7], 'dias');
-      // Salario (índice 8) - editable como número
       hacerEditableNumero(celdas[8], 'salario', true);
-      // Estado (índice 9) - editable como select
       hacerEditableEstado(celdas[9], 'estado');
-      
-      // Guardar valores originales
-      fila.dataset.original = JSON.stringify({
-        personaSustituirCedula: celdas[0].textContent,
-        personaSustituirNombre: celdas[1].textContent,
-        area: celdas[2].textContent,
-        codArea: celdas[3].textContent,
-        inicio: celdas[4].textContent,
-        final: celdas[5].textContent,
-        horario: celdas[6].textContent,
-        dias: celdas[7].textContent,
-        salario: celdas[8].textContent.replace('₡', '').replace(/\./g, '').replace(',', '.'),
-        estado: celdas[9].textContent.includes('✅') ? true : false
-      });
     };
 
     // 🔹 Hacer una celda editable como texto
@@ -338,27 +763,24 @@
 
     // 🔹 Cancelar edición de un registro
     window.cancelarEdicion = function(docId, boton) {
-      const fila = boton.closest('tr');
+      if (!filaActual || !datosOriginales) return;
       
-      // Restaurar valores originales
-      const original = JSON.parse(fila.dataset.original);
-      
-      const celdas = fila.querySelectorAll('td');
-      celdas[0].textContent = original.personaSustituirCedula;
-      celdas[1].textContent = original.personaSustituirNombre;
-      celdas[2].textContent = original.area;
-      celdas[3].textContent = original.codArea;
-      celdas[4].textContent = original.inicio;
-      celdas[5].textContent = original.final;
-      celdas[6].textContent = original.horario;
-      celdas[7].textContent = original.dias;
-      celdas[8].textContent = `₡${parseFloat(original.salario).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
-      celdas[9].textContent = original.estado ? "✅ Pagado" : "⏳ Pendiente";
+      const celdas = filaActual.querySelectorAll('td');
+      celdas[0].textContent = datosOriginales.personaSustituirCedula;
+      celdas[1].textContent = datosOriginales.personaSustituirNombre;
+      celdas[2].textContent = datosOriginales.area;
+      celdas[3].textContent = datosOriginales.codArea;
+      celdas[4].textContent = datosOriginales.inicio;
+      celdas[5].textContent = datosOriginales.final;
+      celdas[6].textContent = datosOriginales.horario;
+      celdas[7].textContent = datosOriginales.dias;
+      celdas[8].textContent = `₡${parseFloat(datosOriginales.salario).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+      celdas[9].textContent = datosOriginales.estado ? "✅ Pagado" : "⏳ Pendiente";
       
       // Cambiar los botones
-      const btnEditar = fila.querySelector('.btn-editar');
-      const btnGuardar = fila.querySelector('.btn-guardar');
-      const btnCancelar = fila.querySelector('.btn-cancelar');
+      const btnEditar = filaActual.querySelector('.btn-editar');
+      const btnGuardar = filaActual.querySelector('.btn-guardar');
+      const btnCancelar = filaActual.querySelector('.btn-cancelar');
       
       btnEditar.style.display = 'inline-block';
       btnGuardar.style.display = 'none';
@@ -367,6 +789,7 @@
       // Limpiar variables
       documentoActual = null;
       filaActual = null;
+      datosOriginales = null;
     };
 
     // 🔹 Guardar cambios de un registro
@@ -418,7 +841,7 @@
       const modal = document.getElementById('modalConfirmacion');
       const mensajeConfirmacion = document.getElementById('mensajeConfirmacion');
       mensajeConfirmacion.textContent = `¿Está seguro que desea guardar los cambios realizados al nombramiento de ${celdas[1].querySelector('.editable')?.value || 'N/A'}?`;
-      modal.style.display = 'block';
+      modal.style.display = 'flex';
       
       // Manejar botones del modal
       const btnAceptar = document.getElementById('btnAceptar');
@@ -458,6 +881,7 @@
           // Limpiar variables
           documentoActual = null;
           filaActual = null;
+          datosOriginales = null;
           
         } catch (error) {
           console.error("Error al guardar cambios:", error);
@@ -487,6 +911,7 @@
       const element = document.getElementById('tablaNombramientos');
       const mes = document.getElementById("mes").options[document.getElementById("mes").selectedIndex].text;
       const anio = document.getElementById("anio").value;
+      const usuarioInfo = document.getElementById('usuarioInfo').outerHTML;
       
       // Verificar si hay datos para exportar
       const filas = document.querySelectorAll("#tablaRegistros tr");
@@ -495,24 +920,44 @@
         return;
       }
 
+      // Crear un contenedor para el PDF
+      const pdfContainer = document.createElement('div');
+      pdfContainer.innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: #0d47a1; font-size: 24px; margin-bottom: 10px;">Reporte de Nombramientos</h2>
+          <p style="font-size: 16px; margin-bottom: 5px;">Filtrado por: ${mes} ${anio}</p>
+          <p style="font-size: 14px;">Generado por: ${usuario.nombre || 'Usuario'}</p>
+          <p style="font-size: 14px;">Fecha: ${new Date().toLocaleDateString('es-CR')}</p>
+        </div>
+        ${usuarioInfo}
+      `;
+      
+      // Clonar la tabla
+      const tablaClone = element.cloneNode(true);
+      
+      // Eliminar botones de acciones en el PDF
+      const botonesAcciones = tablaClone.querySelectorAll('.acciones');
+      botonesAcciones.forEach(btn => {
+        btn.innerHTML = 'Reporte generado';
+        btn.style.backgroundColor = '#e0e0e0';
+        btn.style.color = '#666';
+        btn.style.padding = '5px';
+        btn.style.borderRadius = '3px';
+        btn.style.textAlign = 'center';
+      });
+      
+      pdfContainer.appendChild(tablaClone);
+
       const opt = {
-        margin: 1,
-        filename: `nombramientos_${mes}_${anio}.pdf`,
+        margin: [15, 10, 15, 10],
+        filename: `nombramientos_${mes}_${anio}_${usuario.nombre || 'usuario'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
+        html2canvas: { scale: 2, useCORS: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
       };
 
-      // Agregar título al PDF
-      const titulo = document.createElement('div');
-      titulo.innerHTML = `<h2 style="text-align: center; color: #0d47a1;">Reporte de Nombramientos</h2><p style="text-align: center;">Filtrado por: ${mes} ${anio}</p>`;
-      
-      // Clonar la tabla para agregar el título
-      const clone = element.cloneNode(true);
-      clone.insertBefore(titulo, clone.firstChild);
-
       // Generar el PDF
-      html2pdf().set(opt).from(clone).save();
+      html2pdf().set(opt).from(pdfContainer).save();
     }
 
     // ✅ Inicialización segura al cargar la página
