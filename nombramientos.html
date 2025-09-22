@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Nombramientos</title>
+  <link rel="stylesheet" href="style.css">
+  <!--🎯 Estilos mejorados integrados directamente-->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+  <div class="container">
+    <h2>Registro de Nombramientos</h2>
+
+    <form id="formNombramiento">
+      <label for="inicio">Inicio:</label>
+      <input type="date" id="inicio" required>
+
+      <label for="final">Final:</label>
+      <input type="date" id="final" required>
+
+      <label for="dias">Días:</label>
+      <input type="number" id="dias" readonly>
+
+      <label for="area">Área de Salud:</label>
+      <select id="selectAreaSalud" required>
+        <option value="">-- Elegir Área --</option>
+      </select>
+      <button type="button" id="btnAgregarArea">+ Agregar Área</button>
+
+      <label>Horario:</label>
+      <div style="display:flex; gap:10px;">
+        <input type="time" id="horaEntrada" required>
+        <input type="time" id="horaSalida" required>
+      </div>
+
+      <label for="salario">Salario:</label>
+      <input type="number" id="salario" step="0.01" readonly>
+
+      <label for="comentario">Comentario:</label>
+      <textarea id="comentario" rows="3"></textarea>
+
+      <label>Persona a Sustituir (Cédula):</label>
+      <input type="text" id="cedulaSustituir" placeholder="Ej: 108290753">
+
+      <label>Nombre Persona a Sustituir:</label>
+      <input type="text" id="nombreSustituir" readonly>
+
+      <label>
+        <input type="checkbox" id="estado"> Pago Validado
+      </label>
+
+      <button type="submit">Guardar Nombramiento</button>
+    </form>
+    <button class="logout" onclick="cerrarSesion()">Cerrar Sesión</button>
+  </div>
+
+  <!-- Modal para áreas -->
+  <div id="modalArea">
+    <div class="modal-content">
+      <h3>Nueva Área</h3>
+      <label>Código:</label>
+      <input type="text" id="nuevaCodArea">
+      <label>Nombre Área:</label>
+      <input type="text" id="nuevaNombreArea">
+      <button id="guardarAreaBtn">Guardar Área</button>
+      <button id="cerrarModalBtn">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- 🎯 Botón flotante "Inicio" -->
+  <a href="dashboard.html" class="btn-flotante-inicio" title="Ir al Dashboard">
+    🏠 Inicio
+  </a>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
+      authDomain: "interinos-ccss.firebaseapp.com",
+      projectId: "interinos-ccss",
+      storageBucket: "interinos-ccss.firebasestorage.app",
+      messagingSenderId: "1098694984589",
+      appId: "1:1098694984589:web:180af36da33ff6a161b3c4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Verificar sesión
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!usuario) {
+      window.location.href = "login.html";
+    }
+
+    const inicio = document.getElementById("inicio");
+    const final = document.getElementById("final");
+    const dias = document.getElementById("dias");
+    const salarioInput = document.getElementById("salario");
+
+    function calcularSalario() {
+      const diasValor = parseFloat(dias.value) || 0;
+      const salario = diasValor * 14523;
+      salarioInput.value = salario.toFixed(2); // 2 decimales
+    }
+
+    function calcularDias() {
+      if (!inicio.value || !final.value) return;
+      const fi = new Date(inicio.value);
+      const ff = new Date(final.value);
+      const diff = ff - fi;
+      const total = Math.ceil(diff / (1000*60*60*24)) + 1;
+      dias.value = total >= 0 ? total : 0;
+
+      // ✅ Actualizar salario automáticamente
+      calcularSalario();
+    }
+
+    inicio.addEventListener("change", calcularDias);
+    final.addEventListener("change", calcularDias);
+
+    // Áreas de Salud
+    const selectArea = document.getElementById("selectAreaSalud");
+    const btnAgregarArea = document.getElementById("btnAgregarArea");
+    const modalArea = document.getElementById("modalArea");
+    const guardarAreaBtn = document.getElementById("guardarAreaBtn");
+    const cerrarModalBtn = document.getElementById("cerrarModalBtn");
+
+    async function cargarAreas() {
+      selectArea.innerHTML = `<option value="">-- Elegir Área --</option>`;
+      const snapshot = await getDocs(collection(db, "areasSalud"));
+      snapshot.forEach(doc => {
+        const a = doc.data();
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify({ codArea: a.codArea, nombreArea: a.nombreArea });
+        opt.textContent = `${a.codArea} - ${a.nombreArea}`;
+        selectArea.appendChild(opt);
+      });
+    }
+    cargarAreas();
+
+    btnAgregarArea.addEventListener("click", () => modalArea.style.display = "flex");
+    cerrarModalBtn.addEventListener("click", () => modalArea.style.display = "none");
+
+    guardarAreaBtn.addEventListener("click", async () => {
+      const cod = document.getElementById("nuevaCodArea").value.trim();
+      const nombre = document.getElementById("nuevaNombreArea").value.trim();
+      if (!cod || !nombre) {
+        alert("Debe llenar los campos");
+        return;
+      }
+      await addDoc(collection(db, "areasSalud"), { codArea: cod, nombreArea: nombre });
+      modalArea.style.display = "none";
+      document.getElementById("nuevaCodArea").value = "";
+      document.getElementById("nuevaNombreArea").value = "";
+      cargarAreas();
+    });
+
+    // Buscar nombre por cédula (API externa simulada + Firestore tabla personal)
+    async function buscarPersonaPorCedula(cedula) {
+      try {
+        // 1. Intentar en API externa (ejemplo ficticio)
+        const resp = await fetch(`https://api.hacienda.go.cr/fe/ae?identificacion=${cedula}`);
+        if (resp.ok) {
+          const data = await resp.json();
+          return data.nombre;
+        }
+      } catch (e) {
+        console.log("API no disponible, usando Firestore");
+      }
+
+      // 2. Intentar en Firestore tabla personal
+      const q = query(collection(db, "personal"), where("id", "==", cedula));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        return snap.docs[0].data().nombre;
+      }
+      return "";
+    }
+
+    const cedulaSustituir = document.getElementById("cedulaSustituir");
+    const nombreSustituir = document.getElementById("nombreSustituir");
+
+    cedulaSustituir.addEventListener("blur", async () => {
+      if (!cedulaSustituir.value) return;
+      const nombre = await buscarPersonaPorCedula(cedulaSustituir.value.trim());
+      nombreSustituir.value = nombre || "No encontrado";
+    });
+
+    // Guardar nombramiento
+    document.getElementById("formNombramiento").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!selectArea.value) {
+        alert("Seleccione un área de salud");
+        return;
+      }
+      const area = JSON.parse(selectArea.value);
+      const docRef = await addDoc(collection(db, "nombramientos"), {
+        inicio: inicio.value,
+        final: final.value,
+        dias: parseInt(dias.value),
+        codArea: area.codArea,
+        area: area.nombreArea,
+        horarioEntrada: document.getElementById("horaEntrada").value,
+        horarioSalida: document.getElementById("horaSalida").value,
+        salario: parseFloat(salarioInput.value),
+        comentario: document.getElementById("comentario").value,
+        estado: document.getElementById("estado").checked,
+        personaSustituirCedula: cedulaSustituir.value.trim(),
+        personaSustituirNombre: nombreSustituir.value,
+        usuarioCedula: usuario.cedula,
+        usuarioNombre: usuario.nombre,
+        creadoEn: new Date()
+      });
+      alert("Nombramiento guardado con ID: " + docRef.id);
+      e.target.reset();
+    });
+
+    function cerrarSesion() {
+      localStorage.removeItem("usuarioActivo");
+      window.location.href = "login.html";
+    }
+    window.cerrarSesion = cerrarSesion;
+  </script>
+</body>
+</html>

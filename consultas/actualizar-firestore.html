@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Migrar Registros a Firestore</title>
+</head>
+<body>
+  <h2>Migración de Datos (JSON → Firestore)</h2>
+  <button id="btnMigrar">Migrar registros.json</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    // 🔑 Tu configuración Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
+      authDomain: "interinos-ccss.firebaseapp.com",
+      projectId: "interinos-ccss",
+      storageBucket: "interinos-ccss.firebasestorage.app",
+      messagingSenderId: "1098694984589",
+      appId: "1:1098694984589:web:180af36da33ff6a161b3c4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById("btnMigrar").addEventListener("click", async () => {
+      try {
+        const response = await fetch("registros.json"); // archivo exportado desde PHP
+        const data = await response.json();
+
+        for (const r of data) {
+          await addDoc(collection(db, "nombramientos"), {
+            inicio: r.inicio,
+            final: r.final,
+            dias: parseInt(r.dias),
+            codigo: r.codigo,
+            cedula: r.cedula,
+            funcionario: r.funcionario,
+            salario: parseFloat(r.salario),
+            comentario: r.comentario,
+            estado: (r.estado == "1" || r.estado.toLowerCase() === "pagado")
+          });
+          console.log("Importado:", r.funcionario);
+        }
+
+        alert("✅ Migración completa: " + data.length + " registros");
+      } catch (err) {
+        console.error("Error en migración:", err);
+        alert("❌ Error al migrar");
+      }
+    });
+  </script>
+</body>
+</html>

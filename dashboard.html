@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard CCSS</title>
+  <link rel="stylesheet" href="style.css">
+ 
+</head>
+<body>
+  <div class="container">
+    <h2>Bienvenido</h2>
+    <p id="usuarioNombre"></p>
+
+    <button onclick="location.href='nombramientos.html'">📑 Registrar Nombramientos</button>
+    <button onclick="location.href='tiempo_extra.html'">⏱ Registrar Tiempo Extraordinario</button>
+    <button onclick="location.href='consultas.html'">⏱ Consultar Nombramientos</button>
+    <button class="logout" onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
+  </div>
+
+  <script>
+    // Verificar usuario en sesión
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!usuario) {
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("usuarioNombre").textContent = usuario.nombre + " (" + usuario.cedula + ")";
+    }
+
+    // Cerrar sesión
+    function cerrarSesion() {
+      localStorage.removeItem("usuarioActivo");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consultas de Nombramientos</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      padding: 20px;
+      margin: 0;
+    }
+    h2 {
+      text-align: center;
+      color: #0d47a1;
+      margin-bottom: 20px;
+    }
+    .filtros {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    select, input {
+      padding: 8px;
+      border: 1px solid #90caf9;
+      border-radius: 5px;
+    }
+    button {
+      background: #1565c0;
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0d47a1;
+    }
+    .tabla-container {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #1565c0;
+      color: white;
+    }
+    td {
+      background: #f9f9f9;
+    }
+    .acciones {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+    }
+    .btn-editar {
+      background: #ff9800;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-guardar {
+      background: #4caf50;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+    .btn-cancelar {
+      background: #f44336;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+    .editable {
+      background: #fff;
+      border: 1px solid #90caf9;
+      padding: 3px 5px;
+      border-radius: 3px;
+    }
+    .oculto {
+      display: none;
+    }
+
+    /* 🎯 Botón flotante de Inicio */
+    .btn-flotante-inicio {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0d47a1;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 1000;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn-flotante-inicio:hover {
+      background: #1565c0;
+      transform: scale(1.05);
+    }
+
+    /* Mensaje sin datos */
+    .sin-datos {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-style: italic;
+      font-size: 1.1em;
+    }
+
+    /* Mensaje de carga */
+    .cargando {
+      text-align: center;
+      padding: 20px;
+      color: #1565c0;
+      font-weight: bold;
+    }
+
+    /* Mensaje de error */
+    .error {
+      text-align: center;
+      padding: 20px;
+      color: #d32f2f;
+      font-weight: bold;
+      background-color: #ffebee;
+      border-radius: 8px;
+      margin: 10px;
+    }
+
+    /* Modal de confirmación */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-contenido {
+      background-color: white;
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 500px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .modal-titulo {
+      color: #0d47a1;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .modal-botones {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .btn-modal {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-aceptar {
+      background: #4caf50;
+      color: white;
+    }
+    .btn-cancelar-modal {
+      background: #f44336;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h2>Consultas de Nombramientos</h2>
+
+  <div class="filtros">
+    <label for="mes">Mes:</label>
+    <select id="mes">
+      <option value="1">Enero</option>
+      <option value="2">Febrero</option>
+      <option value="3">Marzo</option>
+      <option value="4">Abril</option>
+      <option value="5">Mayo</option>
+      <option value="6">Junio</option>
+      <option value="7">Julio</option>
+      <option value="8">Agosto</option>
+      <option value="9">Septiembre</option>
+      <option value="10">Octubre</option>
+      <option value="11">Noviembre</option>
+      <option value="12">Diciembre</option>
+    </select>
+
+    <label for="anio">Año:</label>
+    <select id="anio">
+      <!-- Se llenará dinámicamente con JavaScript -->
+    </select>
+
+    <button id="btnFiltrar">Filtrar</button>
+    <button id="btnExportarPDF">📄 Exportar PDF</button>
+  </div>
+
+  <div class="tabla-container">
+    <div id="mensajeError" class="error" style="display:none;"></div>
+    <table id="tablaNombramientos">
+      <thead>
+        <tr>
+          <th>Cédula</th>
+          <th>Funcionario</th>
+          <th>Área</th>
+          <th>Código Área</th>
+          <th>Inicio</th>
+          <th>Final</th>
+          <th>Horario</th>
+          <th>Días</th>
+          <th>Salario</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaRegistros">
+        <tr><td colspan="11" class="cargando">Cargando datos del mes actual...</td></tr>
+      </tbody>
+    </table>
+    <div id="mensajeSinDatos" class="sin-datos" style="display:none;">
+      📭 No se encontraron nombramientos para este mes y año.
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación -->
+  <div id="modalConfirmacion" class="modal">
+    <div class="modal-contenido">
+      <h3 class="modal-titulo">Confirmar Cambios</h3>
+      <p id="mensajeConfirmacion">¿Está seguro que desea guardar los cambios realizados?</p>
+      <div class="modal-botones">
+        <button id="btnAceptar" class="btn-modal btn-aceptar">Aceptar</button>
+        <button id="btnCancelarModal" class="btn-modal btn-cancelar-modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🎯 Botón flotante "Inicio" -->
+  <a href="dashboard.html" class="btn-flotante-inicio" title="Ir al Dashboard">
+    🏠 Inicio
+  </a>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    // 🔹 Configuración Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
+      authDomain: "interinos-ccss.firebaseapp.com",
+      projectId: "interinos-ccss",
+      storageBucket: "interinos-ccss.firebasestorage.app",
+      messagingSenderId: "1098694984589",
+      appId: "1:1098694984589:web:180af36da33ff6a161b3c4"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Verificar autenticación
+    try {
+      const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+      if(!usuario) {
+        window.location.href = "login.html";
+      }
+    } catch (e) {
+      console.warn("No se pudo verificar el usuario activo");
+    }
+
+    // Variables globales
+    let documentoActual = null;
+    let filaActual = null;
+
+    // 🔹 Extrae mes y año directamente del string YYYY-MM-DD (evita zona horaria)
+    function extraerMesYAnioDeFechaString(fechaStr) {
+      if (!fechaStr || !/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
+        console.warn("Formato de fecha inválido:", fechaStr);
+        return null;
+      }
+      const [anio, mes] = fechaStr.split("-").map(Number);
+      return { mes, anio };
+    }
+
+    // 🔹 Cargar registros con filtro desde Firestore
+    async function cargarRegistros() {
+      const mesSeleccionado = parseInt(document.getElementById("mes")?.value);
+      const anioSeleccionado = parseInt(document.getElementById("anio")?.value);
+      const tbody = document.getElementById("tablaRegistros");
+      const mensaje = document.getElementById("mensajeSinDatos");
+      const tabla = document.getElementById("tablaNombramientos");
+      const mensajeError = document.getElementById("mensajeError");
+
+      // Ocultar mensajes previos
+      mensajeError.style.display = "none";
+      mensaje.style.display = "none";
+
+      // ✅ Validar que mes y año sean números válidos
+      if (isNaN(mesSeleccionado) || isNaN(anioSeleccionado)) {
+        tbody.innerHTML = `<tr><td colspan="11" style="color:red;">⚠️ Por favor, seleccione un mes y año válidos.</td></tr>`;
+        tabla.style.display = "table";
+        return;
+      }
+
+      console.log("🔍 Filtrando por Mes:", mesSeleccionado, "Año:", anioSeleccionado);
+
+      // Mostrar estado de carga
+      tbody.innerHTML = `<tr><td colspan="11" class="cargando">Cargando datos...</td></tr>`;
+      tabla.style.display = "table";
+
+      try {
+        // Obtener todos los documentos de la colección "nombramientos"
+        const nombramientosRef = collection(db, "nombramientos");
+        const q = query(nombramientosRef); // Ahora query está correctamente importado
+        const querySnapshot = await getDocs(q);
+
+        let hayDatos = false;
+        tbody.innerHTML = ""; // Limpiar "Cargando..."
+
+        // Procesar cada documento
+        querySnapshot.forEach((docSnapshot) => {
+          const r = docSnapshot.data();
+          
+          // Verificar que el documento tenga la fecha de inicio
+          if (!r.inicio) {
+            console.warn("📄 Documento sin campo 'inicio':", docSnapshot.id);
+            return;
+          }
+
+          // Extraer mes y año de la fecha de inicio
+          const fecha = extraerMesYAnioDeFechaString(r.inicio);
+          if (!fecha) {
+            console.warn("📄 Fecha inválida:", r.inicio, "en documento", docSnapshot.id);
+            return;
+          }
+
+          // Filtrar por mes y año seleccionados
+          if (fecha.mes === mesSeleccionado && fecha.anio === anioSeleccionado) {
+            hayDatos = true;
+            
+            // Formatear los datos para mostrar
+            const usuarioNombre = r.usuarioNombre || "N/A";
+            const usuarioCedula = r.usuarioCedula || "N/A";
+            const area = r.area || "N/A";
+            const codArea = r.codArea || "N/A";
+            const fechaFinal = r.final || "N/A";
+            const horario = `${r.horarioEntrada || 'N/A'} - ${r.horarioSalida || 'N/A'}`;
+            const dias = r.dias || 0;
+            const salario = parseFloat(r.salario || 0).toLocaleString('es-CR', { minimumFractionDigits: 2 });
+            const estado = r.estado ? "✅ Pagado" : "⏳ Pendiente";
+
+            // Crear la fila de la tabla
+            const fila = document.createElement('tr');
+            fila.dataset.id = docSnapshot.id;
+            fila.innerHTML = `
+              <td>${usuarioCedula}</td>
+              <td>${usuarioNombre}</td>
+              <td>${area}</td>
+              <td>${codArea}</td>
+              <td>${r.inicio}</td>
+              <td>${fechaFinal}</td>
+              <td>${horario}</td>
+              <td>${dias}</td>
+              <td>₡${salario}</td>
+              <td>${estado}</td>
+              <td class="acciones">
+                <button class="btn-editar" onclick="iniciarEdicion('${docSnapshot.id}', this)">✏️ Editar</button>
+                <button class="btn-guardar" onclick="guardarCambios('${docSnapshot.id}', this)">💾 Guardar</button>
+                <button class="btn-cancelar" onclick="cancelarEdicion('${docSnapshot.id}', this)">❌ Cancelar</button>
+              </td>
+            `;
+            tbody.appendChild(fila);
+          }
+        });
+
+        if (!hayDatos) {
+          tabla.style.display = "none";
+          mensaje.style.display = "block";
+          console.log("📭 No se encontraron datos para este filtro.");
+        } else {
+          console.log("✅ Datos cargados correctamente.");
+        }
+      } catch (error) {
+        console.error("❌ Error al cargar registros de Firestore:", error);
+        mensajeError.textContent = "Error al cargar datos: " + error.message;
+        mensajeError.style.display = "block";
+        tbody.innerHTML = `<tr><td colspan="11" style="color:red;">Error al cargar datos de la base de datos. Por favor, intente nuevamente.</td></tr>`;
+      }
+    }
+
+    // 🔹 Iniciar edición de un registro
+    window.iniciarEdicion = function(docId, boton) {
+      const fila = boton.closest('tr');
+      filaActual = fila;
+      documentoActual = docId;
+      
+      // Cambiar los botones
+      const btnEditar = fila.querySelector('.btn-editar');
+      const btnGuardar = fila.querySelector('.btn-guardar');
+      const btnCancelar = fila.querySelector('.btn-cancelar');
+      
+      btnEditar.style.display = 'none';
+      btnGuardar.style.display = 'inline-block';
+      btnCancelar.style.display = 'inline-block';
+      
+      // Convertir celdas en campos editables
+      const celdas = fila.querySelectorAll('td');
+      
+      // Cédula (índice 0) - no editable
+      // Funcionario (índice 1) - editable
+      hacerEditable(celdas[1], 'usuarioNombre');
+      // Área (índice 2) - editable
+      hacerEditable(celdas[2], 'area');
+      // Código Área (índice 3) - editable
+      hacerEditable(celdas[3], 'codArea');
+      // Inicio (índice 4) - editable como fecha
+      hacerEditableFecha(celdas[4], 'inicio');
+      // Final (índice 5) - editable como fecha
+      hacerEditableFecha(celdas[5], 'final');
+      // Horario (índice 6) - editable como dos campos separados
+      hacerEditableHorario(celdas[6]);
+      // Días (índice 7) - editable como número
+      hacerEditableNumero(celdas[7], 'dias');
+      // Salario (índice 8) - editable como número
+      hacerEditableNumero(celdas[8], 'salario', true);
+      // Estado (índice 9) - editable como select
+      hacerEditableEstado(celdas[9], 'estado');
+      
+      // Guardar valores originales
+      fila.dataset.original = JSON.stringify({
+        usuarioNombre: celdas[1].textContent,
+        area: celdas[2].textContent,
+        codArea: celdas[3].textContent,
+        inicio: celdas[4].textContent,
+        final: celdas[5].textContent,
+        horario: celdas[6].textContent,
+        dias: celdas[7].textContent,
+        salario: celdas[8].textContent.replace('₡', '').replace(/\./g, '').replace(',', '.'),
+        estado: celdas[9].textContent.includes('✅') ? true : false
+      });
+    };
+
+    // 🔹 Hacer una celda editable como texto
+    function hacerEditable(celda, campo) {
+      const valor = celda.textContent;
+      celda.innerHTML = `<input type="text" class="editable" value="${valor}" data-campo="${campo}">`;
+    }
+
+    // 🔹 Hacer una celda editable como fecha
+    function hacerEditableFecha(celda, campo) {
+      const valor = celda.textContent;
+      celda.innerHTML = `<input type="date" class="editable" value="${valor === 'N/A' ? '' : valor}" data-campo="${campo}">`;
+    }
+
+    // 🔹 Hacer una celda editable como número
+    function hacerEditableNumero(celda, campo, esMoneda = false) {
+      let valor = celda.textContent;
+      if (esMoneda) {
+        valor = valor.replace('₡', '').replace(/\./g, '').replace(',', '.').trim();
+      }
+      celda.innerHTML = `<input type="number" class="editable" value="${valor}" data-campo="${campo}" step="${esMoneda ? '0.01' : '1'}">`;
+    }
+
+    // 🔹 Hacer una celda editable como estado (select)
+    function hacerEditableEstado(celda, campo) {
+      const esPagado = celda.textContent.includes('✅');
+      celda.innerHTML = `
+        <select class="editable" data-campo="${campo}">
+          <option value="true" ${esPagado ? 'selected' : ''}>✅ Pagado</option>
+          <option value="false" ${!esPagado ? 'selected' : ''}>⏳ Pendiente</option>
+        </select>
+      `;
+    }
+
+    // 🔹 Hacer una celda editable como horario (entrada y salida)
+    function hacerEditableHorario(celda) {
+      const texto = celda.textContent;
+      let entrada = 'N/A', salida = 'N/A';
+      
+      if (texto !== 'N/A - N/A') {
+        const partes = texto.split(' - ');
+        if (partes.length === 2) {
+          entrada = partes[0];
+          salida = partes[1];
+        }
+      }
+      
+      celda.innerHTML = `
+        <div style="display: flex; gap: 5px; justify-content: center;">
+          <input type="time" class="editable" value="${entrada === 'N/A' ? '' : entrada}" data-campo="horarioEntrada" style="width: 70px;">
+          <span>-</span>
+          <input type="time" class="editable" value="${salida === 'N/A' ? '' : salida}" data-campo="horarioSalida" style="width: 70px;">
+        </div>
+      `;
+    }
+
+    // 🔹 Cancelar edición de un registro
+    window.cancelarEdicion = function(docId, boton) {
+      const fila = boton.closest('tr');
+      
+      // Restaurar valores originales
+      const original = JSON.parse(fila.dataset.original);
+      
+      const celdas = fila.querySelectorAll('td');
+      celdas[1].textContent = original.usuarioNombre;
+      celdas[2].textContent = original.area;
+      celdas[3].textContent = original.codArea;
+      celdas[4].textContent = original.inicio;
+      celdas[5].textContent = original.final;
+      celdas[6].textContent = original.horario;
+      celdas[7].textContent = original.dias;
+      celdas[8].textContent = `₡${parseFloat(original.salario).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+      celdas[9].textContent = original.estado ? "✅ Pagado" : "⏳ Pendiente";
+      
+      // Cambiar los botones
+      const btnEditar = fila.querySelector('.btn-editar');
+      const btnGuardar = fila.querySelector('.btn-guardar');
+      const btnCancelar = fila.querySelector('.btn-cancelar');
+      
+      btnEditar.style.display = 'inline-block';
+      btnGuardar.style.display = 'none';
+      btnCancelar.style.display = 'none';
+      
+      // Limpiar variables
+      documentoActual = null;
+      filaActual = null;
+    };
+
+    // 🔹 Guardar cambios de un registro
+    window.guardarCambios = function(docId, boton) {
+      const fila = boton.closest('tr');
+      
+      // Obtener los nuevos valores
+      const celdas = fila.querySelectorAll('td');
+      const nuevosValores = {};
+      
+      // Procesar cada celda editable
+      for (let i = 1; i <= 9; i++) { // De la celda 1 a la 9 (excluyendo acciones)
+        const celda = celdas[i];
+        const inputs = celda.querySelectorAll('.editable');
+        
+        if (inputs.length > 0) {
+          if (i === 6) { // Horario (entrada y salida)
+            nuevosValores.horarioEntrada = inputs[0].value || "N/A";
+            nuevosValores.horarioSalida = inputs[1].value || "N/A";
+          } else {
+            const input = inputs[0];
+            const campo = input.dataset.campo;
+            
+            if (campo === 'estado') {
+              nuevosValores[campo] = input.value === 'true';
+            } else if (campo === 'dias' || campo === 'salario') {
+              nuevosValores[campo] = parseFloat(input.value) || 0;
+            } else {
+              nuevosValores[campo] = input.value || "N/A";
+            }
+          }
+        }
+      }
+      
+      // Mostrar modal de confirmación
+      const modal = document.getElementById('modalConfirmacion');
+      const mensajeConfirmacion = document.getElementById('mensajeConfirmacion');
+      mensajeConfirmacion.textContent = `¿Está seguro que desea guardar los cambios realizados al nombramiento de ${celdas[1].querySelector('.editable')?.value || 'N/A'}?`;
+      modal.style.display = 'block';
+      
+      // Manejar botones del modal
+      const btnAceptar = document.getElementById('btnAceptar');
+      const btnCancelarModal = document.getElementById('btnCancelarModal');
+      
+      // Función para guardar realmente los cambios
+      const confirmarGuardado = async () => {
+        try {
+          // Actualizar en Firestore
+          const docRef = doc(db, "nombramientos", docId);
+          await updateDoc(docRef, nuevosValores);
+          
+          // Actualizar la vista
+          celdas[1].textContent = nuevosValores.usuarioNombre || "N/A";
+          celdas[2].textContent = nuevosValores.area || "N/A";
+          celdas[3].textContent = nuevosValores.codArea || "N/A";
+          celdas[4].textContent = nuevosValores.inicio || "N/A";
+          celdas[5].textContent = nuevosValores.final || "N/A";
+          celdas[6].textContent = `${nuevosValores.horarioEntrada || 'N/A'} - ${nuevosValores.horarioSalida || 'N/A'}`;
+          celdas[7].textContent = nuevosValores.dias || 0;
+          celdas[8].textContent = `₡${parseFloat(nuevosValores.salario || 0).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+          celdas[9].textContent = nuevosValores.estado ? "✅ Pagado" : "⏳ Pendiente";
+          
+          // Cambiar los botones
+          const btnEditar = fila.querySelector('.btn-editar');
+          const btnGuardar = fila.querySelector('.btn-guardar');
+          const btnCancelar = fila.querySelector('.btn-cancelar');
+          
+          btnEditar.style.display = 'inline-block';
+          btnGuardar.style.display = 'none';
+          btnCancelar.style.display = 'none';
+          
+          // Mostrar mensaje de éxito
+          alert("✅ Cambios guardados correctamente");
+          
+          // Limpiar variables
+          documentoActual = null;
+          filaActual = null;
+          
+        } catch (error) {
+          console.error("Error al guardar cambios:", error);
+          alert("❌ Error al guardar los cambios: " + error.message);
+        }
+        
+        // Cerrar modal
+        modal.style.display = 'none';
+      };
+      
+      // Asignar eventos a los botones del modal
+      btnAceptar.onclick = confirmarGuardado;
+      btnCancelarModal.onclick = function() {
+        modal.style.display = 'none';
+      };
+      
+      // Cerrar modal al hacer clic fuera de él
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = 'none';
+        }
+      };
+    };
+
+    // 🔹 Exportar tabla a PDF usando html2pdf
+    function exportarPDF() {
+      const element = document.getElementById('tablaNombramientos');
+      const mes = document.getElementById("mes").options[document.getElementById("mes").selectedIndex].text;
+      const anio = document.getElementById("anio").value;
+      
+      // Verificar si hay datos para exportar
+      const filas = document.querySelectorAll("#tablaRegistros tr");
+      if (filas.length <= 1 || filas[0].querySelector("td")?.textContent?.includes("Cargando") || filas[0].querySelector("td")?.textContent?.includes("No se encontraron")) {
+        alert("No hay datos para exportar.");
+        return;
+      }
+
+      const opt = {
+        margin: 1,
+        filename: `nombramientos_${mes}_${anio}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+
+      // Agregar título al PDF
+      const titulo = document.createElement('div');
+      titulo.innerHTML = `<h2 style="text-align: center; color: #0d47a1;">Reporte de Nombramientos</h2><p style="text-align: center;">Filtrado por: ${mes} ${anio}</p>`;
+      
+      // Clonar la tabla para agregar el título
+      const clone = element.cloneNode(true);
+      clone.insertBefore(titulo, clone.firstChild);
+
+      // Generar el PDF
+      html2pdf().set(opt).from(clone).save();
+    }
+
+    // ✅ Inicialización segura al cargar la página
+    document.addEventListener("DOMContentLoaded", () => {
+      const hoy = new Date();
+      const mesSelect = document.getElementById("mes");
+      const anioSelect = document.getElementById("anio");
+
+      // Establecer mes actual por defecto
+      if (mesSelect) mesSelect.value = hoy.getMonth() + 1;
+
+      // Llenar el select de años desde 2020 hasta 2025
+      if (anioSelect) {
+        anioSelect.innerHTML = ""; // Limpiar opciones existentes
+        for (let year = 2020; year <= 2025; year++) {
+          const option = document.createElement("option");
+          option.value = year;
+          option.textContent = year;
+          anioSelect.appendChild(option);
+        }
+        // Establecer año actual por defecto
+        anioSelect.value = hoy.getFullYear();
+      }
+
+      // Cargar datos iniciales después de un breve retraso
+      setTimeout(() => {
+        cargarRegistros();
+      }, 500);
+    });
+
+    // ✅ Asignar eventos a botones y filtros automáticos
+    document.addEventListener("DOMContentLoaded", () => {
+      const btnFiltrar = document.getElementById("btnFiltrar");
+      const btnExportarPDF = document.getElementById("btnExportarPDF");
+      const selectMes = document.getElementById("mes");
+      const selectAnio = document.getElementById("anio");
+
+      if (btnFiltrar) {
+        btnFiltrar.addEventListener("click", cargarRegistros);
+      }
+
+      if (btnExportarPDF) {
+        btnExportarPDF.addEventListener("click", exportarPDF);
+      }
+
+      // ✅ Auto-filtrar cuando cambie mes
+      if (selectMes) {
+        selectMes.addEventListener("change", cargarRegistros);
+      }
+
+      // ✅ Auto-filtrar cuando cambie año
+      if (selectAnio) {
+        selectAnio.addEventListener("change", cargarRegistros);
+      }
+
+      console.log("✅ Todos los eventos y auto-filtros asignados correctamente.");
+    });
+  </script>
+</body>
+</html>

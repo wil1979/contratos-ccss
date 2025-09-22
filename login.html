@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema de Usuarios CCSS</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: url("https://www.ccss.sa.cr/assets/img/fondos/34.jpg") no-repeat center center/cover;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      padding: 30px;
+      width: 350px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    h2 {
+      margin-bottom: 15px;
+      color: #004080;
+    }
+
+    form {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #003366;
+      text-align: left;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #66a3ff;
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #004080;
+      box-shadow: 0 0 6px #66a3ff;
+    }
+
+    button {
+      background: #004080;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      margin-top: 15px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #0066cc;
+    }
+
+    #mensaje {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #cc0000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Registro de Usuarios</h2>
+    <form id="registroForm">
+      <label>Cédula:</label>
+      <input type="text" id="cedula_reg" required>
+      
+      <label>Nombre:</label>
+      <input type="text" id="nombre_reg" required readonly>
+      
+      <label>Contraseña:</label>
+      <input type="password" id="password_reg" required>
+      
+      <button type="submit">Registrar</button>
+    </form>
+
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label>Cédula:</label>
+      <input type="text" id="cedula_login" required>
+      
+      <label>Contraseña:</label>
+      <input type="password" id="password_login" required>
+      
+      <button type="submit">Ingresar</button>
+    </form>
+
+    <p id="mensaje"></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    // 🔑 Configuración Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
+      authDomain: "interinos-ccss.firebaseapp.com",
+      projectId: "interinos-ccss",
+      storageBucket: "interinos-ccss.firebasestorage.app",
+      messagingSenderId: "1098694984589",
+      appId: "1:1098694984589:web:180af36da33ff6a161b3c4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const mensaje = document.getElementById("mensaje");
+
+    // ========================
+    // 📌 Registro de usuarios
+    // ========================
+    const cedulaReg = document.getElementById("cedula_reg");
+    const nombreReg = document.getElementById("nombre_reg");
+    const passwordReg = document.getElementById("password_reg");
+    const registroForm = document.getElementById("registroForm");
+
+    cedulaReg.addEventListener("blur", async () => {
+      const cedula = cedulaReg.value.trim();
+      if (!cedula) return;
+
+      try {
+        const response = await fetch(`https://api.hacienda.go.cr/fe/ae?identificacion=${cedula}`);
+        const data = await response.json();
+        if (data && data.nombre) {
+          nombreReg.value = data.nombre;
+        } else {
+          nombreReg.value = "";
+          mensaje.textContent = "⚠️ No se encontró el nombre en Hacienda.";
+        }
+      } catch (error) {
+        console.error(error);
+        mensaje.textContent = "❌ Error al consultar Hacienda.";
+      }
+    });
+
+    registroForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const cedula = cedulaReg.value.trim();
+      const nombre = nombreReg.value.trim();
+      const password = passwordReg.value.trim();
+
+      try {
+        const q = query(collection(db, "usuarios"), where("cedula", "==", cedula));
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+          mensaje.textContent = "⚠️ Usuario ya registrado.";
+          return;
+        }
+
+        await addDoc(collection(db, "usuarios"), { cedula, nombre, password });
+        mensaje.style.color = "green";
+        mensaje.textContent = "✅ Usuario registrado con éxito.";
+        registroForm.reset();
+      } catch (err) {
+        console.error(err);
+        mensaje.textContent = "❌ Error al registrar usuario.";
+      }
+    });
+
+    // ========================
+    // 📌 Login de usuarios
+    // ========================
+    const loginForm = document.getElementById("loginForm");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const cedula = document.getElementById("cedula_login").value.trim();
+      const password = document.getElementById("password_login").value.trim();
+
+      try {
+        const q = query(collection(db, "usuarios"), where("cedula", "==", cedula));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          mensaje.textContent = "⚠️ Usuario no encontrado.";
+          return;
+        }
+
+        let user = null;
+        snapshot.forEach(doc => user = doc.data());
+
+        if (user.password !== password) {
+          mensaje.textContent = "❌ Contraseña incorrecta.";
+          return;
+        }
+
+        localStorage.setItem("usuarioActivo", JSON.stringify(user));
+        mensaje.style.color = "green";
+        mensaje.textContent = "✅ Bienvenido " + user.nombre;
+        setTimeout(() => window.location.href = "dashboard.html", 1500);
+      } catch (err) {
+        console.error(err);
+        mensaje.textContent = "❌ Error en login.";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tiempo Extra</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url("https://www.ccss.sa.cr/assets/img/fondos/34.jpg") no-repeat center center/cover;
+      background-size: cover;
+      margin: 0; padding: 0; min-height: 100vh;
+      display: flex; justify-content: center; align-items: flex-start;
+      padding-top: 30px;
+    }
+    .container {
+      background: rgba(255,255,255,0.95);
+      padding: 20px; border-radius: 15px; width: 90%; max-width: 1000px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    h2 { text-align: center; color: #004080; }
+    label { font-weight: bold; color: #004080; margin-right: 5px; }
+    input, select, button { padding: 6px; margin: 5px; border-radius: 6px; border: 1px solid #ccc; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    th { background: #004080; color: white; }
+    button.edit { background: #0066cc; color: white; border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer; }
+    button.edit:hover { background: #004080; }
+    button.pdf { background: #009900; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    button.pdf:hover { background: #006600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Registro de Tiempo Extra</h2>
+
+    <form id="formExtra">
+      <label>Fecha:</label>
+      <input type="date" id="fechaExtra" required>
+      
+      <label>Hora Entrada Extra:</label>
+      <input type="time" id="entradaExtra" required>
+      
+      <label>Hora Salida Extra:</label>
+      <input type="time" id="salidaExtra" required>
+
+      <label>Días/Horas:</label>
+      <input type="text" id="horasExtra" readonly>
+
+      <label>Área:</label>
+      <input type="text" id="areaExtra" required>
+
+      <label>Observaciones:</label>
+      <textarea id="observacionesExtra" rows="2"></textarea>
+
+
+      <button type="submit">Guardar Tiempo Extra</button>
+    </form>
+
+    <div>
+      <label>Mes:</label>
+      <select id="mesFiltroExtra">
+        <option value="">Todos</option>
+        <option value="0">Enero</option>
+        <option value="1">Febrero</option>
+        <option value="2">Marzo</option>
+        <option value="3">Abril</option>
+        <option value="4">Mayo</option>
+        <option value="5">Junio</option>
+        <option value="6">Julio</option>
+        <option value="7">Agosto</option>
+        <option value="8">Septiembre</option>
+        <option value="9">Octubre</option>
+        <option value="10">Noviembre</option>
+        <option value="11">Diciembre</option>
+      </select>
+      <label>Año:</label>
+      <select id="anioFiltroExtra"></select>
+      <button onclick="cargarExtras()">Filtrar</button>
+      <button class="pdf" onclick="generarPDFExtra()">Exportar PDF</button>
+    </div>
+
+    <table id="tablaExtras">
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Entrada</th><th>Salida</th><th>Horas</th>
+          <th>Estado Pago</th><th>Acción</th>
+          <th>Área</th>
+          <th>Observaciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
+      authDomain: "interinos-ccss.firebaseapp.com",
+      projectId: "interinos-ccss",
+      storageBucket: "interinos-ccss.firebasestorage.app",
+      messagingSenderId: "1098694984589",
+      appId: "1:1098694984589:web:180af36da33ff6a161b3c4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if(!usuario) window.location.href = "login.html";
+
+    // Generar años
+    const selectAnio = document.getElementById("anioFiltroExtra");
+    const yearActual = new Date().getFullYear();
+    for(let y = yearActual; y >= yearActual-10; y--){
+      const opt = document.createElement("option"); opt.value = y; opt.textContent = y;
+      selectAnio.appendChild(opt);
+    }
+
+    const entrada = document.getElementById("entradaExtra");
+    const salida = document.getElementById("salidaExtra");
+    const horasInput = document.getElementById("horasExtra");
+
+    function calcularHorasExtra() {
+      if(!entrada.value || !salida.value) return;
+      const [h1,m1] = entrada.value.split(":").map(Number);
+      const [h2,m2] = salida.value.split(":").map(Number);
+      let diff = (h2*60 + m2) - (h1*60 + m1);
+      if(diff < 0) diff = 0;
+      const horas = Math.floor(diff/60);
+      const minutos = diff % 60;
+      horasInput.value = `${horas}h ${minutos}m`;
+    }
+
+    entrada.addEventListener("change", calcularHorasExtra);
+    salida.addEventListener("change", calcularHorasExtra);
+
+    // Guardar tiempo extra
+    document.getElementById("formExtra").addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      await addDoc(collection(db,"tiempoExtra"),{
+  fecha: document.getElementById("fechaExtra").value,
+  entrada: entrada.value,
+  salida: salida.value,
+  horas: horasInput.value,
+  estado: false,
+  area: document.getElementById("areaExtra").value,
+  observaciones: document.getElementById("observacionesExtra").value,
+  usuarioCedula: usuario.cedula,
+  usuarioNombre: usuario.nombre
+});
+
+      alert("✅ Tiempo extra guardado");
+      e.target.reset();
+      horasInput.value = "";
+      cargarExtras();
+    });
+
+    const tablaBody = document.querySelector("#tablaExtras tbody");
+
+    async function cargarExtras() {
+      tablaBody.innerHTML = "";
+      const mes = parseInt(document.getElementById("mesFiltroExtra").value);
+      const anio = parseInt(document.getElementById("anioFiltroExtra").value);
+
+      const snapshot = await getDocs(collection(db,"tiempoExtra"));
+      snapshot.forEach(docSnap=>{
+        const r = docSnap.data();
+        const fechaDate = new Date(r.fecha);
+        if(r.usuarioCedula!==usuario.cedula) return;
+        if(!isNaN(mes) && fechaDate.getMonth()!==mes) return;
+        if(!isNaN(anio) && fechaDate.getFullYear()!==anio) return;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.fecha}</td>
+          <td><input type="time" value="${r.entrada || ''}" data-id="${docSnap.id}" class="entrada"></td>
+          <td><input type="time" value="${r.salida || ''}" data-id="${docSnap.id}" class="salida"></td>
+          <td><input type="text" value="${r.horas || ''}" readonly></td>
+          
+          <td><input type="checkbox" ${r.estado ? "checked" : ""} data-id="${docSnap.id}" class="estado"></td>
+          <td><button class="edit" data-id="${docSnap.id}">Guardar</button></td>
+          
+        `;
+        tablaBody.appendChild(tr);
+      });
+      activarBotonesExtra();
+    }
+
+    function activarBotonesExtra(){
+      document.querySelectorAll("button.edit").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.dataset.id;
+          const entradaVal = document.querySelector(`.entrada[data-id="${id}"]`).value;
+          const salidaVal = document.querySelector(`.salida[data-id="${id}"]`).value;
+          const estadoVal = document.querySelector(`.estado[data-id="${id}"]`).checked;
+
+          // Recalcular horas
+          let diff = 0;
+          if(entradaVal && salidaVal){
+            const [h1,m1] = entradaVal.split(":").map(Number);
+            const [h2,m2] = salidaVal.split(":").map(Number);
+            diff = (h2*60 + m2) - (h1*60 + m1);
+            if(diff<0) diff=0;
+          }
+          const horas = `${Math.floor(diff/60)}h ${diff%60}m`;
+
+         await updateDoc(doc(db,"tiempoExtra",id),{
+  entrada: entradaVal,
+  salida: salidaVal,
+  horas: horas,
+  estado: estadoVal,
+  area: document.querySelector(`.area[data-id="${id}"]`).value,
+  observaciones: document.querySelector(`.observaciones[data-id="${id}"]`).value
+});
+          alert("✅ Registro actualizado");
+          cargarExtras();
+        });
+      });
+    }
+
+    function generarPDFExtra(){
+      const element = document.getElementById("tablaExtras");
+      html2pdf().from(element).set({margin:1, filename:`TiempoExtra_${usuario.nombre}.pdf`, html2canvas:{scale:2}}).save();
+    }
+
+    cargarExtras();
+  </script>
+</body>
+</html>
