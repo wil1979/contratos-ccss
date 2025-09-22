@@ -5,61 +5,335 @@
   <title>Tiempo Extra</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: url("https://www.ccss.sa.cr/assets/img/fondos/34.jpg") no-repeat center center/cover;
       background-size: cover;
-      margin: 0; padding: 0; min-height: 100vh;
-      display: flex; justify-content: center; align-items: flex-start;
+      margin: 0; 
+      padding: 0; 
+      min-height: 100vh;
+      display: flex; 
+      justify-content: center; 
+      align-items: flex-start;
       padding-top: 30px;
     }
     .container {
-      background: rgba(255,255,255,0.95);
-      padding: 20px; border-radius: 15px; width: 90%; max-width: 1000px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      background: rgba(255,255,255,0.98);
+      padding: 30px; 
+      border-radius: 15px; 
+      width: 95%; 
+      max-width: 1200px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      border: 1px solid rgba(0,64,128,0.2);
     }
-    h2 { text-align: center; color: #004080; }
-    label { font-weight: bold; color: #004080; margin-right: 5px; }
-    input, select, button { padding: 6px; margin: 5px; border-radius: 6px; border: 1px solid #ccc; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
-    th { background: #004080; color: white; }
-    button.edit { background: #0066cc; color: white; border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer; }
-    button.edit:hover { background: #004080; }
-    button.pdf { background: #009900; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-    button.pdf:hover { background: #006600; }
+    h2 { 
+      text-align: center; 
+      color: #004080; 
+      margin-bottom: 25px;
+      font-size: 28px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+      align-items: flex-end;
+    }
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+    label { 
+      font-weight: bold; 
+      color: #004080; 
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+    input, select, button, textarea { 
+      padding: 10px; 
+      margin: 5px 0; 
+      border-radius: 8px; 
+      border: 2px solid #e0e0e0;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #0066cc;
+      box-shadow: 0 0 5px rgba(0,102,204,0.3);
+    }
+    input[readonly] {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+    }
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-top: 25px; 
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    th, td { 
+      border: 1px solid #d0d0d0; 
+      padding: 12px; 
+      text-align: center; 
+    }
+    th { 
+      background: linear-gradient(135deg, #004080, #0059b3);
+      color: white; 
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+    td {
+      background: #fafafa;
+      font-size: 14px;
+    }
+    tr:nth-child(even) td {
+      background: #f2f2f2;
+    }
+    tr:hover td {
+      background: #e8f4ff;
+      transition: background 0.3s ease;
+    }
+    button.edit { 
+      background: linear-gradient(135deg, #0066cc, #004d99); 
+      color: white; 
+      border: none; 
+      padding: 8px 15px; 
+      border-radius: 20px; 
+      cursor: pointer; 
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+    button.edit:hover { 
+      background: linear-gradient(135deg, #004d99, #003366);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    button.pdf { 
+      background: linear-gradient(135deg, #009900, #006600); 
+      color: white; 
+      border: none; 
+      padding: 10px 20px; 
+      border-radius: 25px; 
+      cursor: pointer; 
+      font-weight: bold;
+      margin-top: 15px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+    button.pdf:hover { 
+      background: linear-gradient(135deg, #006600, #003300);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+    }
+    button.guardar { 
+      background: linear-gradient(135deg, #28a745, #218838); 
+      color: white; 
+      border: none; 
+      padding: 8px 15px; 
+      border-radius: 20px; 
+      cursor: pointer; 
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+    button.guardar:hover { 
+      background: linear-gradient(135deg, #218838, #1e7e34);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .filtros-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+      margin: 25px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+    }
+    .totales-container {
+      margin-top: 20px;
+      padding: 15px;
+      background: linear-gradient(135deg, #004080, #0059b3);
+      color: white;
+      border-radius: 10px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .total-item {
+      text-align: center;
+      padding: 10px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
+      min-width: 150px;
+    }
+    .total-valor {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    .btn-filtrar {
+      background: linear-gradient(135deg, #6c757d, #495057);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    .btn-filtrar:hover {
+      background: linear-gradient(135deg, #495057, #343a40);
+      transform: translateY(-2px);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+      max-height: 120px;
+    }
+    .form-extra {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      margin-bottom: 25px;
+    }
+    .form-title {
+      color: #004080;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #004080;
+    }
+    
+    /* Estilos para impresión */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+      .container {
+        box-shadow: none;
+        border: none;
+        background: white;
+        padding: 20px;
+        width: 100%;
+        max-width: none;
+      }
+      .no-print {
+        display: none !important;
+      }
+      button, input, select, .filtros-container {
+        display: none !important;
+      }
+      table {
+        page-break-inside: avoid;
+      }
+      th, td {
+        border: 1px solid #000 !important;
+        background: white !important;
+      }
+      .print-header {
+        text-align: center;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #004080;
+        padding-bottom: 10px;
+      }
+      .print-totales {
+        margin-top: 30px;
+        page-break-inside: avoid;
+      }
+      .print-footer {
+        margin-top: 50px;
+        text-align: center;
+        font-style: italic;
+        color: #666;
+      }
+    }
+    
+    /* 🎯 Botón flotante de Inicio */
+    .btn-flotante-inicio {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #004080;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 1000;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn-flotante-inicio:hover {
+      background: #0059b3;
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Registro de Tiempo Extra</h2>
+    
+    <div class="form-extra">
+      <h3 class="form-title">Nuevo Registro de Tiempo Extra</h3>
+      <form id="formExtra">
+        <div class="form-group">
+          <div class="form-field">
+            <label>Fecha:</label>
+            <input type="date" id="fechaExtra" required>
+          </div>
+          
+          <div class="form-field">
+            <label>Hora Entrada Extra:</label>
+            <input type="time" id="entradaExtra" required>
+          </div>
+          
+          <div class="form-field">
+            <label>Hora Salida Extra:</label>
+            <input type="time" id="salidaExtra" required>
+          </div>
 
-    <form id="formExtra">
-      <label>Fecha:</label>
-      <input type="date" id="fechaExtra" required>
-      
-      <label>Hora Entrada Extra:</label>
-      <input type="time" id="entradaExtra" required>
-      
-      <label>Hora Salida Extra:</label>
-      <input type="time" id="salidaExtra" required>
+          <div class="form-field">
+            <label>Total Horas:</label>
+            <input type="text" id="horasExtra" readonly>
+          </div>
 
-      <label>Días/Horas:</label>
-      <input type="text" id="horasExtra" readonly>
+          <div class="form-field">
+            <label>Área:</label>
+            <input type="text" id="areaExtra" required>
+          </div>
+        </div>
+        
+        <div class="form-field">
+          <label>Observaciones:</label>
+          <textarea id="observacionesExtra" rows="3" placeholder="Ingrese observaciones adicionales..."></textarea>
+        </div>
 
-      <label>Área:</label>
-      <input type="text" id="areaExtra" required>
+        <button type="submit" class="guardar">Guardar Tiempo Extra</button>
+      </form>
+    </div>
 
-      <label>Observaciones:</label>
-      <textarea id="observacionesExtra" rows="2"></textarea>
-
-
-      <button type="submit">Guardar Tiempo Extra</button>
-    </form>
-
-    <div>
+    <div class="filtros-container">
       <label>Mes:</label>
       <select id="mesFiltroExtra">
-        <option value="">Todos</option>
+        <option value="">Todos los meses</option>
         <option value="0">Enero</option>
         <option value="1">Febrero</option>
         <option value="2">Marzo</option>
@@ -73,24 +347,57 @@
         <option value="10">Noviembre</option>
         <option value="11">Diciembre</option>
       </select>
+      
       <label>Año:</label>
       <select id="anioFiltroExtra"></select>
-      <button onclick="cargarExtras()">Filtrar</button>
-      <button class="pdf" onclick="generarPDFExtra()">Exportar PDF</button>
+      
+      <button class="btn-filtrar" id="btnFiltrar">Filtrar Registros</button>
+      <button class="pdf" id="btnExportarPDF">Exportar PDF</button>
+      <button class="pdf" id="btnImprimir">Imprimir Reporte</button>
     </div>
 
-    <table id="tablaExtras">
-      <thead>
-        <tr>
-          <th>Fecha</th><th>Entrada</th><th>Salida</th><th>Horas</th>
-          <th>Estado Pago</th><th>Acción</th>
-          <th>Área</th>
-          <th>Observaciones</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div id="reporteParaImprimir" class="no-print">
+      <table id="tablaExtras">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Entrada</th>
+            <th>Salida</th>
+            <th>Horas</th>
+            <th>Área</th>
+            <th>Observaciones</th>
+            <th>Estado Pago</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    
+    <div class="totales-container" id="totalesContainer">
+      <div class="total-item">
+        Total Registros
+        <div class="total-valor" id="totalRegistros">0</div>
+      </div>
+      <div class="total-item">
+        Horas Totales
+        <div class="total-valor" id="totalHoras">0h 0m</div>
+      </div>
+      <div class="total-item">
+        Pagados
+        <div class="total-valor" id="totalPagados">0</div>
+      </div>
+      <div class="total-item">
+        Pendientes
+        <div class="total-valor" id="totalPendientes">0</div>
+      </div>
+    </div>
   </div>
+
+  <!-- 🎯 Botón flotante "Inicio" -->
+  <a href="dashboard.html" class="btn-flotante-inicio" title="Ir al Dashboard">
+    🏠 Inicio
+  </a>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -113,17 +420,44 @@
     const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
     if(!usuario) window.location.href = "login.html";
 
-    // Generar años
-    const selectAnio = document.getElementById("anioFiltroExtra");
-    const yearActual = new Date().getFullYear();
-    for(let y = yearActual; y >= yearActual-10; y--){
-      const opt = document.createElement("option"); opt.value = y; opt.textContent = y;
-      selectAnio.appendChild(opt);
+    // Variables globales
+    let tablaBody;
+    let entrada, salida, horasInput;
+
+    // Función para inicializar elementos del DOM
+    function inicializarElementos() {
+      // Obtener elementos del DOM
+      tablaBody = document.querySelector("#tablaExtras tbody");
+      entrada = document.getElementById("entradaExtra");
+      salida = document.getElementById("salidaExtra");
+      horasInput = document.getElementById("horasExtra");
+      
+      // Asignar eventos a los botones
+      document.getElementById("btnFiltrar").addEventListener("click", cargarExtras);
+      document.getElementById("btnExportarPDF").addEventListener("click", generarPDFExtra);
+      document.getElementById("btnImprimir").addEventListener("click", prepararParaImprimir);
+      
+      // Asignar eventos a los campos de hora
+      entrada.addEventListener("change", calcularHorasExtra);
+      salida.addEventListener("change", calcularHorasExtra);
+      
+      // Asignar evento al formulario
+      document.getElementById("formExtra").addEventListener("submit", guardarTiempoExtra);
     }
 
-    const entrada = document.getElementById("entradaExtra");
-    const salida = document.getElementById("salidaExtra");
-    const horasInput = document.getElementById("horasExtra");
+    // Generar años
+    function generarAnios() {
+      const selectAnio = document.getElementById("anioFiltroExtra");
+      const yearActual = new Date().getFullYear();
+      for(let y = yearActual; y >= yearActual-10; y--){
+        const opt = document.createElement("option"); 
+        opt.value = y; 
+        opt.textContent = y;
+        selectAnio.appendChild(opt);
+      }
+      // Establecer año actual por defecto
+      selectAnio.value = yearActual;
+    }
 
     function calcularHorasExtra() {
       if(!entrada.value || !salida.value) return;
@@ -136,59 +470,119 @@
       horasInput.value = `${horas}h ${minutos}m`;
     }
 
-    entrada.addEventListener("change", calcularHorasExtra);
-    salida.addEventListener("change", calcularHorasExtra);
-
     // Guardar tiempo extra
-    document.getElementById("formExtra").addEventListener("submit", async (e)=>{
+    async function guardarTiempoExtra(e) {
       e.preventDefault();
-      await addDoc(collection(db,"tiempoExtra"),{
-  fecha: document.getElementById("fechaExtra").value,
-  entrada: entrada.value,
-  salida: salida.value,
-  horas: horasInput.value,
-  estado: false,
-  area: document.getElementById("areaExtra").value,
-  observaciones: document.getElementById("observacionesExtra").value,
-  usuarioCedula: usuario.cedula,
-  usuarioNombre: usuario.nombre
-});
+      try {
+        await addDoc(collection(db,"tiempoExtra"),{
+          fecha: document.getElementById("fechaExtra").value,
+          entrada: entrada.value,
+          salida: salida.value,
+          horas: horasInput.value,
+          estado: false,
+          area: document.getElementById("areaExtra").value,
+          observaciones: document.getElementById("observacionesExtra").value,
+          usuarioCedula: usuario.cedula,
+          usuarioNombre: usuario.nombre,
+          createdAt: new Date()
+        });
 
-      alert("✅ Tiempo extra guardado");
-      e.target.reset();
-      horasInput.value = "";
-      cargarExtras();
-    });
-
-    const tablaBody = document.querySelector("#tablaExtras tbody");
+        alert("✅ Tiempo extra guardado exitosamente");
+        e.target.reset();
+        horasInput.value = "";
+        cargarExtras();
+      } catch (error) {
+        console.error("Error al guardar:", error);
+        alert("❌ Error al guardar el tiempo extra: " + error.message);
+      }
+    }
 
     async function cargarExtras() {
-      tablaBody.innerHTML = "";
-      const mes = parseInt(document.getElementById("mesFiltroExtra").value);
+      if (!tablaBody) {
+        console.error("tablaBody no está definido");
+        return;
+      }
+      
+      tablaBody.innerHTML = "<tr><td colspan='8' style='text-align:center;padding:20px;'>Cargando registros...</td></tr>";
+      
+      const mes = document.getElementById("mesFiltroExtra").value === "" ? null : parseInt(document.getElementById("mesFiltroExtra").value);
       const anio = parseInt(document.getElementById("anioFiltroExtra").value);
 
-      const snapshot = await getDocs(collection(db,"tiempoExtra"));
-      snapshot.forEach(docSnap=>{
-        const r = docSnap.data();
-        const fechaDate = new Date(r.fecha);
-        if(r.usuarioCedula!==usuario.cedula) return;
-        if(!isNaN(mes) && fechaDate.getMonth()!==mes) return;
-        if(!isNaN(anio) && fechaDate.getFullYear()!==anio) return;
+      try {
+        const snapshot = await getDocs(collection(db,"tiempoExtra"));
+        const registrosFiltrados = [];
+        
+        snapshot.forEach(docSnap=>{
+          const r = docSnap.data();
+          const fechaDate = new Date(r.fecha);
+          if(r.usuarioCedula !== usuario.cedula) return;
+          if(mes !== null && fechaDate.getMonth() !== mes) return;
+          if(!isNaN(anio) && fechaDate.getFullYear() !== anio) return;
+          
+          registrosFiltrados.push({...r, id: docSnap.id});
+        });
+        
+        if(registrosFiltrados.length === 0) {
+          tablaBody.innerHTML = "<tr><td colspan='8' style='text-align:center;padding:20px;color:#666;'>No se encontraron registros para los filtros seleccionados.</td></tr>";
+          actualizarTotales([], 0, 0, 0);
+          return;
+        }
+        
+        tablaBody.innerHTML = "";
+        let totalHoras = 0;
+        let totalPagados = 0;
+        let totalPendientes = 0;
+        
+        registrosFiltrados.forEach(registro => {
+          const tr = document.createElement("tr");
+          
+          // Calcular horas en minutos para el total
+          if(registro.horas) {
+            const match = registro.horas.match(/(\d+)h\s*(\d+)m/);
+            if(match) {
+              totalHoras += parseInt(match[1]) * 60 + parseInt(match[2]);
+            }
+          }
+          
+          if(registro.estado) {
+            totalPagados++;
+          } else {
+            totalPendientes++;
+          }
+          
+          tr.innerHTML = `
+            <td>${registro.fecha}</td>
+            <td><input type="time" value="${registro.entrada || ''}" data-id="${registro.id}" class="entrada" style="width:100px;"></td>
+            <td><input type="time" value="${registro.salida || ''}" data-id="${registro.id}" class="salida" style="width:100px;"></td>
+            <td><input type="text" value="${registro.horas || ''}" readonly style="width:80px;"></td>
+            <td><input type="text" value="${registro.area || ''}" data-id="${registro.id}" class="area" style="width:120px;"></td>
+            <td><textarea data-id="${registro.id}" class="observaciones" style="width:150px;height:60px;">${registro.observaciones || ''}</textarea></td>
+            <td><input type="checkbox" ${registro.estado ? "checked" : ""} data-id="${registro.id}" class="estado"></td>
+            <td><button class="edit" data-id="${registro.id}">Guardar</button></td>
+          `;
+          tablaBody.appendChild(tr);
+        });
+        
+        // Convertir total de minutos a horas y minutos
+        const totalHorasFormateadas = `${Math.floor(totalHoras/60)}h ${totalHoras%60}m`;
+        
+        // Actualizar totales
+        actualizarTotales(registrosFiltrados.length, totalHorasFormateadas, totalPagados, totalPendientes);
+        
+        activarBotonesExtra();
+      } catch (error) {
+        console.error("Error al cargar registros:", error);
+        if (tablaBody) {
+          tablaBody.innerHTML = `<tr><td colspan='8' style='text-align:center;padding:20px;color:red;'>Error al cargar los registros: ${error.message}</td></tr>`;
+        }
+      }
+    }
 
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${r.fecha}</td>
-          <td><input type="time" value="${r.entrada || ''}" data-id="${docSnap.id}" class="entrada"></td>
-          <td><input type="time" value="${r.salida || ''}" data-id="${docSnap.id}" class="salida"></td>
-          <td><input type="text" value="${r.horas || ''}" readonly></td>
-          
-          <td><input type="checkbox" ${r.estado ? "checked" : ""} data-id="${docSnap.id}" class="estado"></td>
-          <td><button class="edit" data-id="${docSnap.id}">Guardar</button></td>
-          
-        `;
-        tablaBody.appendChild(tr);
-      });
-      activarBotonesExtra();
+    function actualizarTotales(totalRegistros, totalHoras, totalPagados, totalPendientes) {
+      document.getElementById("totalRegistros").textContent = totalRegistros;
+      document.getElementById("totalHoras").textContent = totalHoras;
+      document.getElementById("totalPagados").textContent = totalPagados;
+      document.getElementById("totalPendientes").textContent = totalPendientes;
     }
 
     function activarBotonesExtra(){
@@ -198,6 +592,8 @@
           const entradaVal = document.querySelector(`.entrada[data-id="${id}"]`).value;
           const salidaVal = document.querySelector(`.salida[data-id="${id}"]`).value;
           const estadoVal = document.querySelector(`.estado[data-id="${id}"]`).checked;
+          const areaVal = document.querySelector(`.area[data-id="${id}"]`).value;
+          const observacionesVal = document.querySelector(`.observaciones[data-id="${id}"]`).value;
 
           // Recalcular horas
           let diff = 0;
@@ -209,26 +605,283 @@
           }
           const horas = `${Math.floor(diff/60)}h ${diff%60}m`;
 
-         await updateDoc(doc(db,"tiempoExtra",id),{
-  entrada: entradaVal,
-  salida: salidaVal,
-  horas: horas,
-  estado: estadoVal,
-  area: document.querySelector(`.area[data-id="${id}"]`).value,
-  observaciones: document.querySelector(`.observaciones[data-id="${id}"]`).value
-});
-          alert("✅ Registro actualizado");
-          cargarExtras();
+          try {
+            await updateDoc(doc(db,"tiempoExtra",id),{
+              entrada: entradaVal,
+              salida: salidaVal,
+              horas: horas,
+              estado: estadoVal,
+              area: areaVal,
+              observaciones: observacionesVal,
+              updatedAt: new Date()
+            });
+            
+            alert("✅ Registro actualizado correctamente");
+            cargarExtras();
+          } catch (error) {
+            console.error("Error al actualizar:", error);
+            alert("❌ Error al actualizar el registro: " + error.message);
+          }
         });
       });
     }
 
     function generarPDFExtra(){
-      const element = document.getElementById("tablaExtras");
-      html2pdf().from(element).set({margin:1, filename:`TiempoExtra_${usuario.nombre}.pdf`, html2canvas:{scale:2}}).save();
+      // Crear elemento para el PDF
+      const element = document.createElement("div");
+      element.style.padding = "20px";
+      
+      // Agregar encabezado
+      const header = document.createElement("div");
+      header.innerHTML = `
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #004080; padding-bottom: 20px;">
+          <h1 style="color: #004080; margin: 0 0 10px 0; font-size: 28px;">Reporte de Tiempo Extra</h1>
+          <p style="font-size: 16px; color: #333; margin: 0;">
+            <strong>Funcionario:</strong> ${usuario.nombre} (${usuario.cedula})<br>
+            <strong>Período:</strong> ${document.getElementById("mesFiltroExtra").options[document.getElementById("mesFiltroExtra").selectedIndex].text} ${document.getElementById("anioFiltroExtra").value}<br>
+            <strong>Fecha de generación:</strong> ${new Date().toLocaleDateString('es-ES')}
+          </p>
+        </div>
+      `;
+      element.appendChild(header);
+      
+      // Crear tabla para el PDF (sin la columna de acciones)
+      const tablaPDF = document.createElement("table");
+      tablaPDF.style.width = "100%";
+      tablaPDF.style.borderCollapse = "collapse";
+      tablaPDF.style.margin = "20px 0";
+      
+      // Encabezados
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Fecha</th>
+          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Entrada</th>
+          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Salida</th>
+          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Horas</th>
+          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Área</th>
+          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Observaciones</th>
+          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Estado Pago</th>
+        </tr>
+      `;
+      tablaPDF.appendChild(thead);
+      
+      // Cuerpo de la tabla
+      const tbody = document.createElement("tbody");
+      
+      // Obtener datos actuales
+      const filas = document.querySelectorAll("#tablaExtras tbody tr");
+      if (filas.length > 0 && filas[0].querySelector("td")?.textContent?.includes("Cargando")) {
+        alert("Por favor, espere a que se carguen los datos antes de generar el PDF.");
+        return;
+      }
+      
+      filas.forEach(fila => {
+        const celdas = fila.querySelectorAll("td");
+        if (celdas.length >= 7) {
+          const tr = document.createElement("tr");
+          
+          // Formatear el estado de pago
+          const estadoPago = celdas[6].querySelector("input")?.checked ? "PAGADO" : "PENDIENTE";
+          
+          tr.innerHTML = `
+            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[0].textContent}</td>
+            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[1].querySelector("input")?.value || celdas[1].textContent}</td>
+            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[2].querySelector("input")?.value || celdas[2].textContent}</td>
+            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[3].querySelector("input")?.value || celdas[3].textContent}</td>
+            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[4].querySelector("input")?.value || celdas[4].textContent}</td>
+            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[5].querySelector("textarea")?.value || celdas[5].textContent}</td>
+            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9; font-weight: bold; color: ${estadoPago === 'PAGADO' ? '#28a745' : '#dc3545'};">${estadoPago}</td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+      
+      tablaPDF.appendChild(tbody);
+      element.appendChild(tablaPDF);
+      
+      // Agregar totales
+      const totalesDiv = document.createElement("div");
+      totalesDiv.innerHTML = `
+        <div style="margin-top: 30px; padding: 20px; background: #004080; color: white; border-radius: 10px; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
+          <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; min-width: 150px;">
+            <div>Total Registros</div>
+            <div style="font-size: 24px; font-weight: bold; margin-top: 5px;">${document.getElementById("totalRegistros").textContent}</div>
+          </div>
+          <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; min-width: 150px;">
+            <div>Horas Totales</div>
+            <div style="font-size: 24px; font-weight: bold; margin-top: 5px;">${document.getElementById("totalHoras").textContent}</div>
+          </div>
+          <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; min-width: 150px;">
+            <div>Pagados</div>
+            <div style="font-size: 24px; font-weight: bold; margin-top: 5px;">${document.getElementById("totalPagados").textContent}</div>
+          </div>
+          <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; min-width: 150px;">
+            <div>Pendientes</div>
+            <div style="font-size: 24px; font-weight: bold; margin-top: 5px;">${document.getElementById("totalPendientes").textContent}</div>
+          </div>
+        </div>
+      `;
+      element.appendChild(totalesDiv);
+      
+      // Pie de página
+      const footer = document.createElement("div");
+      footer.innerHTML = `
+        <div style="margin-top: 40px; text-align: center; font-style: italic; color: #666; font-size: 14px;">
+          Reporte generado por el Sistema de Gestión de Tiempo Extra - CCSS<br>
+          Fecha: ${new Date().toLocaleDateString('es-ES')} ${new Date().toLocaleTimeString('es-ES')}
+        </div>
+      `;
+      element.appendChild(footer);
+      
+      // Configurar opciones del PDF
+      const opt = {
+        margin: [15, 10, 15, 10],
+        filename: `Reporte_TiempoExtra_${usuario.nombre}_${new Date().toISOString().slice(0,10)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true,
+          scrollY: -window.scrollY
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'landscape',
+          putOnlyUsedFonts: true
+        }
+      };
+      
+      // Generar el PDF
+      html2pdf().set(opt).from(element).save();
     }
 
-    cargarExtras();
+    function prepararParaImprimir() {
+      // Crear una ventana de impresión
+      const printWindow = window.open('', '_blank');
+      
+      // Obtener los valores actuales
+      const mesSeleccionado = document.getElementById("mesFiltroExtra").options[document.getElementById("mesFiltroExtra").selectedIndex].text;
+      const anioSeleccionado = document.getElementById("anioFiltroExtra").value;
+      const totalRegistros = document.getElementById("totalRegistros").textContent;
+      const totalHoras = document.getElementById("totalHoras").textContent;
+      const totalPagados = document.getElementById("totalPagados").textContent;
+      const totalPendientes = document.getElementById("totalPendientes").textContent;
+      
+      // Construir el contenido para impresión
+      let printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Reporte de Tiempo Extra para Impresión</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #004080; padding-bottom: 20px; }
+            .header h1 { color: #004080; margin: 0 0 10px 0; font-size: 24px; }
+            .header p { font-size: 16px; color: #333; margin: 5px 0; }
+            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            th, td { border: 1px solid #004080; padding: 10px; text-align: center; }
+            th { background-color: #004080; color: white; font-weight: bold; }
+            tr:nth-child(even) { background-color: #f2f2f2; }
+            .totales { margin-top: 30px; padding: 20px; background: #004080; color: white; border-radius: 10px; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; }
+            .total-item { text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; min-width: 150px; }
+            .total-valor { font-size: 20px; font-weight: bold; margin-top: 5px; }
+            .footer { margin-top: 40px; text-align: center; font-style: italic; color: #666; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Reporte de Tiempo Extra</h1>
+            <p><strong>Funcionario:</strong> ${usuario.nombre} (${usuario.cedula})</p>
+            <p><strong>Período:</strong> ${mesSeleccionado} ${anioSeleccionado}</p>
+            <p><strong>Fecha de generación:</strong> ${new Date().toLocaleDateString('es-ES')} ${new Date().toLocaleTimeString('es-ES')}</p>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Entrada</th>
+                <th>Salida</th>
+                <th>Horas</th>
+                <th>Área</th>
+                <th>Observaciones</th>
+                <th>Estado Pago</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      // Agregar filas de datos
+      const filas = document.querySelectorAll("#tablaExtras tbody tr");
+      filas.forEach(fila => {
+        const celdas = fila.querySelectorAll("td");
+        if (celdas.length >= 7) {
+          const estadoPago = celdas[6].querySelector("input")?.checked ? "PAGADO" : "PENDIENTE";
+          const estadoColor = estadoPago === 'PAGADO' ? 'color: green; font-weight: bold;' : 'color: red; font-weight: bold;';
+          
+          printContent += `
+            <tr>
+              <td>${celdas[0].textContent}</td>
+              <td>${celdas[1].querySelector("input")?.value || celdas[1].textContent}</td>
+              <td>${celdas[2].querySelector("input")?.value || celdas[2].textContent}</td>
+              <td>${celdas[3].querySelector("input")?.value || celdas[3].textContent}</td>
+              <td>${celdas[4].querySelector("input")?.value || celdas[4].textContent}</td>
+              <td>${celdas[5].querySelector("textarea")?.value || celdas[5].textContent}</td>
+              <td style="${estadoColor}">${estadoPago}</td>
+            </tr>
+          `;
+        }
+      });
+      
+      // Agregar totales y pie de página
+      printContent += `
+            </tbody>
+          </table>
+          
+          <div class="totales">
+            <div class="total-item">
+              Total Registros
+              <div class="total-valor">${totalRegistros}</div>
+            </div>
+            <div class="total-item">
+              Horas Totales
+              <div class="total-valor">${totalHoras}</div>
+            </div>
+            <div class="total-item">
+              Pagados
+              <div class="total-valor">${totalPagados}</div>
+            </div>
+            <div class="total-item">
+              Pendientes
+              <div class="total-valor">${totalPendientes}</div>
+            </div>
+          </div>
+          
+          <div class="footer">
+            Reporte generado por el Sistema de Gestión de Tiempo Extra - CCSS<br>
+            Fecha: ${new Date().toLocaleDateString('es-ES')} ${new Date().toLocaleTimeString('es-ES')}
+          </div>
+        </body>
+        </html>
+      `;
+      
+      // Escribir el contenido en la ventana de impresión
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      
+      // Esperar a que se cargue el contenido y luego mostrar el diálogo de impresión
+      printWindow.onload = function() {
+        printWindow.print();
+      };
+    }
+
+    // Inicializar cuando el DOM esté cargado
+    document.addEventListener("DOMContentLoaded", function() {
+      inicializarElementos();
+      generarAnios();
+      cargarExtras();
+    });
   </script>
 </body>
 </html>
