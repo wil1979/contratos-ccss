@@ -236,8 +236,8 @@
     <table id="tablaNombramientos">
       <thead>
         <tr>
-          <th>Cédula</th>
-          <th>Funcionario</th>
+          <th>Cédula Sustituido</th>
+          <th>Funcionario Sustituido</th>
           <th>Área</th>
           <th>Código Área</th>
           <th>Inicio</th>
@@ -278,7 +278,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, query } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
     // 🔹 Configuración Firebase
     const firebaseConfig = {
@@ -347,7 +347,7 @@
       try {
         // Obtener todos los documentos de la colección "nombramientos"
         const nombramientosRef = collection(db, "nombramientos");
-        const q = query(nombramientosRef); // Ahora query está correctamente importado
+        const q = query(nombramientosRef);
         const querySnapshot = await getDocs(q);
 
         let hayDatos = false;
@@ -374,9 +374,9 @@
           if (fecha.mes === mesSeleccionado && fecha.anio === anioSeleccionado) {
             hayDatos = true;
             
-            // Formatear los datos para mostrar
-            const usuarioNombre = r.usuarioNombre || "N/A";
-            const usuarioCedula = r.usuarioCedula || "N/A";
+            // Formatear los datos para mostrar (CAMBIADO: personaSustituirCedula y personaSustituirNombre)
+            const personaSustituirNombre = r.personaSustituirNombre || "SIN DATOS";
+            const personaSustituirCedula = r.personaSustituirCedula || "N/A";
             const area = r.area || "N/A";
             const codArea = r.codArea || "N/A";
             const fechaFinal = r.final || "N/A";
@@ -389,8 +389,8 @@
             const fila = document.createElement('tr');
             fila.dataset.id = docSnapshot.id;
             fila.innerHTML = `
-              <td>${usuarioCedula}</td>
-              <td>${usuarioNombre}</td>
+              <td>${personaSustituirCedula}</td>
+              <td>${personaSustituirNombre}</td>
               <td>${area}</td>
               <td>${codArea}</td>
               <td>${r.inicio}</td>
@@ -442,9 +442,10 @@
       // Convertir celdas en campos editables
       const celdas = fila.querySelectorAll('td');
       
-      // Cédula (índice 0) - no editable
-      // Funcionario (índice 1) - editable
-      hacerEditable(celdas[1], 'usuarioNombre');
+      // Cédula Sustituido (índice 0) - editable
+      hacerEditable(celdas[0], 'personaSustituirCedula');
+      // Funcionario Sustituido (índice 1) - editable
+      hacerEditable(celdas[1], 'personaSustituirNombre');
       // Área (índice 2) - editable
       hacerEditable(celdas[2], 'area');
       // Código Área (índice 3) - editable
@@ -464,7 +465,8 @@
       
       // Guardar valores originales
       fila.dataset.original = JSON.stringify({
-        usuarioNombre: celdas[1].textContent,
+        personaSustituirCedula: celdas[0].textContent,
+        personaSustituirNombre: celdas[1].textContent,
         area: celdas[2].textContent,
         codArea: celdas[3].textContent,
         inicio: celdas[4].textContent,
@@ -538,7 +540,8 @@
       const original = JSON.parse(fila.dataset.original);
       
       const celdas = fila.querySelectorAll('td');
-      celdas[1].textContent = original.usuarioNombre;
+      celdas[0].textContent = original.personaSustituirCedula;
+      celdas[1].textContent = original.personaSustituirNombre;
       celdas[2].textContent = original.area;
       celdas[3].textContent = original.codArea;
       celdas[4].textContent = original.inicio;
@@ -571,7 +574,7 @@
       const nuevosValores = {};
       
       // Procesar cada celda editable
-      for (let i = 1; i <= 9; i++) { // De la celda 1 a la 9 (excluyendo acciones)
+      for (let i = 0; i <= 9; i++) { // De la celda 0 a la 9 (excluyendo acciones)
         const celda = celdas[i];
         const inputs = celda.querySelectorAll('.editable');
         
@@ -581,7 +584,20 @@
             nuevosValores.horarioSalida = inputs[1].value || "N/A";
           } else {
             const input = inputs[0];
-            const campo = input.dataset.campo;
+            let campo;
+            
+            // Asignar el campo correcto según la posición
+            switch(i) {
+              case 0: campo = 'personaSustituirCedula'; break;
+              case 1: campo = 'personaSustituirNombre'; break;
+              case 2: campo = 'area'; break;
+              case 3: campo = 'codArea'; break;
+              case 4: campo = 'inicio'; break;
+              case 5: campo = 'final'; break;
+              case 7: campo = 'dias'; break;
+              case 8: campo = 'salario'; break;
+              case 9: campo = 'estado'; break;
+            }
             
             if (campo === 'estado') {
               nuevosValores[campo] = input.value === 'true';
@@ -612,7 +628,8 @@
           await updateDoc(docRef, nuevosValores);
           
           // Actualizar la vista
-          celdas[1].textContent = nuevosValores.usuarioNombre || "N/A";
+          celdas[0].textContent = nuevosValores.personaSustituirCedula || "N/A";
+          celdas[1].textContent = nuevosValores.personaSustituirNombre || "N/A";
           celdas[2].textContent = nuevosValores.area || "N/A";
           celdas[3].textContent = nuevosValores.codArea || "N/A";
           celdas[4].textContent = nuevosValores.inicio || "N/A";
