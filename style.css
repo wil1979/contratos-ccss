@@ -63,3 +63,171 @@
       background: #0066cc;
       transform: scale(1.05);
     }
+     /* Estilos adicionales para móviles y reporte */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+        margin: 10px;
+      }
+      
+      h2 {
+        font-size: 24px;
+      }
+      
+      form {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-group {
+        margin-bottom: 15px;
+      }
+      
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      
+      input, select, textarea {
+        width: 100%;
+        box-sizing: border-box;
+      }
+      
+      .horario-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .horario-container input {
+        width: 100%;
+      }
+      
+      .btn-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .btn-container button {
+        width: 100%;
+      }
+    }
+    
+    /* Estilos para el reporte de días por área */
+    .reporte-container {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .reporte-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .reporte-titulo {
+      color: #0d47a1;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    
+    .reporte-refresh {
+      background: #1565c0;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    .reporte-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .area-card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-left: 4px solid #1565c0;
+    }
+    
+    .area-nombre {
+      font-weight: bold;
+      color: #0d47a1;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+    
+    .area-codigo {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    
+    .area-dias {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1565c0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .area-dias::before {
+      content: "📅";
+    }
+    
+    .info-usuario {
+      background: #e8f4ff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      border: 1px solid #0066cc;
+      text-align: center;
+    }
+    
+    .info-usuario h3 {
+      color: #004080;
+      margin: 5px 0;
+      font-size: 18px;
+    }
+    
+    .info-usuario p {
+      color: #333;
+      margin: 5px 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .horario-container {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-container {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    @media (max-width: 480px) {
+      .reporte-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .btn-container {
+        flex-direction: column;
+      }
+    }

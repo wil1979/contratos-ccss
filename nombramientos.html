@@ -2,68 +2,114 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro de Nombramientos</title>
-  <link rel="stylesheet" href="style.css">
-  <!--🎯 Estilos mejorados integrados directamente-->
+  <link rel="stylesheet" href="styleextra.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
 </head>
 <body>
   <div class="container">
     <h2>Registro de Nombramientos</h2>
+    
+    <!-- Información del usuario activo -->
+    <div class="info-usuario" id="infoUsuario">
+      <h3>Usuario Activo: <span id="nombreUsuario">Cargando...</span></h3>
+      <p>Rol: <span id="rolUsuario">Usuario</span></p>
+    </div>
 
     <form id="formNombramiento">
-      <label for="inicio">Inicio:</label>
-      <input type="date" id="inicio" required>
-
-      <label for="final">Final:</label>
-      <input type="date" id="final" required>
-
-      <label for="dias">Días:</label>
-      <input type="number" id="dias" readonly>
-
-      <label for="area">Área de Salud:</label>
-      <select id="selectAreaSalud" required>
-        <option value="">-- Elegir Área --</option>
-      </select>
-      <button type="button" id="btnAgregarArea">+ Agregar Área</button>
-
-      <label>Horario:</label>
-      <div style="display:flex; gap:10px;">
-        <input type="time" id="horaEntrada" required>
-        <input type="time" id="horaSalida" required>
+      <div class="form-group">
+        <label for="inicio">Inicio:</label>
+        <input type="date" id="inicio" required>
       </div>
 
-      <label for="salario">Salario:</label>
-      <input type="number" id="salario" step="0.01" readonly>
+      <div class="form-group">
+        <label for="final">Final:</label>
+        <input type="date" id="final" required>
+      </div>
 
-      <label for="comentario">Comentario:</label>
-      <textarea id="comentario" rows="3"></textarea>
+      <div class="form-group">
+        <label for="dias">Días:</label>
+        <input type="number" id="dias" readonly>
+      </div>
 
-      <label>Persona a Sustituir (Cédula):</label>
-      <input type="text" id="cedulaSustituir" placeholder="Ej: 108290753">
+      <div class="form-group">
+        <label for="selectAreaSalud">Área de Salud:</label>
+        <select id="selectAreaSalud" required>
+          <option value="">-- Elegir Área --</option>
+        </select>
+        <button type="button" id="btnAgregarArea" class="btn-secondary">+ Agregar Área</button>
+      </div>
 
-      <label>Nombre Persona a Sustituir:</label>
-      <input type="text" id="nombreSustituir" readonly>
+      <div class="form-group">
+        <label>Horario:</label>
+        <div class="horario-container">
+          <input type="time" id="horaEntrada" required>
+          <input type="time" id="horaSalida" required>
+        </div>
+      </div>
 
-      <label>
-        <input type="checkbox" id="estado"> Pago Validado
-      </label>
+      <div class="form-group">
+        <label for="salario">Salario:</label>
+        <input type="number" id="salario" step="0.01" readonly>
+      </div>
 
-      <button type="submit">Guardar Nombramiento</button>
+      <div class="form-group">
+        <label for="comentario">Comentario:</label>
+        <textarea id="comentario" rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Persona a Sustituir (Cédula):</label>
+        <input type="text" id="cedulaSustituir" placeholder="Ej: 108290753">
+      </div>
+
+      <div class="form-group">
+        <label>Nombre Persona a Sustituir:</label>
+        <input type="text" id="nombreSustituir" readonly>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="estado"> Pago Validado
+        </label>
+      </div>
+
+      <div class="btn-container">
+        <button type="submit" class="btn-primary">Guardar Nombramiento</button>
+        <button type="button" class="btn-secondary" onclick="cerrarSesion()">Cerrar Sesión</button>
+      </div>
     </form>
-    <button class="logout" onclick="cerrarSesion()">Cerrar Sesión</button>
+    
+    <!-- Reporte de días por área -->
+    <div class="reporte-container">
+      <div class="reporte-header">
+        <h3 class="reporte-titulo">📊 Reporte de Días Laborados por Área</h3>
+        <button id="btnActualizarReporte" class="reporte-refresh">🔄 Actualizar</button>
+      </div>
+      <div id="reporteContenido" class="reporte-grid">
+        <p>Cargando reporte...</p>
+      </div>
+    </div>
   </div>
 
   <!-- Modal para áreas -->
   <div id="modalArea">
     <div class="modal-content">
       <h3>Nueva Área</h3>
-      <label>Código:</label>
-      <input type="text" id="nuevaCodArea">
-      <label>Nombre Área:</label>
-      <input type="text" id="nuevaNombreArea">
-      <button id="guardarAreaBtn">Guardar Área</button>
-      <button id="cerrarModalBtn">Cancelar</button>
+      <div class="form-group">
+        <label>Código:</label>
+        <input type="text" id="nuevaCodArea">
+      </div>
+      <div class="form-group">
+        <label>Nombre Área:</label>
+        <input type="text" id="nuevaNombreArea">
+      </div>
+      <div class="btn-container">
+        <button id="guardarAreaBtn" class="btn-primary">Guardar Área</button>
+        <button id="cerrarModalBtn" class="btn-secondary">Cancelar</button>
+      </div>
     </div>
   </div>
 
@@ -74,7 +120,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
@@ -92,6 +138,10 @@
     const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
     if (!usuario) {
       window.location.href = "login.html";
+    } else {
+      // Mostrar información del usuario activo
+      document.getElementById("nombreUsuario").textContent = usuario.nombre || "Usuario no disponible";
+      document.getElementById("rolUsuario").textContent = usuario.rol || "Usuario";
     }
 
     const inicio = document.getElementById("inicio");
@@ -215,6 +265,8 @@
       });
       alert("Nombramiento guardado con ID: " + docRef.id);
       e.target.reset();
+      // Actualizar reporte después de guardar
+      generarReporteDiasPorArea();
     });
 
     function cerrarSesion() {
@@ -222,6 +274,110 @@
       window.location.href = "login.html";
     }
     window.cerrarSesion = cerrarSesion;
+    
+    // 🔹 Generar reporte de días por área
+    async function generarReporteDiasPorArea() {
+      const reporteContenido = document.getElementById("reporteContenido");
+      reporteContenido.innerHTML = "<p>Cargando datos...</p>";
+      
+      try {
+        // Obtener todos los nombramientos del usuario actual
+        const q = query(
+          collection(db, "nombramientos"),
+          where("usuarioCedula", "==", usuario.cedula)
+        );
+        
+        const querySnapshot = await getDocs(q);
+        
+        // Agrupar días por área
+        const areasMap = new Map();
+        
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          const areaKey = `${data.codArea} - ${data.area}`;
+          
+          if (!areasMap.has(areaKey)) {
+            areasMap.set(areaKey, {
+              codArea: data.codArea,
+              nombreArea: data.area,
+              totalDias: 0,
+              registros: []
+            });
+          }
+          
+          const areaData = areasMap.get(areaKey);
+          areaData.totalDias += data.dias || 0;
+          areaData.registros.push({
+            id: doc.id,
+            inicio: data.inicio,
+            final: data.final,
+            dias: data.dias
+          });
+        });
+        
+        // Ordenar áreas por total de días (descendente)
+        const areasOrdenadas = Array.from(areasMap.values())
+          .sort((a, b) => b.totalDias - a.totalDias);
+        
+        // Generar HTML para el reporte
+        if (areasOrdenadas.length === 0) {
+          reporteContenido.innerHTML = "<p>📊 No hay datos de nombramientos para generar el reporte.</p>";
+          return;
+        }
+        
+        let htmlReporte = "";
+        
+        areasOrdenadas.forEach(area => {
+          htmlReporte += `
+            <div class="area-card">
+              <div class="area-nombre">${area.nombreArea}</div>
+              <div class="area-codigo">Código: ${area.codArea}</div>
+              <div class="area-dias">${area.totalDias} días</div>
+            </div>
+          `;
+        });
+        
+        reporteContenido.innerHTML = htmlReporte;
+        
+        // Mostrar total general
+        const totalGeneral = areasOrdenadas.reduce((sum, area) => sum + area.totalDias, 0);
+        const totalElement = document.createElement("div");
+        totalElement.style.marginTop = "20px";
+        totalElement.style.padding = "15px";
+        totalElement.style.backgroundColor = "#e3f2fd";
+        totalElement.style.borderRadius = "8px";
+        totalElement.style.textAlign = "center";
+        totalElement.style.fontWeight = "bold";
+        totalElement.style.fontSize = "18px";
+        totalElement.innerHTML = `TOTAL GENERAL: ${totalGeneral} días laborados`;
+        reporteContenido.appendChild(totalElement);
+        
+      } catch (error) {
+        console.error("Error al generar reporte:", error);
+        reporteContenido.innerHTML = `<p style="color: red;">❌ Error al cargar el reporte: ${error.message}</p>`;
+      }
+    }
+    
+    // Evento para actualizar reporte manualmente
+    document.getElementById("btnActualizarReporte").addEventListener("click", function() {
+      this.textContent = "Actualizando...";
+      this.disabled = true;
+      
+      generarReporteDiasPorArea().then(() => {
+        this.textContent = "🔄 Actualizar";
+        this.disabled = false;
+      }).catch(() => {
+        this.textContent = "🔄 Actualizar";
+        this.disabled = false;
+      });
+    });
+    
+    // Cargar reporte al iniciar
+    document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(() => {
+        generarReporteDiasPorArea();
+      }, 1000);
+    });
   </script>
 </body>
 </html>
