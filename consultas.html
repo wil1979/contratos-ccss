@@ -20,6 +20,7 @@
       <div>
         <label for="mes">Mes:</label>
         <select id="mes">
+          <option value="">Todos los meses</option>
           <option value="1">Enero</option>
           <option value="2">Febrero</option>
           <option value="3">Marzo</option>
@@ -38,6 +39,7 @@
       <div>
         <label for="anio">Año:</label>
         <select id="anio">
+          <option value="">Todos los años</option>
           <!-- Se llenará dinámicamente con JavaScript -->
         </select>
       </div>
@@ -65,11 +67,11 @@
           </tr>
         </thead>
         <tbody id="tablaRegistros">
-          <tr><td colspan="11" class="cargando">Cargando datos del mes actual...</td></tr>
+          <tr><td colspan="11" class="cargando">Cargando todos los datos registrados...</td></tr>
         </tbody>
       </table>
       <div id="mensajeSinDatos" class="sin-datos" style="display:none;">
-        📭 No se encontraron nombramientos para este mes y año.
+        📭 No se encontraron nombramientos con los criterios seleccionados.
       </div>
     </div>
 
@@ -137,8 +139,8 @@
 
     // 🔹 Cargar registros con filtro desde Firestore (FILTRANDO POR USUARIO ACTIVO)
     async function cargarRegistros() {
-      const mesSeleccionado = parseInt(document.getElementById("mes")?.value);
-      const anioSeleccionado = parseInt(document.getElementById("anio")?.value);
+      const mesSeleccionado = document.getElementById("mes")?.value;
+      const anioSeleccionado = document.getElementById("anio")?.value;
       const tbody = document.getElementById("tablaRegistros");
       const mensaje = document.getElementById("mensajeSinDatos");
       const tabla = document.getElementById("tablaNombramientos");
@@ -148,14 +150,7 @@
       mensajeError.style.display = "none";
       mensaje.style.display = "none";
 
-      // ✅ Validar que mes y año sean números válidos
-      if (isNaN(mesSeleccionado) || isNaN(anioSeleccionado)) {
-        tbody.innerHTML = `<tr><td colspan="11" style="color:red;">⚠️ Por favor, seleccione un mes y año válidos.</td></tr>`;
-        tabla.style.display = "table";
-        return;
-      }
-
-      console.log("🔍 Filtrando por Mes:", mesSeleccionado, "Año:", anioSeleccionado, "Usuario:", usuario.cedula);
+      console.log("🔍 Filtrando por Mes:", mesSeleccionado || "Todos", "Año:", anioSeleccionado || "Todos", "Usuario:", usuario.cedula);
 
       // Mostrar estado de carga
       tbody.innerHTML = `<tr><td colspan="11" class="cargando">Cargando datos...</td></tr>`;
@@ -189,8 +184,18 @@
             return;
           }
 
-          // Filtrar por mes y año seleccionados
-          if (fecha.mes === mesSeleccionado && fecha.anio === anioSeleccionado) {
+          // Filtrar por mes y año seleccionados (si se seleccionaron)
+          let mostrarRegistro = true;
+          
+          if (mesSeleccionado !== "" && fecha.mes !== parseInt(mesSeleccionado)) {
+            mostrarRegistro = false;
+          }
+          
+          if (anioSeleccionado !== "" && fecha.anio !== parseInt(anioSeleccionado)) {
+            mostrarRegistro = false;
+          }
+
+          if (mostrarRegistro) {
             hayDatos = true;
             
             // Formatear los datos para mostrar (CAMBIADO: personaSustituirCedula y personaSustituirNombre)
@@ -489,7 +494,7 @@
     function exportarPDF() {
       const element = document.getElementById('tablaNombramientos');
       const mes = document.getElementById("mes").options[document.getElementById("mes").selectedIndex].text;
-      const anio = document.getElementById("anio").value;
+      const anio = document.getElementById("anio").options[document.getElementById("anio").selectedIndex].text;
       const usuarioInfo = document.getElementById('usuarioInfo').outerHTML;
       
       // Verificar si hay datos para exportar
@@ -545,23 +550,30 @@
       const mesSelect = document.getElementById("mes");
       const anioSelect = document.getElementById("anio");
 
-      // Establecer mes actual por defecto
-      if (mesSelect) mesSelect.value = hoy.getMonth() + 1;
+      // Establecer opción "Todos los meses" por defecto
+      if (mesSelect) mesSelect.value = "";
 
-      // Llenar el select de años desde 2020 hasta 2025
+      // Llenar el select de años desde 2020 hasta 2025 con opción "Todos los años"
       if (anioSelect) {
         anioSelect.innerHTML = ""; // Limpiar opciones existentes
+        // Agregar opción "Todos los años"
+        const optionTodos = document.createElement("option");
+        optionTodos.value = "";
+        optionTodos.textContent = "Todos los años";
+        anioSelect.appendChild(optionTodos);
+        
+        // Agregar años desde 2020 hasta 2025
         for (let year = 2020; year <= 2025; year++) {
           const option = document.createElement("option");
           option.value = year;
           option.textContent = year;
           anioSelect.appendChild(option);
         }
-        // Establecer año actual por defecto
-        anioSelect.value = hoy.getFullYear();
+        // Establecer opción "Todos los años" por defecto
+        anioSelect.value = "";
       }
 
-      // Cargar datos iniciales después de un breve retraso
+      // Cargar todos los datos iniciales (sin filtros)
       setTimeout(() => {
         cargarRegistros();
       }, 500);
