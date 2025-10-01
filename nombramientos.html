@@ -6,7 +6,6 @@
   <title>Registro de Nombramientos</title>
   <link rel="stylesheet" href="styleextra.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-
 </head>
 <body>
   <div class="container">
@@ -60,14 +59,16 @@
         <textarea id="comentario" rows="3"></textarea>
       </div>
 
+      <!-- Persona a Sustituir -->
       <div class="form-group">
         <label>Persona a Sustituir (Cédula):</label>
-        <input type="text" id="cedulaSustituir" placeholder="Ej: 108290753">
+        <input type="text" id="cedulaSustituir" placeholder="Ej: 108290753" >
+        <button type="button" id="btnBuscarPersonal" class="btn-secondary">🔍 Buscar Personal</button>
       </div>
 
       <div class="form-group">
         <label>Nombre Persona a Sustituir:</label>
-        <input type="text" id="nombreSustituir" readonly>
+        <input type="text" id="nombreSustituir" >
       </div>
 
       <div class="form-group">
@@ -113,6 +114,55 @@
     </div>
   </div>
 
+  <!-- Modal Selección de Personal -->
+  <div id="modalPersonal" class="modal">
+    <div class="modal-content">
+      <h3>Seleccionar Personal</h3>
+
+      <!-- Filtros -->
+      <div class="form-group">
+        <input type="text" id="filtroNombre" placeholder="Buscar por nombre...">
+      </div>
+      <div class="form-group">
+        <input type="text" id="filtroCedula" placeholder="Buscar por cédula...">
+      </div>
+      <div class="form-group">
+        <label for="filtroPuesto">Puesto:</label>
+        <select id="filtroPuesto">
+          <option value="">Todos</option>
+          <option value="TRAB.SERV.GENERALES">TRAB.SERV.GENERALES</option>
+          <option value="TEC.SAL.EN FARM. I">TEC.SAL.EN FARM. I</option>
+          <!-- Agrega más puestos según tu Personal.json -->
+        </select>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="btn-container" style="justify-content: center; gap: 10px;">
+        <button id="btnBuscarEnModal" class="btn-primary">🔍 Buscar</button>
+        <button id="btnLimpiarFiltros" class="btn-secondary">🧹 Limpiar</button>
+      </div>
+
+      <!-- Tabla resultados -->
+      <table id="tablaPersonal">
+        <thead>
+          <tr>
+            <th>Cédula</th>
+            <th>Nombre</th>
+            <th>Puesto</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Se llena con JS -->
+        </tbody>
+      </table>
+
+      <div class="btn-container">
+        <button id="cerrarPersonalBtn" class="btn-secondary">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 🎯 Botón flotante "Inicio" -->
   <a href="dashboard.html" class="btn-flotante-inicio" title="Ir al Dashboard">
     🏠 Inicio
@@ -120,7 +170,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
@@ -139,7 +189,6 @@
     if (!usuario) {
       window.location.href = "login.html";
     } else {
-      // Mostrar información del usuario activo
       document.getElementById("nombreUsuario").textContent = usuario.nombre || "Usuario no disponible";
       document.getElementById("rolUsuario").textContent = usuario.rol || "Usuario";
     }
@@ -152,7 +201,7 @@
     function calcularSalario() {
       const diasValor = parseFloat(dias.value) || 0;
       const salario = diasValor * 14523;
-      salarioInput.value = salario.toFixed(2); // 2 decimales
+      salarioInput.value = salario.toFixed(2);
     }
 
     function calcularDias() {
@@ -160,10 +209,8 @@
       const fi = new Date(inicio.value);
       const ff = new Date(final.value);
       const diff = ff - fi;
-      const total = Math.ceil(diff / (1000*60*60*24)) + 1;
+      const total = Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1;
       dias.value = total >= 0 ? total : 0;
-
-      // ✅ Actualizar salario automáticamente
       calcularSalario();
     }
 
@@ -207,36 +254,8 @@
       cargarAreas();
     });
 
-    // Buscar nombre por cédula (API externa simulada + Firestore tabla personal)
-    async function buscarPersonaPorCedula(cedula) {
-      try {
-        // 1. Intentar en API externa (ejemplo ficticio)
-        const resp = await fetch(`https://api.hacienda.go.cr/fe/ae?identificacion=${cedula}`);
-        if (resp.ok) {
-          const data = await resp.json();
-          return data.nombre;
-        }
-      } catch (e) {
-        console.log("API no disponible, usando Firestore");
-      }
-
-      // 2. Intentar en Firestore tabla personal
-      const q = query(collection(db, "personal"), where("id", "==", cedula));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        return snap.docs[0].data().nombre;
-      }
-      return "";
-    }
-
     const cedulaSustituir = document.getElementById("cedulaSustituir");
     const nombreSustituir = document.getElementById("nombreSustituir");
-
-    cedulaSustituir.addEventListener("blur", async () => {
-      if (!cedulaSustituir.value) return;
-      const nombre = await buscarPersonaPorCedula(cedulaSustituir.value.trim());
-      nombreSustituir.value = nombre || "No encontrado";
-    });
 
     // Guardar nombramiento
     document.getElementById("formNombramiento").addEventListener("submit", async (e) => {
@@ -265,7 +284,6 @@
       });
       alert("Nombramiento guardado con ID: " + docRef.id);
       e.target.reset();
-      // Actualizar reporte después de guardar
       generarReporteDiasPorArea();
     });
 
@@ -275,58 +293,34 @@
     }
     window.cerrarSesion = cerrarSesion;
     
-    // 🔹 Generar reporte de días por área
     async function generarReporteDiasPorArea() {
       const reporteContenido = document.getElementById("reporteContenido");
       reporteContenido.innerHTML = "<p>Cargando datos...</p>";
       
       try {
-        // Obtener todos los nombramientos del usuario actual
-        const q = query(
-          collection(db, "nombramientos"),
-          where("usuarioCedula", "==", usuario.cedula)
-        );
-        
+        const q = query(collection(db, "nombramientos"), where("usuarioCedula", "==", usuario.cedula));
         const querySnapshot = await getDocs(q);
         
-        // Agrupar días por área
         const areasMap = new Map();
         
         querySnapshot.forEach(doc => {
           const data = doc.data();
           const areaKey = `${data.codArea} - ${data.area}`;
-          
           if (!areasMap.has(areaKey)) {
-            areasMap.set(areaKey, {
-              codArea: data.codArea,
-              nombreArea: data.area,
-              totalDias: 0,
-              registros: []
-            });
+            areasMap.set(areaKey, { codArea: data.codArea, nombreArea: data.area, totalDias: 0 });
           }
-          
           const areaData = areasMap.get(areaKey);
           areaData.totalDias += data.dias || 0;
-          areaData.registros.push({
-            id: doc.id,
-            inicio: data.inicio,
-            final: data.final,
-            dias: data.dias
-          });
         });
         
-        // Ordenar áreas por total de días (descendente)
-        const areasOrdenadas = Array.from(areasMap.values())
-          .sort((a, b) => b.totalDias - a.totalDias);
+        const areasOrdenadas = Array.from(areasMap.values()).sort((a, b) => b.totalDias - a.totalDias);
         
-        // Generar HTML para el reporte
         if (areasOrdenadas.length === 0) {
           reporteContenido.innerHTML = "<p>📊 No hay datos de nombramientos para generar el reporte.</p>";
           return;
         }
         
         let htmlReporte = "";
-        
         areasOrdenadas.forEach(area => {
           htmlReporte += `
             <div class="area-card">
@@ -336,20 +330,13 @@
             </div>
           `;
         });
-        
         reporteContenido.innerHTML = htmlReporte;
         
-        // Mostrar total general
         const totalGeneral = areasOrdenadas.reduce((sum, area) => sum + area.totalDias, 0);
         const totalElement = document.createElement("div");
-        totalElement.style.marginTop = "20px";
-        totalElement.style.padding = "15px";
-        totalElement.style.backgroundColor = "#e3f2fd";
-        totalElement.style.borderRadius = "8px";
-        totalElement.style.textAlign = "center";
         totalElement.style.fontWeight = "bold";
-        totalElement.style.fontSize = "18px";
-        totalElement.innerHTML = `TOTAL GENERAL: ${totalGeneral} días laborados`;
+        totalElement.style.marginTop = "1rem";
+        totalElement.textContent = `TOTAL GENERAL: ${totalGeneral} días laborados`;
         reporteContenido.appendChild(totalElement);
         
       } catch (error) {
@@ -358,26 +345,152 @@
       }
     }
     
-    // Evento para actualizar reporte manualmente
     document.getElementById("btnActualizarReporte").addEventListener("click", function() {
       this.textContent = "Actualizando...";
       this.disabled = true;
-      
       generarReporteDiasPorArea().then(() => {
-        this.textContent = "🔄 Actualizar";
-        this.disabled = false;
-      }).catch(() => {
         this.textContent = "🔄 Actualizar";
         this.disabled = false;
       });
     });
     
-    // Cargar reporte al iniciar
     document.addEventListener("DOMContentLoaded", function() {
       setTimeout(() => {
         generarReporteDiasPorArea();
       }, 1000);
     });
+
+        // =============================
+    // Modal Selección de Personal (versión segura)
+    // =============================
+    const modalPersonal = document.getElementById("modalPersonal");
+    const btnBuscarPersonal = document.getElementById("btnBuscarPersonal");
+    const cerrarPersonalBtn = document.getElementById("cerrarPersonalBtn");
+    const tablaPersonal = document.querySelector("#tablaPersonal tbody");
+    const filtroNombre = document.getElementById("filtroNombre");
+    const filtroCedula = document.getElementById("filtroCedula");
+    const filtroPuesto = document.getElementById("filtroPuesto");
+    const btnBuscarEnModal = document.getElementById("btnBuscarEnModal");
+    const btnLimpiarFiltros = document.getElementById("btnLimpiarFiltros");
+
+    let listaPersonal = [];
+
+    btnBuscarPersonal.addEventListener("click", async () => {
+      modalPersonal.style.display = "flex";
+      if (listaPersonal.length === 0) {
+        await cargarPersonal();
+      }
+      tablaPersonal.innerHTML = "<tr><td colspan='4'>Ingrese criterios y haga clic en 'Buscar'</td></tr>";
+    });
+
+    cerrarPersonalBtn.addEventListener("click", () => {
+      modalPersonal.style.display = "none";
+    });
+
+    btnLimpiarFiltros.addEventListener("click", () => {
+      filtroNombre.value = "";
+      filtroCedula.value = "";
+      filtroPuesto.value = "";
+      tablaPersonal.innerHTML = "<tr><td colspan='4'>Filtros limpiados. Haga clic en 'Buscar'.</td></tr>";
+    });
+
+    btnBuscarEnModal.addEventListener("click", mostrarPersonal);
+
+    // Cargar Personal.json con manejo de errores robusto
+    async function cargarPersonal() {
+      try {
+        const resp = await fetch("Personal.json");
+        if (!resp.ok) throw new Error("Archivo Personal.json no encontrado");
+        
+        const datos = await resp.json();
+        
+        // Validar y limpiar datos
+        if (!Array.isArray(datos)) {
+          throw new Error("Personal.json debe ser un arreglo");
+        }
+        
+        listaPersonal = datos.filter(p => {
+          if (!p || typeof p !== 'object') return false;
+          return (p.nombre != null) || (p.cedula != null) || (p.puesto != null);
+        });
+        
+        console.log("✅ Personal cargado:", listaPersonal.length, "registros válidos");
+      } catch (error) {
+        console.error("❌ Error al cargar Personal.json:", error);
+        listaPersonal = [];
+        tablaPersonal.innerHTML = `<tr><td colspan='4'>Error: ${error.message}</td></tr>`;
+      }
+    }
+
+    // Función de búsqueda segura
+    function mostrarPersonal() {
+      const nombreFiltro = filtroNombre.value.trim().toLowerCase();
+      const cedulaFiltro = filtroCedula.value.trim().replace(/\D/g, ''); // Solo dígitos
+      const puestoFiltro = filtroPuesto.value;
+
+      tablaPersonal.innerHTML = "<tr><td colspan='4'>Buscando...</td></tr>";
+
+      setTimeout(() => {
+        const resultados = listaPersonal.filter(p => {
+          // Filtro por puesto
+          if (puestoFiltro && p.puesto !== puestoFiltro) return false;
+
+          // Filtro por nombre (seguro contra undefined)
+          if (nombreFiltro) {
+            const nombreNormalizado = (p.nombre || '').toLowerCase();
+            if (!nombreNormalizado.includes(nombreFiltro)) return false;
+          }
+
+          // Filtro por cédula (¡protegido contra undefined, null, etc!)
+          if (cedulaFiltro) {
+            const cedulaStr = (p.cedula != null) ? p.cedula.toString().replace(/\D/g, '') : '';
+            if (!cedulaStr.includes(cedulaFiltro)) return false;
+          }
+
+          return true;
+        });
+
+        if (resultados.length === 0) {
+          tablaPersonal.innerHTML = `<tr><td colspan="4">No se encontraron coincidencias</td></tr>`;
+        } else {
+          // Limitar resultados para mejor rendimiento
+          const resultadosAMostrar = resultados.slice(0, 100);
+          tablaPersonal.innerHTML = resultadosAMostrar.map(p => `
+            <tr>
+              <td>${p.cedula != null ? p.cedula : '—'}</td>
+              <td>${p.nombre || '—'}</td>
+              <td>${p.puesto || '—'}</td>
+              <td><button class="btn-primary btnSeleccionar" 
+                  data-cedula="${p.cedula != null ? p.cedula : ''}" 
+                  data-nombre="${p.nombre || ''}">Seleccionar</button></td>
+            </tr>
+          `).join('');
+
+          if (resultados.length > 100) {
+            const filaAdvertencia = document.createElement("tr");
+            filaAdvertencia.innerHTML = `<td colspan="4" style="text-align: center; font-style: italic;">... y ${resultados.length - 100} más (mostrando 100)</td>`;
+            tablaPersonal.appendChild(filaAdvertencia);
+          }
+
+          // Auto-seleccionar si solo hay un resultado
+          if (resultados.length === 1) {
+            const unico = resultados[0];
+            cedulaSustituir.value = unico.cedula != null ? unico.cedula : '';
+            nombreSustituir.value = unico.nombre || '';
+            modalPersonal.style.display = "none";
+          }
+
+          // Reasignar eventos a botones
+          document.querySelectorAll(".btnSeleccionar").forEach(btn => {
+            btn.addEventListener("click", () => {
+              cedulaSustituir.value = btn.dataset.cedula;
+              nombreSustituir.value = btn.dataset.nombre;
+              modalPersonal.style.display = "none";
+            });
+          });
+        }
+      }, 150);
+    }
   </script>
 </body>
 </html>
