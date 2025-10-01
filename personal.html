@@ -168,7 +168,7 @@
     // Cargar Personal.json con validación robusta
     async function cargarPersonal() {
       try {
-        const respuesta = await fetch("Personal.json");
+        const respuesta = await fetch("personal.json");
         if (!respuesta.ok) {
           throw new Error(`Archivo no encontrado. Código: ${respuesta.status}`);
         }
@@ -177,7 +177,7 @@
 
         // Validar que sea un arreglo
         if (!Array.isArray(datos)) {
-          throw new Error("Personal.json debe ser un arreglo de objetos");
+          throw new Error("personal.json debe ser un arreglo de objetos");
         }
 
         // Filtrar registros válidos y extraer puestos
@@ -287,4 +287,5 @@
     cargarPersonal();
   </script>
 </body>
+
 </html>
