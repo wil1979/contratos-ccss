@@ -207,10 +207,10 @@
         console.log(`✅ Cargados ${listaPersonal.length} registros válidos`);
         tablaCuerpo.innerHTML = '<tr><td colspan="4" class="message">Ingrese criterios y haga clic en "Buscar"</td></tr>';
       } catch (error) {
-        console.error("❌ Error al cargar Personal.json:", error);
+        console.error("❌ Error al cargar personal.json:", error);
         tablaCuerpo.innerHTML = `<tr><td colspan="4" class="message error">
           ❌ Error: ${error.message}<br>
-          Verifique que el archivo "Personal.json" exista y sea un JSON válido.
+          Verifique que el archivo "personal.json" exista y sea un JSON válido.
         </td></tr>`;
       }
     }
@@ -289,3 +289,4 @@
 </body>
 
 </html>
+
