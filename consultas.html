@@ -4,7 +4,317 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Consultas de Nombramientos</title>
-  <link rel="stylesheet" href="styleconsulta.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1400px; /* Aumentado para acomodar la nueva columna */
+      margin: 0 auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #2c3e50;
+    }
+    
+    .usuario-info {
+      background-color: #e8f4f8;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .filtros {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    
+    .filtros > div {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .filtros label {
+      font-weight: 600;
+      color: #34495e;
+    }
+    
+    .filtros select, .filtros button {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .filtros button {
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .filtros button:hover {
+      background-color: #2980b9;
+    }
+    
+    #btnExportarPDF {
+      background-color: #27ae60;
+    }
+    
+    #btnExportarPDF:hover {
+      background-color: #219653;
+    }
+    
+    #btnVerDiasLibres {
+      background-color: #9b59b6;
+    }
+    
+    #btnVerDiasLibres:hover {
+      background-color: #8e44ad;
+    }
+    
+    .tabla-container {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    th {
+      background-color: #f8f9fa;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    
+    tr:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .acciones {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-detalle, .btn-editar, .btn-guardar, .btn-cancelar {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    
+    .btn-detalle {
+      background-color: #9b59b6;
+      color: white;
+    }
+    
+    .btn-detalle:hover {
+      background-color: #8e44ad;
+    }
+    
+    .btn-editar {
+      background-color: #3498db;
+      color: white;
+    }
+    
+    .btn-editar:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-guardar {
+      background-color: #27ae60;
+      color: white;
+      display: none;
+    }
+    
+    .btn-guardar:hover {
+      background-color: #219653;
+    }
+    
+    .btn-cancelar {
+      background-color: #e74c3c;
+      color: white;
+      display: none;
+    }
+    
+    .btn-cancelar:hover {
+      background-color: #c0392b;
+    }
+    
+    .cargando, .sin-datos, .error {
+      text-align: center;
+      padding: 20px;
+      font-style: italic;
+    }
+    
+    .error {
+      color: #e74c3c;
+    }
+    
+    .sin-datos {
+      color: #7f8c8d;
+    }
+    
+    /* Modal de Confirmación */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    
+    .modal-contenido {
+      background-color: white;
+      margin: 5% auto;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      position: relative;
+    }
+    
+    .modal-titulo {
+      margin-bottom: 20px;
+      color: #2c3e50;
+      text-align: center;
+    }
+    
+    .modal-botones {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .btn-modal {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    
+    .btn-aceptar {
+      background-color: #27ae60;
+      color: white;
+    }
+    
+    .btn-aceptar:hover {
+      background-color: #219653;
+    }
+    
+    .btn-cancelar-modal {
+      background-color: #95a5a6;
+      color: white;
+    }
+    
+    .btn-cancelar-modal:hover {
+      background-color: #7f8c8d;
+    }
+    
+    /* Modal de Detalle */
+    .detalle-info {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .detalle-info p {
+      margin: 8px 0;
+    }
+    
+    .dias-seleccion h4 {
+      margin-bottom: 15px;
+      color: #34495e;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #34495e;
+    }
+    
+    .form-control, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .btn-flotante-inicio {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #3498db;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 100;
+    }
+    
+    .btn-flotante-inicio:hover {
+      background-color: #2980b9;
+      transform: scale(1.05);
+      transition: transform 0.2s;
+    }
+    
+    /* Estilo para días libres */
+    .dias-libres-info {
+      font-size: 12px;
+      color: #8e44ad;
+      font-weight: 600;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -39,13 +349,13 @@
       <div>
         <label for="anio">Año:</label>
         <select id="anio">
-          <option value="">Todos los años</option>
           <!-- Se llenará dinámicamente con JavaScript -->
         </select>
       </div>
 
       <button id="btnFiltrar">Filtrar</button>
       <button id="btnExportarPDF">📄 Exportar PDF</button>
+      <button id="btnVerDiasLibres">📊 Ver Días Libres</button>
     </div>
 
     <div class="tabla-container">
@@ -63,15 +373,16 @@
             <th>Días</th>
             <th>Salario</th>
             <th>Estado</th>
+            <th>Días Libres</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="tablaRegistros">
-          <tr><td colspan="11" class="cargando">Cargando todos los datos registrados...</td></tr>
+          <tr><td colspan="12" class="cargando">Cargando datos del mes actual...</td></tr>
         </tbody>
       </table>
       <div id="mensajeSinDatos" class="sin-datos" style="display:none;">
-        📭 No se encontraron nombramientos con los criterios seleccionados.
+        📭 No se encontraron nombramientos para este mes y año.
       </div>
     </div>
 
@@ -83,6 +394,47 @@
         <div class="modal-botones">
           <button id="btnAceptar" class="btn-modal btn-aceptar">Aceptar</button>
           <button id="btnCancelarModal" class="btn-modal btn-cancelar-modal">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Detalle de Nombramiento -->
+    <div id="modalDetalle" class="modal">
+      <div class="modal-contenido" style="max-width: 800px; width: 90%;">
+        <h3 class="modal-titulo">Detalles del Nombramiento</h3>
+        
+        <div class="detalle-info">
+          <p><strong>Funcionario:</strong> <span id="detalleFuncionario"></span></p>
+          <p><strong>Período:</strong> <span id="detallePeriodo"></span></p>
+          <p><strong>Área:</strong> <span id="detalleArea"></span></p>
+        </div>
+
+        <div class="dias-seleccion">
+          <h4>Días del período (<span id="totalDias"></span> días totales)</h4>
+          <div id="diasContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin: 15px 0;"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="tipoAusencia">Tipo de Ausencia:</label>
+          <select id="tipoAusencia" class="form-control">
+            <option value="">-- Seleccione tipo --</option>
+            <option value="libre1">Libre 1</option>
+            <option value="libre2">Libre 2</option>
+            <option value="libre3">Libre 3</option>
+            <option value="vacaciones">Vacaciones</option>
+            <option value="incapacidad">Incapacidad</option>
+            <option value="licencia">Licencia</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="comentarioAusencia">Comentario:</label>
+          <textarea id="comentarioAusencia" placeholder="Comentario adicional sobre la ausencia..."></textarea>
+        </div>
+
+        <div class="modal-botones">
+          <button id="btnGuardarDetalle" class="btn-modal btn-aceptar">💾 Guardar Detalles</button>
+          <button id="btnCerrarDetalle" class="btn-modal btn-cancelar-modal">Cerrar</button>
         </div>
       </div>
     </div>
@@ -126,6 +478,8 @@
     let documentoActual = null;
     let filaActual = null;
     let datosOriginales = null;
+    let documentoDetalleActual = null;
+    let diasSeleccionados = new Set();
 
     // 🔹 Extrae mes y año directamente del string YYYY-MM-DD (evita zona horaria)
     function extraerMesYAnioDeFechaString(fechaStr) {
@@ -140,7 +494,7 @@
     // 🔹 Cargar registros con filtro desde Firestore (FILTRANDO POR USUARIO ACTIVO)
     async function cargarRegistros() {
       const mesSeleccionado = document.getElementById("mes")?.value;
-      const anioSeleccionado = document.getElementById("anio")?.value;
+      const anioSeleccionado = parseInt(document.getElementById("anio")?.value);
       const tbody = document.getElementById("tablaRegistros");
       const mensaje = document.getElementById("mensajeSinDatos");
       const tabla = document.getElementById("tablaNombramientos");
@@ -150,10 +504,17 @@
       mensajeError.style.display = "none";
       mensaje.style.display = "none";
 
-      console.log("🔍 Filtrando por Mes:", mesSeleccionado || "Todos", "Año:", anioSeleccionado || "Todos", "Usuario:", usuario.cedula);
+      // ✅ Validar que año sea un número válido
+      if (isNaN(anioSeleccionado)) {
+        tbody.innerHTML = `<tr><td colspan="12" style="color:red;">⚠️ Por favor, seleccione un año válido.</td></tr>`;
+        tabla.style.display = "table";
+        return;
+      }
+
+      console.log("🔍 Filtrando por Mes:", mesSeleccionado, "Año:", anioSeleccionado, "Usuario:", usuario.cedula);
 
       // Mostrar estado de carga
-      tbody.innerHTML = `<tr><td colspan="11" class="cargando">Cargando datos...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="12" class="cargando">Cargando datos...</td></tr>`;
       tabla.style.display = "table";
 
       try {
@@ -164,8 +525,8 @@
         const q = query(nombramientosRef, where("usuarioCedula", "==", usuario.cedula));
         const querySnapshot = await getDocs(q);
 
-        let hayDatos = false;
-        tbody.innerHTML = ""; // Limpiar "Cargando..."
+        // Array para almacenar registros filtrados
+        const registrosFiltrados = [];
 
         // Procesar cada documento
         querySnapshot.forEach((docSnapshot) => {
@@ -184,21 +545,41 @@
             return;
           }
 
-          // Filtrar por mes y año seleccionados (si se seleccionaron)
-          let mostrarRegistro = true;
-          
-          if (mesSeleccionado !== "" && fecha.mes !== parseInt(mesSeleccionado)) {
-            mostrarRegistro = false;
-          }
-          
-          if (anioSeleccionado !== "" && fecha.anio !== parseInt(anioSeleccionado)) {
-            mostrarRegistro = false;
+          // Filtrar por año seleccionado
+          if (fecha.anio !== anioSeleccionado) {
+            return;
           }
 
-          if (mostrarRegistro) {
-            hayDatos = true;
+          // Si se seleccionó un mes específico, filtrar también por mes
+          if (mesSeleccionado !== "" && fecha.mes !== parseInt(mesSeleccionado)) {
+            return;
+          }
+
+          // Agregar a registros filtrados
+          registrosFiltrados.push({
+            id: docSnapshot.id,
+            data: r
+          });
+        });
+
+        // 🔥 ORDENAR por fecha de inicio (ascendente: más antiguo primero)
+        registrosFiltrados.sort((a, b) => {
+          const fechaA = new Date(a.data.inicio);
+          const fechaB = new Date(b.data.inicio);
+          return fechaA - fechaB;
+        });
+
+        // Renderizar los registros ordenados
+        tbody.innerHTML = "";
+        if (registrosFiltrados.length === 0) {
+          tabla.style.display = "none";
+          mensaje.style.display = "block";
+          console.log("📭 No se encontraron datos para este filtro.");
+        } else {
+          registrosFiltrados.forEach(registro => {
+            const r = registro.data;
             
-            // Formatear los datos para mostrar (CAMBIADO: personaSustituirCedula y personaSustituirNombre)
+            // Formatear los datos para mostrar
             const personaSustituirNombre = r.personaSustituirNombre || "SIN DATOS";
             const personaSustituirCedula = r.personaSustituirCedula || "N/A";
             const area = r.area || "N/A";
@@ -208,10 +589,16 @@
             const dias = r.dias || 0;
             const salario = parseFloat(r.salario || 0).toLocaleString('es-CR', { minimumFractionDigits: 2 });
             const estado = r.estado ? "✅ Pagado" : "⏳ Pendiente";
+            
+            // ✅ NUEVO: Formatear días libres
+            const diasLibres = r.diasLibres || [];
+            const diasLibresTexto = diasLibres.length > 0 
+              ? `${diasLibres.length} día${diasLibres.length !== 1 ? 's' : ''}`
+              : "Ninguno";
 
-            // Crear la fila de la tabla
+            // Crear la fila de la tabla (12 columnas de datos + 1 de acciones = 13 columnas)
             const fila = document.createElement('tr');
-            fila.dataset.id = docSnapshot.id;
+            fila.dataset.id = registro.id;
             fila.innerHTML = `
               <td>${personaSustituirCedula}</td>
               <td>${personaSustituirNombre}</td>
@@ -223,28 +610,23 @@
               <td>${dias}</td>
               <td>₡${salario}</td>
               <td>${estado}</td>
+              <td class="dias-libres-info" title="${diasLibres.length > 0 ? 'Fechas: ' + diasLibres.join(', ') : ''}">${diasLibresTexto}</td>
               <td class="acciones">
-                <button class="btn-editar" onclick="iniciarEdicion('${docSnapshot.id}', this)">✏️ Editar</button>
-                <button class="btn-guardar" onclick="guardarCambios('${docSnapshot.id}', this)">💾 Guardar</button>
-                <button class="btn-cancelar" onclick="cancelarEdicion('${docSnapshot.id}', this)">❌ Cancelar</button>
+                <button class="btn-detalle" onclick='abrirDetalle("${registro.id}", JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(r))}")))'>📋 Detalles</button>
+                <button class="btn-editar" onclick="iniciarEdicion('${registro.id}', this)">✏️ Editar</button>
+                <button class="btn-guardar" onclick="guardarCambios('${registro.id}', this)">💾 Guardar</button>
+                <button class="btn-cancelar" onclick="cancelarEdicion('${registro.id}', this)">❌ Cancelar</button>
               </td>
             `;
             tbody.appendChild(fila);
-          }
-        });
-
-        if (!hayDatos) {
-          tabla.style.display = "none";
-          mensaje.style.display = "block";
-          console.log("📭 No se encontraron datos para este filtro.");
-        } else {
-          console.log(`✅ Se cargaron ${querySnapshot.size} registros del usuario ${usuario.cedula}.`);
+          });
+          console.log(`✅ Se cargaron y ordenaron ${registrosFiltrados.length} registros.`);
         }
       } catch (error) {
         console.error("❌ Error al cargar registros de Firestore:", error);
         mensajeError.textContent = "Error al cargar datos: " + error.message;
         mensajeError.style.display = "block";
-        tbody.innerHTML = `<tr><td colspan="11" style="color:red;">Error al cargar datos de la base de datos. Por favor, intente nuevamente.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" style="color:red;">Error al cargar datos de la base de datos. Por favor, intente nuevamente.</td></tr>`;
       }
     }
 
@@ -265,7 +647,7 @@
         final: celdas[5].textContent,
         horario: celdas[6].textContent,
         dias: celdas[7].textContent,
-        salario: celdas[8].textContent.replace('₡', '').replace(/\./g, '').replace(',', '.'),
+        salario: celdas[8].textContent.replace(/[^\d.,-]/g, '').replace(',', '.'),
         estado: celdas[9].textContent.includes('✅')
       };
       
@@ -279,7 +661,7 @@
       btnCancelar.style.display = 'inline-block';
       
       // Convertir celdas en campos editables
-      hacerEditable(celdas[0], 'personaSustituirCedula');
+      hacerEditable(celdas[0], 'personaSustituirCedula'); 
       hacerEditable(celdas[1], 'personaSustituirNombre');
       hacerEditable(celdas[2], 'area');
       hacerEditable(celdas[3], 'codArea');
@@ -303,13 +685,17 @@
       celda.innerHTML = `<input type="date" class="editable" value="${valor === 'N/A' ? '' : valor}" data-campo="${campo}">`;
     }
 
-    // 🔹 Hacer una celda editable como número
+    // 🔹 Hacer una celda editable como número (versión segura)
     function hacerEditableNumero(celda, campo, esMoneda = false) {
       let valor = celda.textContent;
       if (esMoneda) {
-        valor = valor.replace('₡', '').replace(/\./g, '').replace(',', '.').trim();
+        // Eliminar símbolos de moneda, espacios, puntos de miles, y dejar solo dígitos y punto decimal
+        valor = valor.replace(/[^\d,.-]/g, '') // Elimina todo excepto dígitos, comas, puntos, guiones
+                     .replace(',', '.')        // Convertir coma decimal a punto
+                     .replace(/\.(?=.*\.)/g, ''); // Eliminar puntos de miles (solo deja el último punto)
       }
-      celda.innerHTML = `<input type="number" class="editable" value="${valor}" data-campo="${campo}" step="${esMoneda ? '0.01' : '1'}">`;
+      const valorNumerico = parseFloat(valor) || 0;
+      celda.innerHTML = `<input type="number" class="editable" value="${valorNumerico}" data-campo="${campo}" step="${esMoneda ? '0.01' : '1'}">`;
     }
 
     // 🔹 Hacer una celda editable como estado (select)
@@ -450,6 +836,18 @@
           celdas[8].textContent = `₡${parseFloat(nuevosValores.salario || 0).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
           celdas[9].textContent = nuevosValores.estado ? "✅ Pagado" : "⏳ Pendiente";
           
+          // ✅ Actualizar también la columna de días libres (aunque no se edita aquí)
+          const diasLibres = nuevosValores.diasLibres || (datosOriginales?.diasLibres || []);
+          const diasLibresTexto = diasLibres.length > 0 
+            ? `${diasLibres.length} día${diasLibres.length !== 1 ? 's' : ''}`
+            : "Ninguno";
+          celdas[10].textContent = diasLibresTexto;
+          if (diasLibres.length > 0) {
+            celdas[10].title = 'Fechas: ' + diasLibres.join(', ');
+          } else {
+            celdas[10].title = '';
+          }
+          
           // Cambiar los botones
           const btnEditar = fila.querySelector('.btn-editar');
           const btnGuardar = fila.querySelector('.btn-guardar');
@@ -490,11 +888,179 @@
       };
     };
 
+    // 🔹 Abrir modal de detalle
+    window.abrirDetalle = function(docId, datos) {
+      documentoDetalleActual = docId;
+      
+      // Mostrar información básica
+      document.getElementById('detalleFuncionario').textContent = datos.personaSustituirNombre || 'SIN DATOS';
+      document.getElementById('detallePeriodo').textContent = `${datos.inicio} - ${datos.final || 'N/A'}`;
+      document.getElementById('detalleArea').textContent = datos.area || 'N/A';
+      
+      // Generar checkboxes para cada día del período
+      generarDiasPeriodo(datos.inicio, datos.final);
+      
+      // Cargar datos existentes si los hay
+      cargarDatosDetalle(datos);
+      
+      // Mostrar modal
+      document.getElementById('modalDetalle').style.display = 'flex';
+    };
+
+    // 🔹 Generar checkboxes para cada día del período
+    function generarDiasPeriodo(fechaInicio, fechaFinal) {
+      const container = document.getElementById('diasContainer');
+      const totalDiasElem = document.getElementById('totalDias');
+      
+      if (!fechaInicio || !fechaFinal) {
+        container.innerHTML = '<p style="color: red;">Fechas inválidas</p>';
+        totalDiasElem.textContent = '0';
+        return;
+      }
+      
+      const inicio = new Date(fechaInicio);
+      const final = new Date(fechaFinal);
+      const dias = [];
+      
+      // Generar todos los días del período
+      let fechaActual = new Date(inicio);
+      while (fechaActual <= final) {
+        dias.push(new Date(fechaActual));
+        fechaActual.setDate(fechaActual.getDate() + 1);
+      }
+      
+      // Mostrar total de días
+      totalDiasElem.textContent = dias.length;
+      
+      // Crear checkboxes
+      container.innerHTML = '';
+      dias.forEach(fecha => {
+        const fechaStr = fecha.toISOString().split('T')[0];
+        const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'short' });
+        const fechaFormateada = fecha.toLocaleDateString('es-ES');
+        
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.gap = '8px';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `dia_${fechaStr}`;
+        checkbox.value = fechaStr;
+        checkbox.dataset.fecha = fechaStr;
+        
+        const label = document.createElement('label');
+        label.htmlFor = `dia_${fechaStr}`;
+        label.textContent = `${fechaFormateada} (${diaSemana})`;
+        label.style.cursor = 'pointer';
+        
+        div.appendChild(checkbox);
+        div.appendChild(label);
+        container.appendChild(div);
+        
+        // Evento para manejar selección
+        checkbox.addEventListener('change', function() {
+          if (this.checked) {
+            diasSeleccionados.add(this.value);
+          } else {
+            diasSeleccionados.delete(this.value);
+          }
+        });
+      });
+    }
+
+    // 🔹 Cargar datos existentes del detalle
+    function cargarDatosDetalle(datos) {
+      // Resetear selección
+      diasSeleccionados.clear();
+      document.querySelectorAll('#diasContainer input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+      });
+      
+      // Cargar días seleccionados existentes
+      const diasLibres = datos.diasLibres || [];
+      diasLibres.forEach(fecha => {
+        const checkbox = document.querySelector(`#dia_${fecha}`);
+        if (checkbox) {
+          checkbox.checked = true;
+          diasSeleccionados.add(fecha);
+        }
+      });
+      
+      // Cargar tipo de ausencia
+      document.getElementById('tipoAusencia').value = datos.tipoAusencia || '';
+      
+      // Cargar comentario
+      document.getElementById('comentarioAusencia').value = datos.comentarioAusencia || '';
+    }
+
+    // 🔹 Guardar detalles del nombramiento
+    document.getElementById('btnGuardarDetalle').addEventListener('click', async function() {
+      if (!documentoDetalleActual) return;
+      
+      const tipoAusencia = document.getElementById('tipoAusencia').value;
+      const comentarioAusencia = document.getElementById('comentarioAusencia').value;
+      
+      // Validar que se haya seleccionado al menos un día si se eligió un tipo de ausencia
+      if (tipoAusencia && diasSeleccionados.size === 0) {
+        alert('⚠️ Debe seleccionar al menos un día si especifica un tipo de ausencia.');
+        return;
+      }
+      
+      try {
+        // Preparar datos para guardar
+        const datosDetalle = {
+          diasLibres: Array.from(diasSeleccionados),
+          tipoAusencia: tipoAusencia || null,
+          comentarioAusencia: comentarioAusencia || null,
+          ultimaActualizacionDetalle: new Date()
+        };
+        
+        // Actualizar en Firestore
+        const docRef = doc(db, "nombramientos", documentoDetalleActual);
+        await updateDoc(docRef, datosDetalle);
+        
+        // ✅ Actualizar la vista en la tabla principal
+        const fila = document.querySelector(`tr[data-id="${documentoDetalleActual}"]`);
+        if (fila) {
+          const celdaDiasLibres = fila.querySelectorAll('td')[10]; // Índice 10 = columna de días libres
+          const diasLibresTexto = diasSeleccionados.size > 0 
+            ? `${diasSeleccionados.size} día${diasSeleccionados.size !== 1 ? 's' : ''}`
+            : "Ninguno";
+          celdaDiasLibres.textContent = diasLibresTexto;
+          celdaDiasLibres.title = diasSeleccionados.size > 0 
+            ? 'Fechas: ' + Array.from(diasSeleccionados).join(', ') 
+            : '';
+        }
+        
+        alert('✅ Detalles guardados correctamente');
+        document.getElementById('modalDetalle').style.display = 'none';
+        
+      } catch (error) {
+        console.error('Error al guardar detalles:', error);
+        alert('❌ Error al guardar los detalles: ' + error.message);
+      }
+    });
+
+    // 🔹 Cerrar modal de detalle
+    document.getElementById('btnCerrarDetalle').addEventListener('click', function() {
+      document.getElementById('modalDetalle').style.display = 'none';
+    });
+
+    // Cerrar modal al hacer clic fuera
+    window.addEventListener('click', function(event) {
+      const modal = document.getElementById('modalDetalle');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+
     // 🔹 Exportar tabla a PDF usando html2pdf
     function exportarPDF() {
       const element = document.getElementById('tablaNombramientos');
       const mes = document.getElementById("mes").options[document.getElementById("mes").selectedIndex].text;
-      const anio = document.getElementById("anio").options[document.getElementById("anio").selectedIndex].text;
+      const anio = document.getElementById("anio").value;
       const usuarioInfo = document.getElementById('usuarioInfo').outerHTML;
       
       // Verificar si hay datos para exportar
@@ -544,36 +1110,106 @@
       html2pdf().set(opt).from(pdfContainer).save();
     }
 
+    // 🔹 Mostrar resumen de días libres
+    function mostrarResumenDiasLibres() {
+      const modal = document.createElement('div');
+      modal.id = 'modalResumenLibres';
+      modal.className = 'modal';
+      modal.innerHTML = `
+        <div class="modal-contenido" style="max-width: 800px;">
+          <h3 class="modal-titulo">📊 Resumen de Días Libres</h3>
+          <div id="resumenLibresContenido" class="cargando">Cargando resumen...</div>
+          <div class="modal-botones">
+            <button id="btnCerrarResumen" class="btn-modal btn-cancelar-modal">Cerrar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      
+      // Cargar datos
+      cargarResumenDiasLibres();
+      
+      // Cerrar modal
+      document.getElementById('btnCerrarResumen').onclick = () => {
+        document.body.removeChild(modal);
+      };
+    }
+
+    async function cargarResumenDiasLibres() {
+      try {
+        const nombramientosRef = collection(db, "nombramientos");
+        const q = query(nombramientosRef, where("usuarioCedula", "==", usuario.cedula));
+        const querySnapshot = await getDocs(q);
+        
+        let totalDiasLibres = 0;
+        let registrosConLibres = [];
+        
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          const diasLibres = data.diasLibres || [];
+          if (diasLibres.length > 0) {
+            totalDiasLibres += diasLibres.length;
+            registrosConLibres.push({
+              funcionario: data.personaSustituirNombre || 'SIN DATOS',
+              periodo: `${data.inicio} - ${data.final || 'N/A'}`,
+              dias: diasLibres,
+              tipo: data.tipoAusencia || 'Sin tipo'
+            });
+          }
+        });
+        
+        const contenido = document.getElementById('resumenLibresContenido');
+        if (registrosConLibres.length === 0) {
+          contenido.innerHTML = '<p style="text-align: center; color: #7f8c8d;">📭 No has registrado ningún día libre.</p>';
+        } else {
+          let html = `<p><strong>Total de días libres registrados: ${totalDiasLibres}</strong></p>`;
+          html += '<div style="max-height: 400px; overflow-y: auto; margin-top: 15px;">';
+          
+          registrosConLibres.forEach(reg => {
+            html += `
+              <div style="border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px;">
+                <p><strong>Funcionario:</strong> ${reg.funcionario}</p>
+                <p><strong>Período:</strong> ${reg.periodo}</p>
+                <p><strong>Tipo:</strong> ${reg.tipo}</p>
+                <p><strong>Días libres (${reg.dias.length}):</strong> ${reg.dias.join(', ')}</p>
+              </div>
+            `;
+          });
+          
+          html += '</div>';
+          contenido.innerHTML = html;
+        }
+        
+      } catch (error) {
+        console.error('Error al cargar resumen:', error);
+        document.getElementById('resumenLibresContenido').innerHTML = 
+          '<p style="color: red;">❌ Error al cargar el resumen: ' + error.message + '</p>';
+      }
+    }
+
     // ✅ Inicialización segura al cargar la página
     document.addEventListener("DOMContentLoaded", () => {
       const hoy = new Date();
       const mesSelect = document.getElementById("mes");
       const anioSelect = document.getElementById("anio");
 
-      // Establecer opción "Todos los meses" por defecto
-      if (mesSelect) mesSelect.value = "";
+      // Establecer mes actual por defecto
+      if (mesSelect) mesSelect.value = hoy.getMonth() + 1;
 
-      // Llenar el select de años desde 2020 hasta 2025 con opción "Todos los años"
+      // Llenar el select de años desde 2020 hasta 2025
       if (anioSelect) {
         anioSelect.innerHTML = ""; // Limpiar opciones existentes
-        // Agregar opción "Todos los años"
-        const optionTodos = document.createElement("option");
-        optionTodos.value = "";
-        optionTodos.textContent = "Todos los años";
-        anioSelect.appendChild(optionTodos);
-        
-        // Agregar años desde 2020 hasta 2025
         for (let year = 2020; year <= 2025; year++) {
           const option = document.createElement("option");
           option.value = year;
           option.textContent = year;
           anioSelect.appendChild(option);
         }
-        // Establecer opción "Todos los años" por defecto
-        anioSelect.value = "";
+        // Establecer año actual por defecto
+        anioSelect.value = hoy.getFullYear();
       }
 
-      // Cargar todos los datos iniciales (sin filtros)
+      // Cargar datos iniciales después de un breve retraso
       setTimeout(() => {
         cargarRegistros();
       }, 500);
@@ -583,6 +1219,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       const btnFiltrar = document.getElementById("btnFiltrar");
       const btnExportarPDF = document.getElementById("btnExportarPDF");
+      const btnVerDiasLibres = document.getElementById("btnVerDiasLibres");
       const selectMes = document.getElementById("mes");
       const selectAnio = document.getElementById("anio");
 
@@ -592,6 +1229,10 @@
 
       if (btnExportarPDF) {
         btnExportarPDF.addEventListener("click", exportarPDF);
+      }
+
+      if (btnVerDiasLibres) {
+        btnVerDiasLibres.addEventListener("click", mostrarResumenDiasLibres);
       }
 
       // ✅ Auto-filtrar cuando cambie mes
