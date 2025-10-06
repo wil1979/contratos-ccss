@@ -1,15 +1,102 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard CCSS</title>
-  <link rel="stylesheet" href="style.css">
- 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard CCSS | Gestión de Personal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .dashboard-card {
+      @apply transition-all duration-300 hover:scale-105 hover:shadow-xl;
+    }
+  </style>
 </head>
-<body>
-  <div class="container">
-    <h2>Bienvenido</h2>
-    <p id="usuarioNombre"></p>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+  <nav class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="shield-plus" class="text-blue-600 w-6 h-6"></i>
+        <span class="text-xl font-bold text-gray-800">CCSS Dashboard</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span id="usuarioNombre" class="text-sm font-medium text-gray-600"></span>
+        <button onclick="cerrarSesion()" class="flex items-center space-x-1 bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+          <span class="text-sm">Salir</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
+      <button onclick="location.href='nombramientos.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-blue-500 border-2 border-transparent">
+        <div class="flex items-center space-x-4">
+          <div class="bg-blue-100 p-3 rounded-lg">
+            <i data-lucide="file-text" class="w-6 h-6 text-blue-600"></i>
+          </div>
+          <div class="text-left">
+            <h3 class="font-semibold text-gray-800">Registrar Nombramientos</h3>
+            <p class="text-sm text-gray-500 mt-1">Gestión de nuevos nombramientos</p>
+          </div>
+        </div>
+      </button>
+
+      <button onclick="location.href='consultas.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
+        <div class="flex items-center space-x-4">
+          <div class="bg-green-100 p-3 rounded-lg">
+            <i data-lucide="search" class="w-6 h-6 text-green-600"></i>
+          </div>
+          <div class="text-left">
+            <h3 class="font-semibold text-gray-800">Consultar Nombramientos</h3>
+            <p class="text-sm text-gray-500 mt-1">Búsqueda y visualización</p>
+          </div>
+        </div>
+      </button>
+
+<button onclick="location.href='tiempo_extra.htm'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
+        <div class="flex items-center space-x-4">
+          <div class="bg-red-100 p-3 rounded-lg">
+            <i data-lucide="search" class="w-6 h-6 text-green-600"></i>
+          </div>
+          <div class="text-left">
+            <h3 class="font-semibold text-gray-800">Registrar Tiempo extraordinario</h3>
+            <p class="text-sm text-gray-500 mt-1">Registro de datos</p>
+          </div>
+        </div>
+      </button>
+
+<button onclick="location.href='personal.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
+        <div class="flex items-center space-x-4">
+          <div class="bg-pink-100 p-3 rounded-lg">
+            <i data-lucide="search" class="w-6 h-6 text-green-600"></i>
+          </div>
+          <div class="text-left">
+            <h3 class="font-semibold text-gray-800">Consultar Extras</h3>
+            <p class="text-sm text-gray-500 mt-1">Visualización</p>
+          </div>
+        </div>
+      </button>
+
+      <!-- Resto de botones con estructura similar -->
+    </div>
+  </main>
+
+  <script>
+    lucide.createIcons();
+    // Animación inicial
+    document.querySelectorAll('.dashboard-card').forEach((card, index) => {
+      card.style.animation = `fadeIn 0.5s ease-out ${index * 0.1}s both`;
+    });
+
+    // Resto del código JavaScript original
+
 
     <button onclick="location.href='nombramientos.html'">📑 Registrar Nombramientos</button>
     <button onclick="location.href='consultas.html'">⏱ Consultar Nombramientos</button>
