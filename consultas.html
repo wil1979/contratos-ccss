@@ -18,7 +18,7 @@
     }
     
     .container {
-      max-width: 1400px; /* Aumentado para acomodar la nueva columna */
+      max-width: 1400px;
       margin: 0 auto;
       background: white;
       padding: 25px;
@@ -491,6 +491,26 @@
       return { mes, anio };
     }
 
+    // 🔹 Calcular días y salario
+    function calcularDiasYsalario(fechaInicio, fechaFinal) {
+      if (!fechaInicio || !fechaFinal) return { dias: 0, salario: 0 };
+      
+      const inicio = new Date(fechaInicio);
+      const final = new Date(fechaFinal);
+      
+      // Validar fechas
+      if (isNaN(inicio.getTime()) || isNaN(final.getTime()) || final < inicio) {
+        return { dias: 0, salario: 0 };
+      }
+      
+      const diffTime = final - inicio;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      const dias = Math.max(0, diffDays);
+      const salario = dias * 14523; // Tarifa diaria
+      
+      return { dias, salario };
+    }
+
     // 🔹 Cargar registros con filtro desde Firestore (FILTRANDO POR USUARIO ACTIVO)
     async function cargarRegistros() {
       const mesSeleccionado = document.getElementById("mes")?.value;
@@ -558,7 +578,7 @@
           // Agregar a registros filtrados
           registrosFiltrados.push({
             id: docSnapshot.id,
-            data: r
+             r
           });
         });
 
@@ -586,8 +606,8 @@
             const codArea = r.codArea || "N/A";
             const fechaFinal = r.final || "N/A";
             const horario = `${r.horarioEntrada || 'N/A'} - ${r.horarioSalida || 'N/A'}`;
-            const dias = r.dias || 0;
-            const salario = parseFloat(r.salario || 0).toLocaleString('es-CR', { minimumFractionDigits: 2 });
+            const { dias, salario } = calcularDiasYsalario(r.inicio, r.final);
+            const salarioFormateado = salario.toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const estado = r.estado ? "✅ Pagado" : "⏳ Pendiente";
             
             // ✅ NUEVO: Formatear días libres
@@ -608,7 +628,7 @@
               <td>${fechaFinal}</td>
               <td>${horario}</td>
               <td>${dias}</td>
-              <td>₡${salario}</td>
+              <td>₡${salarioFormateado}</td>
               <td>${estado}</td>
               <td class="dias-libres-info" title="${diasLibres.length > 0 ? 'Fechas: ' + diasLibres.join(', ') : ''}">${diasLibresTexto}</td>
               <td class="acciones">
@@ -646,8 +666,8 @@
         inicio: celdas[4].textContent,
         final: celdas[5].textContent,
         horario: celdas[6].textContent,
-        dias: celdas[7].textContent,
-        salario: celdas[8].textContent.replace(/[^\d.,-]/g, '').replace(',', '.'),
+        dias: parseInt(celdas[7].textContent) || 0,
+        salario: parseFloat(celdas[8].textContent.replace(/[^\d.,-]/g, '').replace(',', '.')) || 0,
         estado: celdas[9].textContent.includes('✅')
       };
       
@@ -671,6 +691,25 @@
       hacerEditableNumero(celdas[7], 'dias');
       hacerEditableNumero(celdas[8], 'salario', true);
       hacerEditableEstado(celdas[9], 'estado');
+      
+      // ✅ Agregar eventos para actualizar salario al cambiar fechas
+      const inputInicio = celdas[4].querySelector('input');
+      const inputFinal = celdas[5].querySelector('input');
+      
+      if (inputInicio && inputFinal) {
+        const actualizarSalario = () => {
+          const inicioVal = inputInicio.value;
+          const finalVal = inputFinal.value;
+          if (inicioVal && finalVal) {
+            const { dias, salario } = calcularDiasYsalario(inicioVal, finalVal);
+            celdas[7].querySelector('input').value = dias;
+            celdas[8].querySelector('input').value = salario;
+          }
+        };
+        
+        inputInicio.addEventListener('change', actualizarSalario);
+        inputFinal.addEventListener('change', actualizarSalario);
+      }
     };
 
     // 🔹 Hacer una celda editable como texto
@@ -824,6 +863,10 @@
           const docRef = doc(db, "nombramientos", docId);
           await updateDoc(docRef, nuevosValores);
           
+          // Recalcular días y salario para mostrar
+          const { dias, salario } = calcularDiasYsalario(nuevosValores.inicio, nuevosValores.final);
+          const salarioFormateado = salario.toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          
           // Actualizar la vista
           celdas[0].textContent = nuevosValores.personaSustituirCedula || "N/A";
           celdas[1].textContent = nuevosValores.personaSustituirNombre || "N/A";
@@ -832,8 +875,8 @@
           celdas[4].textContent = nuevosValores.inicio || "N/A";
           celdas[5].textContent = nuevosValores.final || "N/A";
           celdas[6].textContent = `${nuevosValores.horarioEntrada || 'N/A'} - ${nuevosValores.horarioSalida || 'N/A'}`;
-          celdas[7].textContent = nuevosValores.dias || 0;
-          celdas[8].textContent = `₡${parseFloat(nuevosValores.salario || 0).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+          celdas[7].textContent = dias;
+          celdas[8].textContent = `₡${salarioFormateado}`;
           celdas[9].textContent = nuevosValores.estado ? "✅ Pagado" : "⏳ Pendiente";
           
           // ✅ Actualizar también la columna de días libres (aunque no se edita aquí)
@@ -1112,6 +1155,12 @@
 
     // 🔹 Mostrar resumen de días libres
     function mostrarResumenDiasLibres() {
+      // Primero, eliminar modal anterior si existe
+      const modalExistente = document.getElementById('modalResumenLibres');
+      if (modalExistente) {
+        document.body.removeChild(modalExistente);
+      }
+
       const modal = document.createElement('div');
       modal.id = 'modalResumenLibres';
       modal.className = 'modal';
@@ -1132,6 +1181,13 @@
       // Cerrar modal
       document.getElementById('btnCerrarResumen').onclick = () => {
         document.body.removeChild(modal);
+      };
+      
+      // Cerrar al hacer clic fuera
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          document.body.removeChild(modal);
+        }
       };
     }
 
@@ -1160,18 +1216,21 @@
         
         const contenido = document.getElementById('resumenLibresContenido');
         if (registrosConLibres.length === 0) {
-          contenido.innerHTML = '<p style="text-align: center; color: #7f8c8d;">📭 No has registrado ningún día libre.</p>';
+          contenido.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 20px;">📭 No has registrado ningún día libre.</p>';
         } else {
-          let html = `<p><strong>Total de días libres registrados: ${totalDiasLibres}</strong></p>`;
+          let html = `<p style="text-align: center; font-weight: bold; margin-bottom: 15px; color: #8e44ad;">
+            Total de días libres registrados: <span style="font-size: 24px; color: #2c3e50;">${totalDiasLibres}</span>
+          </p>`;
           html += '<div style="max-height: 400px; overflow-y: auto; margin-top: 15px;">';
           
           registrosConLibres.forEach(reg => {
             html += `
-              <div style="border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px;">
+              <div style="border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px; background: #f9f9f9;">
                 <p><strong>Funcionario:</strong> ${reg.funcionario}</p>
                 <p><strong>Período:</strong> ${reg.periodo}</p>
-                <p><strong>Tipo:</strong> ${reg.tipo}</p>
-                <p><strong>Días libres (${reg.dias.length}):</strong> ${reg.dias.join(', ')}</p>
+                <p><strong>Tipo de ausencia:</strong> ${reg.tipo}</p>
+                <p><strong>Días libres (${reg.dias.length}):</strong></p>
+                <p style="background: white; padding: 8px; border-radius: 4px; font-family: monospace;">${reg.dias.join(', ')}</p>
               </div>
             `;
           });
@@ -1181,9 +1240,13 @@
         }
         
       } catch (error) {
-        console.error('Error al cargar resumen:', error);
-        document.getElementById('resumenLibresContenido').innerHTML = 
-          '<p style="color: red;">❌ Error al cargar el resumen: ' + error.message + '</p>';
+        console.error('❌ Error al cargar resumen de días libres:', error);
+        const contenido = document.getElementById('resumenLibresContenido');
+        if (contenido) {
+          contenido.innerHTML = `<p style="color: red; padding: 20px; text-align: center;">
+            ❌ Error al cargar el resumen: ${error.message}
+          </p>`;
+        }
       }
     }
 
@@ -1192,37 +1255,28 @@
       const hoy = new Date();
       const mesSelect = document.getElementById("mes");
       const anioSelect = document.getElementById("anio");
-
-      // Establecer mes actual por defecto
-      if (mesSelect) mesSelect.value = hoy.getMonth() + 1;
-
-      // Llenar el select de años desde 2020 hasta 2025
-      if (anioSelect) {
-        anioSelect.innerHTML = ""; // Limpiar opciones existentes
-        for (let year = 2020; year <= 2025; year++) {
-          const option = document.createElement("option");
-          option.value = year;
-          option.textContent = year;
-          anioSelect.appendChild(option);
-        }
-        // Establecer año actual por defecto
-        anioSelect.value = hoy.getFullYear();
-      }
-
-      // Cargar datos iniciales después de un breve retraso
-      setTimeout(() => {
-        cargarRegistros();
-      }, 500);
-    });
-
-    // ✅ Asignar eventos a botones y filtros automáticos
-    document.addEventListener("DOMContentLoaded", () => {
       const btnFiltrar = document.getElementById("btnFiltrar");
       const btnExportarPDF = document.getElementById("btnExportarPDF");
       const btnVerDiasLibres = document.getElementById("btnVerDiasLibres");
       const selectMes = document.getElementById("mes");
       const selectAnio = document.getElementById("anio");
 
+      // Establecer mes actual por defecto
+      if (mesSelect) mesSelect.value = hoy.getMonth() + 1;
+
+      // Llenar el select de años desde 2020 hasta 2025
+      if (anioSelect) {
+        anioSelect.innerHTML = "";
+        for (let year = 2020; year <= 2025; year++) {
+          const option = document.createElement("option");
+          option.value = year;
+          option.textContent = year;
+          anioSelect.appendChild(option);
+        }
+        anioSelect.value = hoy.getFullYear();
+      }
+
+      // Asignar eventos a los botones
       if (btnFiltrar) {
         btnFiltrar.addEventListener("click", cargarRegistros);
       }
@@ -1232,20 +1286,26 @@
       }
 
       if (btnVerDiasLibres) {
-        btnVerDiasLibres.addEventListener("click", mostrarResumenDiasLibres);
+        btnVerDiasLibres.addEventListener("click", function(e) {
+          e.preventDefault();
+          console.log("✅ Botón 'Ver Días Libres' clickeado");
+          mostrarResumenDiasLibres();
+        });
       }
 
-      // ✅ Auto-filtrar cuando cambie mes
+      // Auto-filtrar cuando cambie mes o año
       if (selectMes) {
         selectMes.addEventListener("change", cargarRegistros);
       }
 
-      // ✅ Auto-filtrar cuando cambie año
       if (selectAnio) {
         selectAnio.addEventListener("change", cargarRegistros);
       }
 
-      console.log("✅ Todos los eventos y auto-filtros asignados correctamente.");
+      // Cargar datos iniciales
+      setTimeout(cargarRegistros, 500);
+
+      console.log("✅ Todos los eventos asignados correctamente.");
     });
   </script>
 </body>
