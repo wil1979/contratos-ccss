@@ -491,15 +491,23 @@
       return { mes, anio };
     }
 
-    // 🔹 Calcular días y salario
+    // 🔹 Calcular días y salario (versión segura)
     function calcularDiasYsalario(fechaInicio, fechaFinal) {
-      if (!fechaInicio || !fechaFinal) return { dias: 0, salario: 0 };
+      // Verificar que ambas fechas existan y sean válidas
+      if (!fechaInicio || !fechaFinal) {
+        return { dias: 0, salario: 0 };
+      }
       
       const inicio = new Date(fechaInicio);
       const final = new Date(fechaFinal);
       
-      // Validar fechas
-      if (isNaN(inicio.getTime()) || isNaN(final.getTime()) || final < inicio) {
+      // Validar que las fechas sean válidas
+      if (isNaN(inicio.getTime()) || isNaN(final.getTime())) {
+        return { dias: 0, salario: 0 };
+      }
+      
+      // Validar que la fecha final no sea anterior a la inicial
+      if (final < inicio) {
         return { dias: 0, salario: 0 };
       }
       
@@ -553,7 +561,7 @@
           const r = docSnapshot.data();
           
           // Verificar que el documento tenga la fecha de inicio
-          if (!r.inicio) {
+          if (!r || !r.inicio) {
             console.warn("📄 Documento sin campo 'inicio':", docSnapshot.id);
             return;
           }
@@ -599,19 +607,29 @@
           registrosFiltrados.forEach(registro => {
             const r = registro.data;
             
-            // Formatear los datos para mostrar
-            const personaSustituirNombre = r.personaSustituirNombre || "SIN DATOS";
-            const personaSustituirCedula = r.personaSustituirCedula || "N/A";
-            const area = r.area || "N/A";
-            const codArea = r.codArea || "N/A";
-            const fechaFinal = r.final || "N/A";
-            const horario = `${r.horarioEntrada || 'N/A'} - ${r.horarioSalida || 'N/A'}`;
-            const { dias, salario } = calcularDiasYsalario(r.inicio, r.final);
-            const salarioFormateado = salario.toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            const estado = r.estado ? "✅ Pagado" : "⏳ Pendiente";
+            // ✅ Formatear los datos para mostrar (versión segura)
+            const personaSustituirNombre = (r && r.personaSustituirNombre) || "SIN DATOS";
+            const personaSustituirCedula = (r && r.personaSustituirCedula) || "N/A";
+            const area = (r && r.area) || "N/A";
+            const codArea = (r && r.codArea) || "N/A";
+            const fechaFinal = (r && r.final) || "N/A";
+            const horarioEntrada = (r && r.horarioEntrada) || "N/A";
+            const horarioSalida = (r && r.horarioSalida) || "N/A";
+            const horario = `${horarioEntrada} - ${horarioSalida}`;
+            const estado = (r && r.estado) ? "✅ Pagado" : "⏳ Pendiente";
+
+            // ✅ Calcular días y salario de forma segura
+            const { dias, salario } = calcularDiasYsalario(
+              (r && r.inicio) || null,
+              (r && r.final) || null
+            );
+            const salarioFormateado = salario.toLocaleString('es-CR', { 
+              minimumFractionDigits: 2, 
+              maximumFractionDigits: 2 
+            });
             
-            // ✅ NUEVO: Formatear días libres
-            const diasLibres = r.diasLibres || [];
+            // ✅ NUEVO: Formatear días libres (versión segura)
+            const diasLibres = (r && r.diasLibres) || [];
             const diasLibresTexto = diasLibres.length > 0 
               ? `${diasLibres.length} día${diasLibres.length !== 1 ? 's' : ''}`
               : "Ninguno";
@@ -624,7 +642,7 @@
               <td>${personaSustituirNombre}</td>
               <td>${area}</td>
               <td>${codArea}</td>
-              <td>${r.inicio}</td>
+              <td>${(r && r.inicio) || "N/A"}</td>
               <td>${fechaFinal}</td>
               <td>${horario}</td>
               <td>${dias}</td>
@@ -632,7 +650,7 @@
               <td>${estado}</td>
               <td class="dias-libres-info" title="${diasLibres.length > 0 ? 'Fechas: ' + diasLibres.join(', ') : ''}">${diasLibresTexto}</td>
               <td class="acciones">
-                <button class="btn-detalle" onclick='abrirDetalle("${registro.id}", JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(r))}")))'>📋 Detalles</button>
+                <button class="btn-detalle" onclick='abrirDetalle("${registro.id}", JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(r || {}))}")))'>📋 Detalles</button>
                 <button class="btn-editar" onclick="iniciarEdicion('${registro.id}', this)">✏️ Editar</button>
                 <button class="btn-guardar" onclick="guardarCambios('${registro.id}', this)">💾 Guardar</button>
                 <button class="btn-cancelar" onclick="cancelarEdicion('${registro.id}', this)">❌ Cancelar</button>
@@ -644,7 +662,7 @@
         }
       } catch (error) {
         console.error("❌ Error al cargar registros de Firestore:", error);
-        mensajeError.textContent = "Error al cargar datos: " + error.message;
+        mensajeError.textContent = "Error al cargar datos: " + (error.message || 'Error desconocido');
         mensajeError.style.display = "block";
         tbody.innerHTML = `<tr><td colspan="12" style="color:red;">Error al cargar datos de la base de datos. Por favor, intente nuevamente.</td></tr>`;
       }
@@ -910,7 +928,7 @@
           
         } catch (error) {
           console.error("Error al guardar cambios:", error);
-          alert("❌ Error al guardar los cambios: " + error.message);
+          alert("❌ Error al guardar los cambios: " + (error.message || 'Error desconocido'));
         }
         
         // Cerrar modal
@@ -936,15 +954,15 @@
       documentoDetalleActual = docId;
       
       // Mostrar información básica
-      document.getElementById('detalleFuncionario').textContent = datos.personaSustituirNombre || 'SIN DATOS';
-      document.getElementById('detallePeriodo').textContent = `${datos.inicio} - ${datos.final || 'N/A'}`;
-      document.getElementById('detalleArea').textContent = datos.area || 'N/A';
+      document.getElementById('detalleFuncionario').textContent = (datos && datos.personaSustituirNombre) || 'SIN DATOS';
+      document.getElementById('detallePeriodo').textContent = `${(datos && datos.inicio) || 'N/A'} - ${(datos && datos.final) || 'N/A'}`;
+      document.getElementById('detalleArea').textContent = (datos && datos.area) || 'N/A';
       
       // Generar checkboxes para cada día del período
-      generarDiasPeriodo(datos.inicio, datos.final);
+      generarDiasPeriodo((datos && datos.inicio) || null, (datos && datos.final) || null);
       
       // Cargar datos existentes si los hay
-      cargarDatosDetalle(datos);
+      cargarDatosDetalle(datos || {});
       
       // Mostrar modal
       document.getElementById('modalDetalle').style.display = 'flex';
@@ -1022,7 +1040,7 @@
       });
       
       // Cargar días seleccionados existentes
-      const diasLibres = datos.diasLibres || [];
+      const diasLibres = (datos && datos.diasLibres) || [];
       diasLibres.forEach(fecha => {
         const checkbox = document.querySelector(`#dia_${fecha}`);
         if (checkbox) {
@@ -1032,10 +1050,10 @@
       });
       
       // Cargar tipo de ausencia
-      document.getElementById('tipoAusencia').value = datos.tipoAusencia || '';
+      document.getElementById('tipoAusencia').value = (datos && datos.tipoAusencia) || '';
       
       // Cargar comentario
-      document.getElementById('comentarioAusencia').value = datos.comentarioAusencia || '';
+      document.getElementById('comentarioAusencia').value = (datos && datos.comentarioAusencia) || '';
     }
 
     // 🔹 Guardar detalles del nombramiento
@@ -1082,7 +1100,7 @@
         
       } catch (error) {
         console.error('Error al guardar detalles:', error);
-        alert('❌ Error al guardar los detalles: ' + error.message);
+        alert('❌ Error al guardar los detalles: ' + (error.message || 'Error desconocido'));
       }
     });
 
@@ -1202,14 +1220,14 @@
         
         querySnapshot.forEach(doc => {
           const data = doc.data();
-          const diasLibres = data.diasLibres || [];
+          const diasLibres = (data && data.diasLibres) || [];
           if (diasLibres.length > 0) {
             totalDiasLibres += diasLibres.length;
             registrosConLibres.push({
-              funcionario: data.personaSustituirNombre || 'SIN DATOS',
-              periodo: `${data.inicio} - ${data.final || 'N/A'}`,
+              funcionario: (data && data.personaSustituirNombre) || 'SIN DATOS',
+              periodo: `${(data && data.inicio) || 'N/A'} - ${(data && data.final) || 'N/A'}`,
               dias: diasLibres,
-              tipo: data.tipoAusencia || 'Sin tipo'
+              tipo: (data && data.tipoAusencia) || 'Sin tipo'
             });
           }
         });
@@ -1244,7 +1262,7 @@
         const contenido = document.getElementById('resumenLibresContenido');
         if (contenido) {
           contenido.innerHTML = `<p style="color: red; padding: 20px; text-align: center;">
-            ❌ Error al cargar el resumen: ${error.message}
+            ❌ Error al cargar el resumen: ${(error.message || 'Error desconocido')}
           </p>`;
         }
       }
