@@ -3,26 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard CCSS | Gestión de Personal</title>
+  <title>Menu Interinos CCSS | Gestión de Personal</title>
+   <link rel="stylesheet" href="styleconsulta.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .dashboard-card {
-      @apply transition-all duration-300 hover:scale-105 hover:shadow-xl;
-    }
-  </style>
+  
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
   <nav class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center space-x-2">
         <i data-lucide="shield-plus" class="text-blue-600 w-6 h-6"></i>
-        <span class="text-xl font-bold text-gray-800">CCSS Dashboard</span>
+        <span class="text-xl font-bold text-gray-800">Menu Interinos CCSS</span>
       </div>
       <div class="flex items-center space-x-4">
         <span id="usuarioNombre" class="text-sm font-medium text-gray-600"></span>
@@ -78,8 +70,20 @@
             <i data-lucide="search" class="w-6 h-6 text-green-600"></i>
           </div>
           <div class="text-left">
-            <h3 class="font-semibold text-gray-800">Consultar Extras</h3>
-            <p class="text-sm text-gray-500 mt-1">Visualización</p>
+            <h3 class="font-semibold text-gray-800">Consultar Personal</h3>
+            <p class="text-sm text-black-500 mt-1">Visualización</p>
+          </div>
+        </div>
+      </button>
+
+      <button onclick="location.href='calendar.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
+        <div class="flex items-center space-x-4">
+          <div class="bg-orange-100 p-3 rounded-lg">
+            <i data-lucide="search" class="w-6 h-6 text-red-600"></i>
+          </div>
+          <div class="text-left">
+            <h3 class="font-semibold text-gray-800">Calendario laboral</h3>
+            <p class="text-sm text-gray-500 mt-1">Registro y Visualización</p>
           </div>
         </div>
       </button>
@@ -98,14 +102,7 @@
     // Resto del código JavaScript original
 
 
-    <button onclick="location.href='nombramientos.html'">📑 Registrar Nombramientos</button>
-    <button onclick="location.href='consultas.html'">⏱ Consultar Nombramientos</button>
-    <button onclick="location.href='tiempo_extra.html'">⏱ Registrar Tiempo Extraordinario</button>
-    <button onclick="location.href='personal.html'">⏱ Consultar Personal</button>
-    <button class="logout" onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
-  </div>
-
-  <script>
+ 
     // Verificar usuario en sesión
     const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
     if (!usuario) {
@@ -121,5 +118,4 @@
     }
   </script>
 </body>
-
 </html>

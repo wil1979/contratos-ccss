@@ -3,64 +3,324 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Consultas de Nombramientos (Corregido)</title>
+  <title>Consultas de Nombramientos</title>
   <style>
-    /* (mantuve el mismo estilo del archivo original para no cambiar la UI) */
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #f5f7fa; padding: 20px; }
-    .container { max-width: 1200px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    h2 { text-align: center; margin-bottom: 25px; color: #2c3e50; }
-    .usuario-info { background-color: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-    .filtros { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: end; }
-    .filtros > div { display: flex; flex-direction: column; gap: 5px; }
-    .filtros label { font-weight: 600; color: #34495e; }
-    .filtros select, .filtros button { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-    .filtros button { background-color: #3498db; color: white; cursor: pointer; font-weight: 600; }
-    .filtros button:hover { background-color: #2980b9; }
-    #btnExportarPDF { background-color: #27ae60; }
-    #btnExportarPDF:hover { background-color: #219653; }
-    .tabla-container { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-    th { background-color: #f8f9fa; color: #2c3e50; font-weight: 600; }
-    tr:hover { background-color: #f8f9fa; }
-    .acciones { display: flex; gap: 5px; flex-wrap: wrap; }
-    .btn-detalle, .btn-editar, .btn-guardar, .btn-cancelar { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap; }
-    .btn-detalle { background-color: #9b59b6; color: white; }
-    .btn-detalle:hover { background-color: #8e44ad; }
-    .btn-editar { background-color: #3498db; color: white; }
-    .btn-editar:hover { background-color: #2980b9; }
-    .btn-guardar { background-color: #27ae60; color: white; display: none; }
-    .btn-guardar:hover { background-color: #219653; }
-    .btn-cancelar { background-color: #e74c3c; color: white; display: none; }
-    .btn-cancelar:hover { background-color: #c0392b; }
-    .cargando, .sin-datos, .error { text-align: center; padding: 20px; font-style: italic; }
-    .error { color: #e74c3c; }
-    .sin-datos { color: #7f8c8d; }
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-    .modal-contenido { background-color: white; margin: 5% auto; padding: 25px; border-radius: 12px; max-width: 600px; width: 90%; position: relative; }
-    .modal-titulo { margin-bottom: 20px; color: #2c3e50; text-align: center; }
-    .modal-botones { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
-    .btn-modal { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; }
-    .btn-aceptar { background-color: #27ae60; color: white; }
-    .btn-aceptar:hover { background-color: #219653; }
-    .btn-cancelar-modal { background-color: #95a5a6; color: white; }
-    .btn-cancelar-modal:hover { background-color: #7f8c8d; }
-    .detalle-info { background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-    .detalle-info p { margin: 8px 0; }
-    .dias-seleccion h4 { margin-bottom: 15px; color: #34495e; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #34495e; }
-    .form-control, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-    textarea { resize: vertical; min-height: 80px; }
-    .btn-flotante-inicio { position: fixed; bottom: 20px; right: 20px; background-color: #3498db; color: white; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 100; }
-    .btn-flotante-inicio:hover { background-color: #2980b9; transform: scale(1.05); transition: transform 0.2s; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #2c3e50;
+    }
+    
+    .usuario-info {
+      background-color: #e8f4f8;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .filtros {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    
+    .filtros > div {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .filtros label {
+      font-weight: 600;
+      color: #34495e;
+    }
+    
+    .filtros select, .filtros button {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .filtros button {
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .filtros button:hover {
+      background-color: #2980b9;
+    }
+    
+    #btnExportarPDF {
+      background-color: #27ae60;
+    }
+    
+    #btnExportarPDF:hover {
+      background-color: #219653;
+    }
+    
+    #btnVerDiasLibres {
+      background-color: #9b59b6;
+    }
+    
+    #btnVerDiasLibres:hover {
+      background-color: #8e44ad;
+    }
+    
+    .tabla-container {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    th {
+      background-color: #f8f9fa;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    
+    tr:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .acciones {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-detalle, .btn-editar, .btn-guardar, .btn-cancelar {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    
+    .btn-detalle {
+      background-color: #9b59b6;
+      color: white;
+    }
+    
+    .btn-detalle:hover {
+      background-color: #8e44ad;
+    }
+    
+    .btn-editar {
+      background-color: #3498db;
+      color: white;
+    }
+    
+    .btn-editar:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-guardar {
+      background-color: #27ae60;
+      color: white;
+      display: none;
+    }
+    
+    .btn-guardar:hover {
+      background-color: #219653;
+    }
+    
+    .btn-cancelar {
+      background-color: #e74c3c;
+      color: white;
+      display: none;
+    }
+    
+    .btn-cancelar:hover {
+      background-color: #c0392b;
+    }
+    
+    .cargando, .sin-datos, .error {
+      text-align: center;
+      padding: 20px;
+      font-style: italic;
+    }
+    
+    .error {
+      color: #e74c3c;
+    }
+    
+    .sin-datos {
+      color: #7f8c8d;
+    }
+    
+    /* Modal de Confirmación */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    
+    .modal-contenido {
+      background-color: white;
+      margin: 5% auto;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      position: relative;
+    }
+    
+    .modal-titulo {
+      margin-bottom: 20px;
+      color: #2c3e50;
+      text-align: center;
+    }
+    
+    .modal-botones {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .btn-modal {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    
+    .btn-aceptar {
+      background-color: #27ae60;
+      color: white;
+    }
+    
+    .btn-aceptar:hover {
+      background-color: #219653;
+    }
+    
+    .btn-cancelar-modal {
+      background-color: #95a5a6;
+      color: white;
+    }
+    
+    .btn-cancelar-modal:hover {
+      background-color: #7f8c8d;
+    }
+    
+    /* Modal de Detalle */
+    .detalle-info {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .detalle-info p {
+      margin: 8px 0;
+    }
+    
+    .dias-seleccion h4 {
+      margin-bottom: 15px;
+      color: #34495e;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #34495e;
+    }
+    
+    .form-control, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .btn-flotante-inicio {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #3498db;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 100;
+    }
+    
+    .btn-flotante-inicio:hover {
+      background-color: #2980b9;
+      transform: scale(1.05);
+      transition: transform 0.2s;
+    }
+    
+    /* Estilo para días libres */
+    .dias-libres-info {
+      font-size: 12px;
+      color: #8e44ad;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Consultas de Nombramientos</h2>
 
+    <!-- Información del usuario activo -->
     <div class="usuario-info" id="usuarioInfo">
       <h3>Usuario Activo: <span id="nombreUsuario">Cargando...</span></h3>
       <p>Rol: <span id="rolUsuario">Administrador</span></p>
@@ -88,11 +348,14 @@
 
       <div>
         <label for="anio">Año:</label>
-        <select id="anio"></select>
+        <select id="anio">
+          <!-- Se llenará dinámicamente con JavaScript -->
+        </select>
       </div>
 
       <button id="btnFiltrar">Filtrar</button>
       <button id="btnExportarPDF">📄 Exportar PDF</button>
+      <button id="btnVerDiasLibres">📊 Ver Días Libres</button>
     </div>
 
     <div class="tabla-container">
@@ -110,17 +373,20 @@
             <th>Días</th>
             <th>Salario</th>
             <th>Estado</th>
+            <th>Días Libres</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="tablaRegistros">
-          <tr><td colspan="11" class="cargando">Cargando datos del mes actual...</td></tr>
+          <tr><td colspan="12" class="cargando">Cargando datos del mes actual...</td></tr>
         </tbody>
       </table>
-      <div id="mensajeSinDatos" class="sin-datos" style="display:none;">📭 No se encontraron nombramientos para este mes y año.</div>
+      <div id="mensajeSinDatos" class="sin-datos" style="display:none;">
+        📭 No se encontraron nombramientos para este mes y año.
+      </div>
     </div>
 
-    <!-- Modal Confirmacion -->
+    <!-- Modal de Confirmación -->
     <div id="modalConfirmacion" class="modal">
       <div class="modal-contenido">
         <h3 class="modal-titulo">Confirmar Cambios</h3>
@@ -132,10 +398,11 @@
       </div>
     </div>
 
-    <!-- Modal Detalle -->
+    <!-- Modal de Detalle de Nombramiento -->
     <div id="modalDetalle" class="modal">
       <div class="modal-contenido" style="max-width: 800px; width: 90%;">
         <h3 class="modal-titulo">Detalles del Nombramiento</h3>
+        
         <div class="detalle-info">
           <p><strong>Funcionario:</strong> <span id="detalleFuncionario"></span></p>
           <p><strong>Período:</strong> <span id="detallePeriodo"></span></p>
@@ -172,7 +439,10 @@
       </div>
     </div>
 
-    <a href="dashboard.html" class="btn-flotante-inicio" title="Ir al Dashboard">🏠 Inicio</a>
+    <!-- 🎯 Botón flotante "Inicio" -->
+    <a href="dashboard.html" class="btn-flotante-inicio" title="Ir al Dashboard">
+      🏠 Inicio
+    </a>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -180,7 +450,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
-    // Config Firebase (igual que el original)
+    // 🔹 Configuración Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
       authDomain: "interinos-ccss.firebaseapp.com",
@@ -190,6 +460,7 @@
       appId: "1:1098694984589:web:180af36da33ff6a161b3c4"
     };
 
+    // Inicializar Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
@@ -198,6 +469,7 @@
     if (!usuario) {
       window.location.href = "login.html";
     } else {
+      // Mostrar información del usuario activo
       document.getElementById("nombreUsuario").textContent = usuario.nombre || "Usuario";
       document.getElementById("rolUsuario").textContent = usuario.rol || "Usuario";
     }
@@ -209,207 +481,199 @@
     let documentoDetalleActual = null;
     let diasSeleccionados = new Set();
 
-    /***** Helpers robustos para fechas y timestamps *****/
-    function isFirestoreTimestamp(v) {
-      return v && typeof v.toDate === 'function';
-    }
-
-    // Parsear sin efectos de zona horaria cuando se recibe YYYY-MM-DD
-    function parseDateNoTZ(val) {
-      if (!val) return null;
-      if (isFirestoreTimestamp(val)) return val.toDate();
-      if (val instanceof Date) return val;
-      if (typeof val === 'string') {
-        if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
-          const [y,m,d] = val.split('-').map(Number);
-          return new Date(y, m-1, d);
-        }
-        const tryDate = new Date(val);
-        if (!isNaN(tryDate)) return tryDate;
+    // 🔹 Extrae mes y año directamente del string YYYY-MM-DD (evita zona horaria)
+    function extraerMesYAnioDeFechaString(fechaStr) {
+      if (!fechaStr || !/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
+        console.warn("Formato de fecha inválido:", fechaStr);
+        return null;
       }
-      return null;
+      const [anio, mes] = fechaStr.split("-").map(Number);
+      return { mes, anio };
     }
 
-    function toDateObject(val) {
-      return parseDateNoTZ(val);
+ // 🔹 Cargar registros con filtro desde Firestore (FILTRANDO POR USUARIO ACTIVO)
+async function cargarRegistros() {
+  const mesSeleccionado = document.getElementById("mes")?.value;
+  const anioSeleccionado = parseInt(document.getElementById("anio")?.value);
+  const tbody = document.getElementById("tablaRegistros");
+  const mensaje = document.getElementById("mensajeSinDatos");
+  const tabla = document.getElementById("tablaNombramientos");
+  const mensajeError = document.getElementById("mensajeError");
+
+  // Ocultar mensajes previos
+  mensajeError.style.display = "none";
+  mensaje.style.display = "none";
+
+  // ✅ Validar que año sea un número válido
+  if (isNaN(anioSeleccionado)) {
+    tbody.innerHTML = `<tr><td colspan="12" style="color:red;">⚠️ Por favor, seleccione un año válido.</td></tr>`;
+    tabla.style.display = "table";
+    return;
+  }
+
+  console.log("🔍 Filtrando por Mes:", mesSeleccionado, "Año:", anioSeleccionado, "Usuario:", usuario.cedula);
+
+  // Mostrar estado de carga
+  tbody.innerHTML = `<tr><td colspan="12" class="cargando">Cargando datos...</td></tr>`;
+  tabla.style.display = "table";
+
+  try {
+    // Obtener documentos de la colección "nombramientos" filtrados por usuarioCedula
+    const nombramientosRef = collection(db, "nombramientos");
+    
+    // Crear query que filtre por usuarioCedula del usuario activo
+    const q = query(nombramientosRef, where("usuarioCedula", "==", usuario.cedula));
+    const querySnapshot = await getDocs(q);
+
+    // Array para almacenar registros filtrados
+    const registrosFiltrados = [];
+
+    // Procesar cada documento
+querySnapshot.forEach((docSnapshot) => {
+  const r = docSnapshot.data();
+  
+  // 🔹 Validación robusta: verificar que el documento tenga datos válidos
+  if (!r || typeof r !== 'object' || Array.isArray(r)) {
+    console.warn("📄 Documento inválido (sin datos, no es objeto, o es array):", docSnapshot.id);
+    return;
+  }
+  
+  // Verificar que el documento tenga la fecha de inicio
+  if (!r.inicio) {
+    console.warn("📄 Documento sin campo 'inicio':", docSnapshot.id);
+    return;
+  }
+
+  // Extraer mes y año de la fecha de inicio
+  const fecha = extraerMesYAnioDeFechaString(r.inicio);
+  if (!fecha) {
+    console.warn("📄 Fecha inválida:", r.inicio, "en documento", docSnapshot.id);
+    return;
+  }
+
+  // Filtrar por año seleccionado
+  if (fecha.anio !== anioSeleccionado) {
+    return;
+  }
+
+  // Si se seleccionó un mes específico, filtrar también por mes
+  if (mesSeleccionado !== "" && fecha.mes !== parseInt(mesSeleccionado)) {
+    return;
+  }
+
+  // 🔹 Validación adicional: asegurar que los campos críticos existan
+  // Esto previene errores al renderizar la tabla
+  const camposCriticos = ['personaSustituirNombre', 'personaSustituirCedula', 'area', 'codArea', 'inicio', 'dias', 'salario', 'estado'];
+  const faltanCampos = camposCriticos.filter(campo => r[campo] === undefined);
+  
+  if (faltanCampos.length > 0) {
+    console.warn(`📄 Documento incompleto, faltan campos: ${faltanCampos.join(', ')}`, docSnapshot.id);
+    // Podemos seguir procesando el documento, pero usaremos valores por defecto al renderizar
+  }
+
+  // Agregar a registros filtrados - asegurando que data sea el objeto r
+  registrosFiltrados.push({
+    id: docSnapshot.id,
+    data: r  // ← Usar 'data' explícitamente en lugar de spread
+  });
+});
+
+    // 🔥 ORDENAR por fecha de inicio (ascendente: más antiguo primero) - versión segura
+    registrosFiltrados.sort((a, b) => {
+      // Verificar que ambos registros tengan datos y campo 'inicio'
+      const inicioA = a.data?.inicio;
+      const inicioB = b.data?.inicio;
+      
+      // Si alguno no tiene fecha de inicio, colocarlo al final
+      if (!inicioA && !inicioB) return 0;
+      if (!inicioA) return 1; // a va después de b
+      if (!inicioB) return -1; // b va después de a
+      
+      const fechaA = new Date(inicioA);
+      const fechaB = new Date(inicioB);
+      
+      // Manejar fechas inválidas
+      if (isNaN(fechaA.getTime()) && isNaN(fechaB.getTime())) return 0;
+      if (isNaN(fechaA.getTime())) return 1;
+      if (isNaN(fechaB.getTime())) return -1;
+      
+      return fechaA - fechaB;
+    });
+
+    // Renderizar los registros ordenados
+tbody.innerHTML = "";
+if (registrosFiltrados.length === 0) {
+  tabla.style.display = "none";
+  mensaje.style.display = "block";
+  console.log("📭 No se encontraron datos para este filtro.");
+} else {
+  registrosFiltrados.forEach(registro => {
+    // 🔹 Asegurar que registro.data exista
+    if (!registro.data) {
+      console.warn("📄 Registro sin datos:", registro.id);
+      return;
     }
+    
+    const r = registro.data;
+    
+    // Formatear los datos para mostrar - con valores por defecto seguros
+    const personaSustituirNombre = (r.personaSustituirNombre !== undefined) ? r.personaSustituirNombre : "SIN DATOS";
+    const personaSustituirCedula = (r.personaSustituirCedula !== undefined) ? r.personaSustituirCedula : "N/A";
+    const area = (r.area !== undefined) ? r.area : "N/A";
+    const codArea = (r.codArea !== undefined) ? r.codArea : "N/A";
+    const fechaFinal = (r.final !== undefined) ? r.final : "N/A";
+    const horario = `${(r.horarioEntrada !== undefined) ? r.horarioEntrada : 'N/A'} - ${(r.horarioSalida !== undefined) ? r.horarioSalida : 'N/A'}`;
+    const dias = (r.dias !== undefined) ? r.dias : 0;
+    const salario = parseFloat((r.salario !== undefined) ? r.salario : 0).toLocaleString('es-CR', { minimumFractionDigits: 2 });
+    const estado = (r.estado !== undefined) ? (r.estado ? "✅ Pagado" : "⏳ Pendiente") : "⏳ Pendiente";
+    
+    // ✅ NUEVO: Formatear días libres
+    const diasLibres = (r.diasLibres !== undefined && Array.isArray(r.diasLibres)) ? r.diasLibres : [];
+    const diasLibresTexto = diasLibres.length > 0 
+      ? `${diasLibres.length} día${diasLibres.length !== 1 ? 's' : ''}`
+      : "Ninguno";
 
-    function formatDateForDisplay(val) {
-      const d = toDateObject(val);
-      if (!d || isNaN(d)) return 'N/A';
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth()+1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${yyyy}-${mm}-${dd}`;
-    }
+    // Crear la fila de la tabla
+    const fila = document.createElement('tr');
+    fila.dataset.id = registro.id;
+    fila.innerHTML = `
+      <td>${personaSustituirCedula}</td>
+      <td>${personaSustituirNombre}</td>
+      <td>${area}</td>
+      <td>${codArea}</td>
+      <td>${r.inicio}</td>
+      <td>${fechaFinal}</td>
+      <td>${horario}</td>
+      <td>${dias}</td>
+      <td>₡${salario}</td>
+      <td>${estado}</td>
+      <td class="dias-libres-info" title="${diasLibres.length > 0 ? 'Fechas: ' + diasLibres.join(', ') : ''}">${diasLibresTexto}</td>
+      <td class="acciones">
+        <button class="btn-detalle" onclick='abrirDetalle("${registro.id}", JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(r))}")))'>📋 Detalles</button>
+        <button class="btn-editar" onclick="iniciarEdicion('${registro.id}', this)">✏️ Editar</button>
+        <button class="btn-guardar" onclick="guardarCambios('${registro.id}', this)">💾 Guardar</button>
+        <button class="btn-cancelar" onclick="cancelarEdicion('${registro.id}', this)">❌ Cancelar</button>
+      </td>
+    `;
+    tbody.appendChild(fila);
+  });
+  console.log(`✅ Se cargaron y ordenaron ${registrosFiltrados.length} registros.`);
+}
+  } catch (error) {
+    console.error("❌ Error al cargar registros de Firestore:", error);
+    mensajeError.textContent = "Error al cargar datos: " + error.message;
+    mensajeError.style.display = "block";
+    tbody.innerHTML = `<tr><td colspan="12" style="color:red;">Error al cargar datos de la base de datos. Por favor, intente nuevamente.</td></tr>`;
+  }
+}
 
-    function calcularDiasInclusivos(inicioVal, finalVal) {
-      const inicio = toDateObject(inicioVal);
-      const fin = toDateObject(finalVal);
-      if (!inicio || !fin || isNaN(inicio) || isNaN(fin) || fin < inicio) return 0;
-      const diff = Math.floor((fin - inicio) / (1000 * 60 * 60 * 24)) + 1;
-      return diff;
-    }
-
-    /***** FIN helpers *****/
-
-    // Extrae mes y año de una fecha (acepta strings, timestamp, Date)
-    function extraerMesYAnioDeFechaString(fecha) {
-      const d = toDateObject(fecha);
-      if (!d || isNaN(d)) return null;
-      return { mes: d.getMonth() + 1, anio: d.getFullYear() };
-    }
-
-    // Cargar registros desde Firestore con correcciones
-    async function cargarRegistros() {
-      const mesSeleccionado = document.getElementById("mes")?.value;
-      const anioSeleccionado = parseInt(document.getElementById("anio")?.value);
-      const tbody = document.getElementById("tablaRegistros");
-      const mensaje = document.getElementById("mensajeSinDatos");
-      const tabla = document.getElementById("tablaNombramientos");
-      const mensajeError = document.getElementById("mensajeError");
-
-      mensajeError.style.display = "none";
-      mensaje.style.display = "none";
-
-      if (isNaN(anioSeleccionado)) {
-        tbody.innerHTML = `<tr><td colspan="11" style="color:red;">⚠️ Por favor, seleccione un año válido.</td></tr>`;
-        tabla.style.display = "table";
-        return;
-      }
-
-      tbody.innerHTML = `<tr><td colspan="11" class="cargando">Cargando datos...</td></tr>`;
-      tabla.style.display = "table";
-
-      try {
-        const nombramientosRef = collection(db, "nombramientos");
-        const q = query(nombramientosRef, where("usuarioCedula", "==", usuario.cedula));
-        const querySnapshot = await getDocs(q);
-
-        const registrosFiltrados = [];
-
-        querySnapshot.forEach((docSnapshot) => {
-          const rRaw = docSnapshot.data();
-
-          // Asegurarnos de tener campo 'inicio'
-          if (!rRaw || !rRaw.inicio) {
-            console.warn("Documento sin campo 'inicio':", docSnapshot.id);
-            return;
-          }
-
-          const fecha = extraerMesYAnioDeFechaString(rRaw.inicio);
-          if (!fecha) {
-            console.warn("Fecha inválida:", rRaw.inicio, "en documento", docSnapshot.id);
-            return;
-          }
-
-          if (fecha.anio !== anioSeleccionado) return;
-          if (mesSeleccionado !== "" && fecha.mes !== parseInt(mesSeleccionado)) return;
-
-          // Normalizar fechas a formato YYYY-MM-DD para mostrar y manipular sin TZ
-          const normalized = { ...rRaw };
-          normalized.inicio = formatDateForDisplay(rRaw.inicio);
-          normalized.final = formatDateForDisplay(rRaw.final);
-
-          registrosFiltrados.push({ id: docSnapshot.id, data: normalized, raw: rRaw });
-        });
-
-        // Ordenar por fecha de inicio (usar parseDateNoTZ para evitar problemas de TZ)
-        registrosFiltrados.sort((a, b) => {
-          const da = parseDateNoTZ(a.data.inicio) || new Date(0);
-          const db = parseDateNoTZ(b.data.inicio) || new Date(0);
-          return da - db;
-        });
-
-        // Renderizar filas (crear elementos DOM en vez de innerHTML con JSON.stringify)
-        tbody.innerHTML = "";
-        if (registrosFiltrados.length === 0) {
-          tabla.style.display = "none";
-          mensaje.style.display = "block";
-          console.log("📭 No se encontraron datos para este filtro.");
-        } else {
-          registrosFiltrados.forEach((registro) => {
-            const r = registro.data;
-            const tr = document.createElement('tr');
-            tr.dataset.id = registro.id;
-
-            // Helper para formatear salario
-            const salarioNum = parseFloat(registro.raw && registro.raw.salario ? registro.raw.salario : (r.salario || 0)) || 0;
-            const salarioStr = salarioNum.toLocaleString('es-CR', { minimumFractionDigits: 2 });
-
-            const estado = (registro.raw && typeof registro.raw.estado !== 'undefined') ? (registro.raw.estado ? "✅ Pagado" : "⏳ Pendiente") : (r.estado ? "✅ Pagado" : "⏳ Pendiente");
-
-            // Crear celdas
-            const campos = [
-              r.personaSustituirCedula || 'N/A',
-              r.personaSustituirNombre || 'SIN DATOS',
-              r.area || 'N/A',
-              r.codArea || 'N/A',
-              r.inicio || 'N/A',
-              r.final || 'N/A',
-              `${r.horarioEntrada || 'N/A'} - ${r.horarioSalida || 'N/A'}`,
-              r.dias || 0,
-              `₡${salarioStr}`,
-              estado
-            ];
-
-            campos.forEach((valor) => {
-              const td = document.createElement('td');
-              td.textContent = valor;
-              tr.appendChild(td);
-            });
-
-            // Acciones: botones creados por addEventListener (no JSON.stringify)
-            const tdAcc = document.createElement('td');
-            tdAcc.className = 'acciones';
-
-            const btnDetalle = document.createElement('button');
-            btnDetalle.className = 'btn-detalle';
-            btnDetalle.textContent = '📋 Detalles';
-            btnDetalle.addEventListener('click', () => abrirDetalle(registro.id, registro.data));
-
-            const btnEditar = document.createElement('button');
-            btnEditar.className = 'btn-editar';
-            btnEditar.textContent = '✏️ Editar';
-            btnEditar.addEventListener('click', () => iniciarEdicion(registro.id, btnEditar));
-
-            const btnGuardar = document.createElement('button');
-            btnGuardar.className = 'btn-guardar';
-            btnGuardar.textContent = '💾 Guardar';
-            btnGuardar.style.display = 'none';
-            btnGuardar.addEventListener('click', () => guardarCambios(registro.id, btnGuardar));
-
-            const btnCancelar = document.createElement('button');
-            btnCancelar.className = 'btn-cancelar';
-            btnCancelar.textContent = '❌ Cancelar';
-            btnCancelar.style.display = 'none';
-            btnCancelar.addEventListener('click', () => cancelarEdicion(registro.id, btnCancelar));
-
-            tdAcc.appendChild(btnDetalle);
-            tdAcc.appendChild(btnEditar);
-            tdAcc.appendChild(btnGuardar);
-            tdAcc.appendChild(btnCancelar);
-
-            tr.appendChild(tdAcc);
-            tbody.appendChild(tr);
-          });
-
-          console.log(`✅ Se cargaron y ordenaron ${registrosFiltrados.length} registros.`);
-        }
-      } catch (error) {
-        console.error("❌ Error al cargar registros de Firestore:", error);
-        mensajeError.textContent = "Error al cargar datos: " + error.message;
-        mensajeError.style.display = "block";
-        tbody.innerHTML = `<tr><td colspan="11" style="color:red;">Error al cargar datos de la base de datos. Por favor, intente nuevamente.</td></tr>`;
-      }
-    }
-
-    // Iniciar edición: hace celdas editables y guarda valores originales (numéricos correctamente)
+    // 🔹 Iniciar edición de un registro
     window.iniciarEdicion = function(docId, boton) {
       const fila = boton.closest('tr');
       filaActual = fila;
       documentoActual = docId;
-
+      
+      // Guardar valores originales
       const celdas = fila.querySelectorAll('td');
       datosOriginales = {
         personaSustituirCedula: celdas[0].textContent,
@@ -419,21 +683,22 @@
         inicio: celdas[4].textContent,
         final: celdas[5].textContent,
         horario: celdas[6].textContent,
-        dias: parseInt(celdas[7].textContent) || 0,
-        salario: parseFloat(celdas[8].textContent.replace('₡', '').replace(/\./g, '').replace(',', '.')) || 0,
+        dias: celdas[7].textContent,
+        salario: celdas[8].textContent.replace(/[^\d.,-]/g, '').replace(',', '.'),
         estado: celdas[9].textContent.includes('✅')
       };
-
-      // Cambiar visibilidad de botones
+      
+      // Cambiar los botones
       const btnEditar = fila.querySelector('.btn-editar');
       const btnGuardar = fila.querySelector('.btn-guardar');
       const btnCancelar = fila.querySelector('.btn-cancelar');
+      
       btnEditar.style.display = 'none';
       btnGuardar.style.display = 'inline-block';
       btnCancelar.style.display = 'inline-block';
-
-      // Crear campos editables
-      hacerEditable(celdas[0], 'personaSustituirCedula');
+      
+      // Convertir celdas en campos editables
+      hacerEditable(celdas[0], 'personaSustituirCedula'); 
       hacerEditable(celdas[1], 'personaSustituirNombre');
       hacerEditable(celdas[2], 'area');
       hacerEditable(celdas[3], 'codArea');
@@ -445,88 +710,68 @@
       hacerEditableEstado(celdas[9], 'estado');
     };
 
+    // 🔹 Hacer una celda editable como texto
     function hacerEditable(celda, campo) {
       const valor = celda.textContent;
       celda.innerHTML = `<input type="text" class="editable" value="${valor}" data-campo="${campo}">`;
     }
 
+    // 🔹 Hacer una celda editable como fecha
     function hacerEditableFecha(celda, campo) {
       const valor = celda.textContent;
-      const dateVal = (valor === 'N/A') ? '' : formatDateForDisplay(valor);
-      celda.innerHTML = `<input type="date" class="editable" value="${dateVal}" data-campo="${campo}">`;
-
-      // Agregar listener para recalcular días y salario en la fila cuando cambien las fechas
-      const input = celda.querySelector('input');
-      input.addEventListener('change', () => {
-        const fila = celda.closest('tr');
-        actualizarDiasYSalarioEnFila(fila);
-      });
+      celda.innerHTML = `<input type="date" class="editable" value="${valor === 'N/A' ? '' : valor}" data-campo="${campo}">`;
     }
 
+    // 🔹 Hacer una celda editable como número (versión segura)
     function hacerEditableNumero(celda, campo, esMoneda = false) {
       let valor = celda.textContent;
       if (esMoneda) {
-        valor = valor.replace('₡', '').replace(/\./g, '').replace(',', '.').trim();
+        // Eliminar símbolos de moneda, espacios, puntos de miles, y dejar solo dígitos y punto decimal
+        valor = valor.replace(/[^\d,.-]/g, '') // Elimina todo excepto dígitos, comas, puntos, guiones
+                     .replace(',', '.')        // Convertir coma decimal a punto
+                     .replace(/\.(?=.*\.)/g, ''); // Eliminar puntos de miles (solo deja el último punto)
       }
-      celda.innerHTML = `<input type="number" class="editable" value="${valor}" data-campo="${campo}" step="${esMoneda ? '0.01' : '1'}">`;
+      const valorNumerico = parseFloat(valor) || 0;
+      celda.innerHTML = `<input type="number" class="editable" value="${valorNumerico}" data-campo="${campo}" step="${esMoneda ? '0.01' : '1'}">`;
     }
 
+    // 🔹 Hacer una celda editable como estado (select)
     function hacerEditableEstado(celda, campo) {
       const esPagado = celda.textContent.includes('✅');
-      celda.innerHTML = `\n        <select class="editable" data-campo="${campo}">\n          <option value="true" ${esPagado ? 'selected' : ''}>✅ Pagado</option>\n          <option value="false" ${!esPagado ? 'selected' : ''}>⏳ Pendiente</option>\n        </select>\n      `;
+      celda.innerHTML = `
+        <select class="editable" data-campo="${campo}">
+          <option value="true" ${esPagado ? 'selected' : ''}>✅ Pagado</option>
+          <option value="false" ${!esPagado ? 'selected' : ''}>⏳ Pendiente</option>
+        </select>
+      `;
     }
 
+    // 🔹 Hacer una celda editable como horario (entrada y salida)
     function hacerEditableHorario(celda) {
       const texto = celda.textContent;
       let entrada = 'N/A', salida = 'N/A';
+      
       if (texto !== 'N/A - N/A') {
         const partes = texto.split(' - ');
-        if (partes.length === 2) { entrada = partes[0]; salida = partes[1]; }
+        if (partes.length === 2) {
+          entrada = partes[0];
+          salida = partes[1];
+        }
       }
-      celda.innerHTML = `\n        <div style="display: flex; gap: 5px; justify-content: center;">\n          <input type="time" class="editable" value="${entrada === 'N/A' ? '' : entrada}" data-campo="horarioEntrada" style="width: 70px;">\n          <span>-</span>\n          <input type="time" class="editable" value="${salida === 'N/A' ? '' : salida}" data-campo="horarioSalida" style="width: 70px;">\n        </div>\n      `;
+      
+      celda.innerHTML = `
+        <div style="display: flex; gap: 5px; justify-content: center;">
+          <input type="time" class="editable" value="${entrada === 'N/A' ? '' : entrada}" data-campo="horarioEntrada" style="width: 70px;">
+          <span>-</span>
+          <input type="time" class="editable" value="${salida === 'N/A' ? '' : salida}" data-campo="horarioSalida" style="width: 70px;">
+        </div>
+      `;
     }
 
-    // Recalcula días y salario (si puede) cuando cambian las fechas en una fila en edición
-    function actualizarDiasYSalarioEnFila(fila) {
-      if (!fila) return;
-      const inicioInput = fila.querySelector('input[data-campo="inicio"]');
-      const finalInput = fila.querySelector('input[data-campo="final"]');
-      const diasInput = fila.querySelector('input[data-campo="dias"]');
-      const salarioInput = fila.querySelector('input[data-campo="salario"]');
-
-      if (!inicioInput || !finalInput) return;
-
-      const inicioVal = inicioInput.value;
-      const finalVal = finalInput.value;
-      const nuevosDias = calcularDiasInclusivos(inicioVal, finalVal);
-
-      if (diasInput) diasInput.value = nuevosDias;
-      else {
-        // Si no hay input, actualizar texto de la celda 7
-        const celdas = fila.querySelectorAll('td');
-        celdas[7].textContent = nuevosDias;
-      }
-
-      // Calcular salario nuevo basado en tarifa diaria original si existe
-      let tarifaDiaria = null;
-      if (datosOriginales && Number(datosOriginales.dias) > 0) {
-        tarifaDiaria = Number(datosOriginales.salario || 0) / Number(datosOriginales.dias || 1);
-      } else if (salarioInput && Number(diasInput?.value) > 0) {
-        tarifaDiaria = Number(salarioInput.value || 0) / Number(diasInput.value || 1);
-      }
-
-      if (tarifaDiaria !== null && salarioInput) {
-        const nuevoSal = (tarifaDiaria * nuevosDias).toFixed(2);
-        salarioInput.value = nuevoSal;
-      } else if (tarifaDiaria !== null) {
-        const celdas = fila.querySelectorAll('td');
-        celdas[8].textContent = `₡${(tarifaDiaria * nuevosDias).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
-      }
-    }
-
-    // Cancelar edición
+    // 🔹 Cancelar edición de un registro
     window.cancelarEdicion = function(docId, boton) {
       if (!filaActual || !datosOriginales) return;
+      
       const celdas = filaActual.querySelectorAll('td');
       celdas[0].textContent = datosOriginales.personaSustituirCedula;
       celdas[1].textContent = datosOriginales.personaSustituirNombre;
@@ -538,35 +783,44 @@
       celdas[7].textContent = datosOriginales.dias;
       celdas[8].textContent = `₡${parseFloat(datosOriginales.salario).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
       celdas[9].textContent = datosOriginales.estado ? "✅ Pagado" : "⏳ Pendiente";
-
+      
+      // Cambiar los botones
       const btnEditar = filaActual.querySelector('.btn-editar');
       const btnGuardar = filaActual.querySelector('.btn-guardar');
       const btnCancelar = filaActual.querySelector('.btn-cancelar');
+      
       btnEditar.style.display = 'inline-block';
       btnGuardar.style.display = 'none';
       btnCancelar.style.display = 'none';
-
+      
+      // Limpiar variables
       documentoActual = null;
       filaActual = null;
       datosOriginales = null;
     };
 
-    // Guardar cambios: prepara nuevosValores y actualiza Firestore
+    // 🔹 Guardar cambios de un registro
     window.guardarCambios = function(docId, boton) {
       const fila = boton.closest('tr');
+      
+      // Obtener los nuevos valores
       const celdas = fila.querySelectorAll('td');
       const nuevosValores = {};
-
-      for (let i = 0; i <= 9; i++) {
+      
+      // Procesar cada celda editable
+      for (let i = 0; i <= 9; i++) { // De la celda 0 a la 9 (excluyendo acciones)
         const celda = celdas[i];
         const inputs = celda.querySelectorAll('.editable');
+        
         if (inputs.length > 0) {
-          if (i === 6) {
+          if (i === 6) { // Horario (entrada y salida)
             nuevosValores.horarioEntrada = inputs[0].value || "N/A";
             nuevosValores.horarioSalida = inputs[1].value || "N/A";
           } else {
             const input = inputs[0];
             let campo;
+            
+            // Asignar el campo correcto según la posición
             switch(i) {
               case 0: campo = 'personaSustituirCedula'; break;
               case 1: campo = 'personaSustituirNombre'; break;
@@ -578,37 +832,36 @@
               case 8: campo = 'salario'; break;
               case 9: campo = 'estado'; break;
             }
-
+            
             if (campo === 'estado') {
               nuevosValores[campo] = input.value === 'true';
             } else if (campo === 'dias' || campo === 'salario') {
-              nuevosValores[campo] = (campo === 'salario') ? parseFloat(input.value) || 0 : parseInt(input.value) || 0;
+              nuevosValores[campo] = parseFloat(input.value) || 0;
             } else {
               nuevosValores[campo] = input.value || "N/A";
             }
           }
         }
       }
-
-      // Si inicio/final están presentes, asegurarnos de guardarlos en formato YYYY-MM-DD
-      if (nuevosValores.inicio) nuevosValores.inicio = formatDateForDisplay(nuevosValores.inicio);
-      if (nuevosValores.final) nuevosValores.final = formatDateForDisplay(nuevosValores.final);
-
+      
       // Mostrar modal de confirmación
       const modal = document.getElementById('modalConfirmacion');
       const mensajeConfirmacion = document.getElementById('mensajeConfirmacion');
-      mensajeConfirmacion.textContent = `¿Está seguro que desea guardar los cambios realizados al nombramiento de ${nuevosValores.personaSustituirNombre || 'N/A'}?`;
+      mensajeConfirmacion.textContent = `¿Está seguro que desea guardar los cambios realizados al nombramiento de ${celdas[1].querySelector('.editable')?.value || 'N/A'}?`;
       modal.style.display = 'flex';
-
+      
+      // Manejar botones del modal
       const btnAceptar = document.getElementById('btnAceptar');
       const btnCancelarModal = document.getElementById('btnCancelarModal');
-
+      
+      // Función para guardar realmente los cambios
       const confirmarGuardado = async () => {
         try {
+          // Actualizar en Firestore
           const docRef = doc(db, "nombramientos", docId);
           await updateDoc(docRef, nuevosValores);
-
-          // Actualizar vista (mostrar valores guardados)
+          
+          // Actualizar la vista
           celdas[0].textContent = nuevosValores.personaSustituirCedula || "N/A";
           celdas[1].textContent = nuevosValores.personaSustituirNombre || "N/A";
           celdas[2].textContent = nuevosValores.area || "N/A";
@@ -619,224 +872,515 @@
           celdas[7].textContent = nuevosValores.dias || 0;
           celdas[8].textContent = `₡${parseFloat(nuevosValores.salario || 0).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
           celdas[9].textContent = nuevosValores.estado ? "✅ Pagado" : "⏳ Pendiente";
-
+          
+          // ✅ Actualizar también la columna de días libres (aunque no se edita aquí)
+          const diasLibres = nuevosValores.diasLibres || (datosOriginales?.diasLibres || []);
+          const diasLibresTexto = diasLibres.length > 0 
+            ? `${diasLibres.length} día${diasLibres.length !== 1 ? 's' : ''}`
+            : "Ninguno";
+          celdas[10].textContent = diasLibresTexto;
+          if (diasLibres.length > 0) {
+            celdas[10].title = 'Fechas: ' + diasLibres.join(', ');
+          } else {
+            celdas[10].title = '';
+          }
+          
+          // Cambiar los botones
           const btnEditar = fila.querySelector('.btn-editar');
           const btnGuardar = fila.querySelector('.btn-guardar');
           const btnCancelar = fila.querySelector('.btn-cancelar');
+          
           btnEditar.style.display = 'inline-block';
           btnGuardar.style.display = 'none';
           btnCancelar.style.display = 'none';
-
+          
+          // Mostrar mensaje de éxito
           alert("✅ Cambios guardados correctamente");
-
+          
+          // Limpiar variables
           documentoActual = null;
           filaActual = null;
           datosOriginales = null;
+          
         } catch (error) {
           console.error("Error al guardar cambios:", error);
           alert("❌ Error al guardar los cambios: " + error.message);
         }
+        
+        // Cerrar modal
         modal.style.display = 'none';
       };
-
+      
+      // Asignar eventos a los botones del modal
       btnAceptar.onclick = confirmarGuardado;
-      btnCancelarModal.onclick = function() { modal.style.display = 'none'; };
-
-      // Cerrar modal al hacer clic fuera
+      btnCancelarModal.onclick = function() {
+        modal.style.display = 'none';
+      };
+      
+      // Cerrar modal al hacer clic fuera de él
       window.onclick = function(event) {
-        if (event.target == modal) modal.style.display = 'none';
+        if (event.target == modal) {
+          modal.style.display = 'none';
+        }
       };
     };
 
-    // Abrir detalle (las fechas en 'datos' ya vienen normalizadas a YYYY-MM-DD)
+    // 🔹 Abrir modal de detalle
     window.abrirDetalle = function(docId, datos) {
       documentoDetalleActual = docId;
+      
+      // Mostrar información básica
       document.getElementById('detalleFuncionario').textContent = datos.personaSustituirNombre || 'SIN DATOS';
       document.getElementById('detallePeriodo').textContent = `${datos.inicio} - ${datos.final || 'N/A'}`;
       document.getElementById('detalleArea').textContent = datos.area || 'N/A';
-
+      
+      // Generar checkboxes para cada día del período
       generarDiasPeriodo(datos.inicio, datos.final);
+      
+      // Cargar datos existentes si los hay
       cargarDatosDetalle(datos);
+      
+      // Mostrar modal
       document.getElementById('modalDetalle').style.display = 'flex';
     };
 
+    // 🔹 Generar checkboxes para cada día del período
     function generarDiasPeriodo(fechaInicio, fechaFinal) {
       const container = document.getElementById('diasContainer');
       const totalDiasElem = document.getElementById('totalDias');
-
+      
       if (!fechaInicio || !fechaFinal) {
         container.innerHTML = '<p style="color: red;">Fechas inválidas</p>';
         totalDiasElem.textContent = '0';
         return;
       }
-
-      const inicio = parseDateNoTZ(fechaInicio);
-      const final = parseDateNoTZ(fechaFinal);
-      if (!inicio || !final || final < inicio) {
-        container.innerHTML = '<p style="color: red;">Fechas inválidas o rango incorrecto</p>';
-        totalDiasElem.textContent = '0';
-        return;
-      }
-
+      
+      const inicio = new Date(fechaInicio);
+      const final = new Date(fechaFinal);
       const dias = [];
-      let actual = new Date(inicio);
-      while (actual <= final) {
-        dias.push(new Date(actual));
-        actual.setDate(actual.getDate() + 1);
+      
+      // Generar todos los días del período
+      let fechaActual = new Date(inicio);
+      while (fechaActual <= final) {
+        dias.push(new Date(fechaActual));
+        fechaActual.setDate(fechaActual.getDate() + 1);
       }
-
+      
+      // Mostrar total de días
       totalDiasElem.textContent = dias.length;
+      
+      // Crear checkboxes
       container.innerHTML = '';
-
       dias.forEach(fecha => {
-        const yyyy = fecha.getFullYear();
-        const mm = String(fecha.getMonth()+1).padStart(2,'0');
-        const dd = String(fecha.getDate()).padStart(2,'0');
-        const fechaStr = `${yyyy}-${mm}-${dd}`;
+        const fechaStr = fecha.toISOString().split('T')[0];
         const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'short' });
         const fechaFormateada = fecha.toLocaleDateString('es-ES');
-
+        
         const div = document.createElement('div');
         div.style.display = 'flex';
         div.style.alignItems = 'center';
         div.style.gap = '8px';
-
+        
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = `dia_${fechaStr}`;
         checkbox.value = fechaStr;
         checkbox.dataset.fecha = fechaStr;
-
+        
         const label = document.createElement('label');
         label.htmlFor = `dia_${fechaStr}`;
         label.textContent = `${fechaFormateada} (${diaSemana})`;
         label.style.cursor = 'pointer';
-
+        
         div.appendChild(checkbox);
         div.appendChild(label);
         container.appendChild(div);
-
+        
+        // Evento para manejar selección
         checkbox.addEventListener('change', function() {
-          if (this.checked) diasSeleccionados.add(this.value);
-          else diasSeleccionados.delete(this.value);
+          if (this.checked) {
+            diasSeleccionados.add(this.value);
+          } else {
+            diasSeleccionados.delete(this.value);
+          }
         });
       });
     }
 
+    // 🔹 Cargar datos existentes del detalle
     function cargarDatosDetalle(datos) {
+      // Resetear selección
       diasSeleccionados.clear();
-      document.querySelectorAll('#diasContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
-
+      document.querySelectorAll('#diasContainer input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+      });
+      
+      // Cargar días seleccionados existentes
       const diasLibres = datos.diasLibres || [];
       diasLibres.forEach(fecha => {
-        const fechaStr = formatDateForDisplay(fecha); // normalizar formatos posibles
-        const checkbox = document.querySelector(`#dia_${fechaStr}`);
+        const checkbox = document.querySelector(`#dia_${fecha}`);
         if (checkbox) {
           checkbox.checked = true;
-          diasSeleccionados.add(fechaStr);
+          diasSeleccionados.add(fecha);
         }
       });
-
+      
+      // Cargar tipo de ausencia
       document.getElementById('tipoAusencia').value = datos.tipoAusencia || '';
+      
+      // Cargar comentario
       document.getElementById('comentarioAusencia').value = datos.comentarioAusencia || '';
     }
 
+    // 🔹 Guardar detalles del nombramiento
     document.getElementById('btnGuardarDetalle').addEventListener('click', async function() {
       if (!documentoDetalleActual) return;
+      
       const tipoAusencia = document.getElementById('tipoAusencia').value;
       const comentarioAusencia = document.getElementById('comentarioAusencia').value;
-
+      
+      // Validar que se haya seleccionado al menos un día si se eligió un tipo de ausencia
       if (tipoAusencia && diasSeleccionados.size === 0) {
         alert('⚠️ Debe seleccionar al menos un día si especifica un tipo de ausencia.');
         return;
       }
-
+      
       try {
+        // Preparar datos para guardar
         const datosDetalle = {
           diasLibres: Array.from(diasSeleccionados),
           tipoAusencia: tipoAusencia || null,
           comentarioAusencia: comentarioAusencia || null,
           ultimaActualizacionDetalle: new Date()
         };
-
+        
+        // Actualizar en Firestore
         const docRef = doc(db, "nombramientos", documentoDetalleActual);
         await updateDoc(docRef, datosDetalle);
-
+        
+        // ✅ Actualizar la vista en la tabla principal
+        const fila = document.querySelector(`tr[data-id="${documentoDetalleActual}"]`);
+        if (fila) {
+          const celdaDiasLibres = fila.querySelectorAll('td')[10]; // Índice 10 = columna de días libres
+          const diasLibresTexto = diasSeleccionados.size > 0 
+            ? `${diasSeleccionados.size} día${diasSeleccionados.size !== 1 ? 's' : ''}`
+            : "Ninguno";
+          celdaDiasLibres.textContent = diasLibresTexto;
+          celdaDiasLibres.title = diasSeleccionados.size > 0 
+            ? 'Fechas: ' + Array.from(diasSeleccionados).join(', ') 
+            : '';
+        }
+        
         alert('✅ Detalles guardados correctamente');
         document.getElementById('modalDetalle').style.display = 'none';
+        
       } catch (error) {
         console.error('Error al guardar detalles:', error);
         alert('❌ Error al guardar los detalles: ' + error.message);
       }
     });
 
+    // 🔹 Cerrar modal de detalle
     document.getElementById('btnCerrarDetalle').addEventListener('click', function() {
       document.getElementById('modalDetalle').style.display = 'none';
     });
 
+    // Cerrar modal al hacer clic fuera
     window.addEventListener('click', function(event) {
       const modal = document.getElementById('modalDetalle');
-      if (event.target === modal) modal.style.display = 'none';
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
     });
 
+    // 🔹 Exportar tabla a PDF usando html2pdf
     function exportarPDF() {
       const element = document.getElementById('tablaNombramientos');
       const mes = document.getElementById("mes").options[document.getElementById("mes").selectedIndex].text;
       const anio = document.getElementById("anio").value;
       const usuarioInfo = document.getElementById('usuarioInfo').outerHTML;
-
+      
+      // Verificar si hay datos para exportar
       const filas = document.querySelectorAll("#tablaRegistros tr");
       if (filas.length <= 1 || filas[0].querySelector("td")?.textContent?.includes("Cargando") || filas[0].querySelector("td")?.textContent?.includes("No se encontraron")) {
         alert("No hay datos para exportar.");
         return;
       }
 
+      // Crear un contenedor para el PDF
       const pdfContainer = document.createElement('div');
       pdfContainer.innerHTML = `
         <div style="text-align: center; margin-bottom: 20px;">
           <h2 style="color: #0d47a1; font-size: 24px; margin-bottom: 10px;">Reporte de Nombramientos</h2>
           <p style="font-size: 16px; margin-bottom: 5px;">Filtrado por: ${mes} ${anio}</p>
-          <p style="font-size: 14px;">Generado por: ${usuario.nombre || 'Usuario'}</p>
-          <p style="font-size: 14px;">Fecha: ${new Date().toLocaleDateString('es-CR')}</p>
+          <p style="font-size: 10px;">Generado por: ${usuario.nombre || 'Usuario'}</p>
+          <p style="font-size: 8px;">Fecha: ${new Date().toLocaleDateString('es-CR')}</p>
         </div>
         ${usuarioInfo}
       `;
-
+      
+      // Clonar la tabla
       const tablaClone = element.cloneNode(true);
+      
+      // Eliminar botones de acciones en el PDF
       const botonesAcciones = tablaClone.querySelectorAll('.acciones');
-      botonesAcciones.forEach(btn => { btn.innerHTML = 'Reporte generado'; btn.style.backgroundColor = '#e0e0e0'; btn.style.color = '#666'; btn.style.padding = '5px'; btn.style.borderRadius = '3px'; btn.style.textAlign = 'center'; });
+      botonesAcciones.forEach(btn => {
+        btn.innerHTML = 'Reporte generado';
+        btn.style.backgroundColor = '#e0e0e0';
+        btn.style.color = '#666';
+        btn.style.padding = '5px';
+        btn.style.borderRadius = '3px';
+        btn.style.textAlign = 'center';
+      });
+      
       pdfContainer.appendChild(tablaClone);
 
-      const opt = { margin: [15, 10, 15, 10], filename: `nombramientos_${mes}_${anio}_${usuario.nombre || 'usuario'}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
+      const opt = {
+        margin: [15, 10, 15, 10],
+        filename: `nombramientos_${mes}_${anio}_${usuario.nombre || 'usuario'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+
+      // Generar el PDF
       html2pdf().set(opt).from(pdfContainer).save();
     }
 
+    // 🔹 Mostrar resumen de días libres
+    function mostrarResumenDiasLibres() {
+      const modal = document.createElement('div');
+      modal.id = 'modalResumenLibres';
+      modal.className = 'modal';
+      modal.innerHTML = `
+        <div class="modal-contenido" style="max-width: 800px;">
+          <h3 class="modal-titulo">📊 Resumen de Días Libres</h3>
+          <div id="resumenLibresContenido" class="cargando">Cargando resumen...</div>
+          <div class="modal-botones">
+            <button id="btnCerrarResumen" class="btn-modal btn-cancelar-modal">Cerrar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      
+      // Cargar datos
+      cargarResumenDiasLibres();
+      
+      // Cerrar modal
+      document.getElementById('btnCerrarResumen').onclick = () => {
+        document.body.removeChild(modal);
+      };
+    }
+
+    async function cargarResumenDiasLibres() {
+      try {
+        const mesSeleccionado = document.getElementById("mes")?.value;
+        const anioSeleccionado = parseInt(document.getElementById("anio")?.value);
+        
+        if (isNaN(anioSeleccionado)) {
+          document.getElementById('resumenLibresContenido').innerHTML = 
+            '<p style="color: red;">❌ Seleccione un año válido para ver el resumen.</p>';
+          return;
+        }
+
+        const nombramientosRef = collection(db, "nombramientos");
+        const q = query(nombramientosRef, where("usuarioCedula", "==", usuario.cedula));
+        const querySnapshot = await getDocs(q);
+        
+        // Si se seleccionaron filtros específicos, usar la lógica anterior
+        if (mesSeleccionado !== "" || true) {
+          let totalDiasLibres = 0;
+          let registrosConLibres = [];
+          
+          querySnapshot.forEach(doc => {
+            const data = doc.data();
+            
+            if (!data.inicio) return;
+            const fechaNombramiento = extraerMesYAnioDeFechaString(data.inicio);
+            if (!fechaNombramiento) return;
+            
+            // Verificar año
+            if (fechaNombramiento.anio !== anioSeleccionado) return;
+            
+            // Verificar mes (si se seleccionó)
+            if (mesSeleccionado !== "" && fechaNombramiento.mes !== parseInt(mesSeleccionado)) return;
+            
+            const diasLibres = data.diasLibres || [];
+            if (diasLibres.length > 0) {
+              // Filtrar días libres por el período seleccionado
+              const diasLibresFiltrados = diasLibres.filter(fechaLibre => {
+                const fechaLibreObj = extraerMesYAnioDeFechaString(fechaLibre);
+                if (!fechaLibreObj) return false;
+                if (fechaLibreObj.anio !== anioSeleccionado) return false;
+                if (mesSeleccionado !== "" && fechaLibreObj.mes !== parseInt(mesSeleccionado)) return false;
+                return true;
+              });
+              
+              if (diasLibresFiltrados.length > 0) {
+                totalDiasLibres += diasLibresFiltrados.length;
+                registrosConLibres.push({
+                  funcionario: data.personaSustituirNombre || 'SIN DATOS',
+                  periodo: `${data.inicio} - ${data.final || 'N/A'}`,
+                  dias: diasLibresFiltrados,
+                  tipo: data.tipoAusencia || 'Sin tipo',
+                  mes: fechaNombramiento.mes,
+                  anio: fechaNombramiento.anio
+                });
+              }
+            }
+          });
+          
+          const contenido = document.getElementById('resumenLibresContenido');
+          const mesTexto = mesSeleccionado ? 
+            document.getElementById("mes").options[parseInt(mesSeleccionado)].text : 
+            "Todos los meses";
+          
+          if (registrosConLibres.length === 0) {
+            contenido.innerHTML = `
+              <p style="text-align: center; color: #7f8c8d;">
+                📭 No hay días libres registrados para ${mesTexto} ${anioSeleccionado}.
+              </p>
+            `;
+          } else if (mesSeleccionado !== "") {
+            // Mostrar resumen simple para un mes específico
+            let html = `<p><strong>Días libres en ${mesTexto} ${anioSeleccionado}: ${totalDiasLibres}</strong></p>`;
+            html += '<div style="max-height: 400px; overflow-y: auto; margin-top: 15px;">';
+            
+            registrosConLibres.forEach(reg => {
+              html += `
+                <div style="border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px;">
+                  <p><strong>Funcionario:</strong> ${reg.funcionario}</p>
+                  <p><strong>Período:</strong> ${reg.periodo}</p>
+                  <p><strong>Tipo:</strong> ${reg.tipo}</p>
+                  <p><strong>Días libres (${reg.dias.length}):</strong> ${reg.dias.join(', ')}</p>
+                </div>
+              `;
+            });
+            
+            html += '</div>';
+            contenido.innerHTML = html;
+          } else {
+            // ✅ AGRUPAR POR MES cuando se seleccionan "Todos los meses"
+            const registrosPorMes = {};
+            
+            // Agrupar registros por mes
+            registrosConLibres.forEach(reg => {
+              const claveMes = `${reg.anio}-${reg.mes}`;
+              if (!registrosPorMes[claveMes]) {
+                registrosPorMes[claveMes] = {
+                  mes: reg.mes,
+                  anio: reg.anio,
+                  registros: [],
+                  totalDias: 0
+                };
+              }
+              registrosPorMes[claveMes].registros.push(reg);
+              registrosPorMes[claveMes].totalDias += reg.dias.length;
+            });
+            
+            // Ordenar por mes y año (ascendente)
+            const mesesOrdenados = Object.keys(registrosPorMes)
+              .map(clave => registrosPorMes[clave])
+              .sort((a, b) => {
+                if (a.anio !== b.anio) return a.anio - b.anio;
+                return a.mes - b.mes;
+              });
+            
+            let html = `<p><strong>Resumen de días libres en ${anioSeleccionado} (todos los meses):</strong></p>`;
+            html += '<div style="max-height: 400px; overflow-y: auto; margin-top: 15px;">';
+            
+            mesesOrdenados.forEach(mesData => {
+              const nombreMes = document.getElementById("mes").options[mesData.mes]?.text || `Mes ${mesData.mes}`;
+              html += `
+                <div style="border: 2px solid #3498db; padding: 15px; margin-bottom: 20px; border-radius: 8px; background-color: #f8f9fa;">
+                  <h4 style="color: #2980b9; margin-bottom: 15px;">
+                    📅 ${nombreMes} ${mesData.anio} 
+                    <span style="float: right; background: #2980b9; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px;">
+                      ${mesData.totalDias} día${mesData.totalDias !== 1 ? 's' : ''}
+                    </span>
+                  </h4>
+              `;
+              
+              mesData.registros.forEach(reg => {
+                html += `
+                  <div style="border: 1px solid #ddd; padding: 12px; margin-bottom: 10px; border-radius: 6px; background-color: white;">
+                    <p><strong>Funcionario:</strong> ${reg.funcionario}</p>
+                    <p><strong>Período:</strong> ${reg.periodo}</p>
+                    <p><strong>Tipo:</strong> ${reg.tipo}</p>
+                    <p><strong>Días libres (${reg.dias.length}):</strong> ${reg.dias.join(', ')}</p>
+                  </div>
+                `;
+              });
+              
+              html += '</div>';
+            });
+            
+            html += '</div>';
+            contenido.innerHTML = html;
+          }
+        }
+        
+      } catch (error) {
+        console.error('Error al cargar resumen:', error);
+        document.getElementById('resumenLibresContenido').innerHTML = 
+          '<p style="color: red;">❌ Error al cargar el resumen: ' + error.message + '</p>';
+      }
+    }
+
+    // ✅ Inicialización segura al cargar la página
     document.addEventListener("DOMContentLoaded", () => {
       const hoy = new Date();
       const mesSelect = document.getElementById("mes");
       const anioSelect = document.getElementById("anio");
+
+      // Establecer mes actual por defecto
       if (mesSelect) mesSelect.value = hoy.getMonth() + 1;
+
+      // Llenar el select de años desde 2020 hasta 2025
       if (anioSelect) {
         anioSelect.innerHTML = "";
         for (let year = 2020; year <= 2025; year++) {
-          const option = document.createElement("option"); option.value = year; option.textContent = year; anioSelect.appendChild(option);
+          const option = document.createElement("option");
+          option.value = year;
+          option.textContent = year;
+          anioSelect.appendChild(option);
         }
         anioSelect.value = hoy.getFullYear();
       }
 
-      setTimeout(() => { cargarRegistros(); }, 500);
+      // Cargar datos iniciales después de un breve retraso
+      setTimeout(() => {
+        cargarRegistros();
+      }, 500);
     });
 
+    // ✅ Asignar eventos a botones y filtros automáticos
     document.addEventListener("DOMContentLoaded", () => {
       const btnFiltrar = document.getElementById("btnFiltrar");
       const btnExportarPDF = document.getElementById("btnExportarPDF");
+      const btnVerDiasLibres = document.getElementById("btnVerDiasLibres");
       const selectMes = document.getElementById("mes");
       const selectAnio = document.getElementById("anio");
 
-      if (btnFiltrar) btnFiltrar.addEventListener("click", cargarRegistros);
-      if (btnExportarPDF) btnExportarPDF.addEventListener("click", exportarPDF);
-      if (selectMes) selectMes.addEventListener("change", cargarRegistros);
-      if (selectAnio) selectAnio.addEventListener("change", cargarRegistros);
+      if (btnFiltrar) {
+        btnFiltrar.addEventListener("click", cargarRegistros);
+      }
+
+      if (btnExportarPDF) {
+        btnExportarPDF.addEventListener("click", exportarPDF);
+      }
+
+      if (btnVerDiasLibres) {
+        btnVerDiasLibres.addEventListener("click", mostrarResumenDiasLibres);
+      }
+
+      if (selectMes) {
+        selectMes.addEventListener("change", cargarRegistros);
+      }
+
+      if (selectAnio) {
+        selectAnio.addEventListener("change", cargarRegistros);
+      }
 
       console.log("✅ Todos los eventos y auto-filtros asignados correctamente.");
     });

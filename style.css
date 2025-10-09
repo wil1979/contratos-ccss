@@ -231,3 +231,12 @@
         flex-direction: column;
       }
     }
+
+   @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .dashboard-card {
+      @apply transition-all duration-300 hover:scale-105 hover:shadow-xl;
+    }
