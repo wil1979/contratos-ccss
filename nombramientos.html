@@ -257,6 +257,90 @@
     const cedulaSustituir = document.getElementById("cedulaSustituir");
     const nombreSustituir = document.getElementById("nombreSustituir");
 
+    // 🔹 Función para buscar persona por cédula usando API de Hacienda
+    async function buscarPersonaPorCedula(cedula) {
+      try {
+        // Validar cédula
+        if (!cedula || cedula.trim() === '') {
+          return null;
+        }
+        
+        const cedulaLimpia = cedula.trim().replace(/\D/g, '');
+        if (cedulaLimpia.length < 9) {
+          console.warn("Cédula demasiado corta:", cedulaLimpia);
+          return null;
+        }
+
+        // 1. Intentar con API de Hacienda (API pública de Costa Rica)
+        console.log("🔍 Buscando en API de Hacienda:", cedulaLimpia);
+        const apiUrl = `https://api.hacienda.go.cr/fe/ae?identificacion=${cedulaLimpia}`;
+        
+        const resp = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.nombre) {
+            console.log("✅ Nombre encontrado en API de Hacienda:", data.nombre);
+            return data.nombre;
+          }
+        } else {
+          console.warn("API de Hacienda no devolvió datos válidos para:", cedulaLimpia);
+        }
+      } catch (error) {
+        console.error("❌ Error al consultar API de Hacienda:", error);
+        // No retornamos aquí porque queremos intentar con Firestore
+      }
+
+      // 2. Intentar en Firestore tabla personal (como respaldo)
+      try {
+        console.log("🔍 Buscando en Firestore personal:", cedula);
+        const q = query(collection(db, "personal"), where("id", "==", cedula.trim()));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const nombre = snap.docs[0].data().nombre;
+          console.log("✅ Nombre encontrado en Firestore:", nombre);
+          return nombre;
+        }
+      } catch (error) {
+        console.error("❌ Error al buscar en Firestore:", error);
+      }
+
+      return null;
+    }
+
+    // 🔹 Evento para buscar automáticamente al salir del campo de cédula
+    cedulaSustituir.addEventListener("blur", async () => {
+      const cedula = cedulaSustituir.value.trim();
+      if (!cedula) {
+        nombreSustituir.value = "";
+        return;
+      }
+
+      // Mostrar estado de carga
+      nombreSustituir.value = "Buscando...";
+      nombreSustituir.disabled = true;
+
+      try {
+        const nombre = await buscarPersonaPorCedula(cedula);
+        if (nombre) {
+          nombreSustituir.value = nombre;
+        } else {
+          nombreSustituir.value = "No encontrado";
+        }
+      } catch (error) {
+        console.error("Error en búsqueda automática:", error);
+        nombreSustituir.value = "Error en búsqueda";
+      } finally {
+        nombreSustituir.disabled = false;
+      }
+    });
+
     // Guardar nombramiento
     document.getElementById("formNombramiento").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -360,7 +444,7 @@
       }, 1000);
     });
 
-        // =============================
+    // =============================
     // Modal Selección de Personal (versión segura)
     // =============================
     const modalPersonal = document.getElementById("modalPersonal");
