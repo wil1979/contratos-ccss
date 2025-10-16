@@ -444,137 +444,161 @@
       }, 1000);
     });
 
-    // =============================
-    // Modal Selección de Personal (versión segura)
-    // =============================
-    const modalPersonal = document.getElementById("modalPersonal");
-    const btnBuscarPersonal = document.getElementById("btnBuscarPersonal");
-    const cerrarPersonalBtn = document.getElementById("cerrarPersonalBtn");
-    const tablaPersonal = document.querySelector("#tablaPersonal tbody");
-    const filtroNombre = document.getElementById("filtroNombre");
-    const filtroCedula = document.getElementById("filtroCedula");
-    const filtroPuesto = document.getElementById("filtroPuesto");
-    const btnBuscarEnModal = document.getElementById("btnBuscarEnModal");
-    const btnLimpiarFiltros = document.getElementById("btnLimpiarFiltros");
+   // =============================
+// Modal Selección de Personal (CORREGIDO)
+// =============================
+const modalPersonal = document.getElementById("modalPersonal");
+const btnBuscarPersonal = document.getElementById("btnBuscarPersonal");
+const cerrarPersonalBtn = document.getElementById("cerrarPersonalBtn");
+const tablaPersonal = document.querySelector("#tablaPersonal tbody");
+const filtroNombre = document.getElementById("filtroNombre");
+const filtroCedula = document.getElementById("filtroCedula");
+const filtroPuesto = document.getElementById("filtroPuesto");
+const btnBuscarEnModal = document.getElementById("btnBuscarEnModal");
+const btnLimpiarFiltros = document.getElementById("btnLimpiarFiltros");
 
-    let listaPersonal = [];
+let listaPersonal = [];
+const puestosUnicos = new Set(); // 👈 ¡Importante: estaba faltando!
 
-    btnBuscarPersonal.addEventListener("click", async () => {
-      modalPersonal.style.display = "flex";
-      if (listaPersonal.length === 0) {
-        await cargarPersonal();
-      }
-      tablaPersonal.innerHTML = "<tr><td colspan='4'>Ingrese criterios y haga clic en 'Buscar'</td></tr>";
-    });
+// Función para seleccionar una persona y cerrar el modal
+function seleccionarPersona(cedula, nombre) {
+  document.getElementById("cedulaSustituir").value = cedula;
+  document.getElementById("nombreSustituir").value = nombre;
+  modalPersonal.style.display = "none";
+}
+window.seleccionarPersona = seleccionarPersona; // Necesario para onclick en strings
 
-    cerrarPersonalBtn.addEventListener("click", () => {
-      modalPersonal.style.display = "none";
-    });
-
-    btnLimpiarFiltros.addEventListener("click", () => {
-      filtroNombre.value = "";
-      filtroCedula.value = "";
-      filtroPuesto.value = "";
-      tablaPersonal.innerHTML = "<tr><td colspan='4'>Filtros limpiados. Haga clic en 'Buscar'.</td></tr>";
-    });
-
-    btnBuscarEnModal.addEventListener("click", mostrarPersonal);
-
-    // Cargar Personal.json con manejo de errores robusto
-    async function cargarPersonal() {
-      try {
-        const resp = await fetch("Personal.json");
-        if (!resp.ok) throw new Error("Archivo Personal.json no encontrado");
-        
-        const datos = await resp.json();
-        
-        // Validar y limpiar datos
-        if (!Array.isArray(datos)) {
-          throw new Error("Personal.json debe ser un arreglo");
-        }
-        
-        listaPersonal = datos.filter(p => {
-          if (!p || typeof p !== 'object') return false;
-          return (p.nombre != null) || (p.cedula != null) || (p.puesto != null);
-        });
-        
-        console.log("✅ Personal cargado:", listaPersonal.length, "registros válidos");
-      } catch (error) {
-        console.error("❌ Error al cargar Personal.json:", error);
-        listaPersonal = [];
-        tablaPersonal.innerHTML = `<tr><td colspan='4'>Error: ${error.message}</td></tr>`;
-      }
+// Cargar Personal.json con validación robusta
+async function cargarPersonal() {
+  try {
+    const respuesta = await fetch("personal.json");
+    if (!respuesta.ok) {
+      throw new Error(`Archivo no encontrado. Código: ${respuesta.status}`);
     }
 
-    // Función de búsqueda segura
-    function mostrarPersonal() {
-      const nombreFiltro = filtroNombre.value.trim().toLowerCase();
-      const cedulaFiltro = filtroCedula.value.trim().replace(/\D/g, ''); // Solo dígitos
-      const puestoFiltro = filtroPuesto.value;
+    const datos = await respuesta.json();
 
-      tablaPersonal.innerHTML = "<tr><td colspan='4'>Buscando...</td></tr>";
-
-      setTimeout(() => {
-        const resultados = listaPersonal.filter(p => {
-          // Filtro por puesto
-          if (puestoFiltro && p.puesto !== puestoFiltro) return false;
-
-          // Filtro por nombre (seguro contra undefined)
-          if (nombreFiltro) {
-            const nombreNormalizado = (p.nombre || '').toLowerCase();
-            if (!nombreNormalizado.includes(nombreFiltro)) return false;
-          }
-
-          // Filtro por cédula (¡protegido contra undefined, null, etc!)
-          if (cedulaFiltro) {
-            const cedulaStr = (p.cedula != null) ? p.cedula.toString().replace(/\D/g, '') : '';
-            if (!cedulaStr.includes(cedulaFiltro)) return false;
-          }
-
-          return true;
-        });
-
-        if (resultados.length === 0) {
-          tablaPersonal.innerHTML = `<tr><td colspan="4">No se encontraron coincidencias</td></tr>`;
-        } else {
-          // Limitar resultados para mejor rendimiento
-          const resultadosAMostrar = resultados.slice(0, 100);
-          tablaPersonal.innerHTML = resultadosAMostrar.map(p => `
-            <tr>
-              <td>${p.cedula != null ? p.cedula : '—'}</td>
-              <td>${p.nombre || '—'}</td>
-              <td>${p.puesto || '—'}</td>
-              <td><button class="btn-primary btnSeleccionar" 
-                  data-cedula="${p.cedula != null ? p.cedula : ''}" 
-                  data-nombre="${p.nombre || ''}">Seleccionar</button></td>
-            </tr>
-          `).join('');
-
-          if (resultados.length > 100) {
-            const filaAdvertencia = document.createElement("tr");
-            filaAdvertencia.innerHTML = `<td colspan="4" style="text-align: center; font-style: italic;">... y ${resultados.length - 100} más (mostrando 100)</td>`;
-            tablaPersonal.appendChild(filaAdvertencia);
-          }
-
-          // Auto-seleccionar si solo hay un resultado
-          if (resultados.length === 1) {
-            const unico = resultados[0];
-            cedulaSustituir.value = unico.cedula != null ? unico.cedula : '';
-            nombreSustituir.value = unico.nombre || '';
-            modalPersonal.style.display = "none";
-          }
-
-          // Reasignar eventos a botones
-          document.querySelectorAll(".btnSeleccionar").forEach(btn => {
-            btn.addEventListener("click", () => {
-              cedulaSustituir.value = btn.dataset.cedula;
-              nombreSustituir.value = btn.dataset.nombre;
-              modalPersonal.style.display = "none";
-            });
-          });
-        }
-      }, 150);
+    if (!Array.isArray(datos)) {
+      throw new Error("personal.json debe ser un arreglo de objetos");
     }
+
+    listaPersonal = datos.filter(p => {
+      if (!p || typeof p !== 'object') return false;
+      return (p.nombre != null) || (p.cedula != null) || (p.puesto != null);
+    });
+
+    // Limpiar y llenar puestos únicos
+    puestosUnicos.clear();
+    listaPersonal.forEach(p => {
+      if (p.puesto && typeof p.puesto === 'string') {
+        puestosUnicos.add(p.puesto);
+      }
+    });
+
+    // Llenar el select de puestos en el modal
+    const opcionesPuesto = Array.from(puestosUnicos).sort();
+    filtroPuesto.innerHTML = '<option value="">Todos los puestos</option>';
+    opcionesPuesto.forEach(puesto => {
+      const option = document.createElement("option");
+      option.value = puesto;
+      option.textContent = puesto;
+      filtroPuesto.appendChild(option);
+    });
+
+    console.log(`✅ Cargados ${listaPersonal.length} registros válidos`);
+    tablaPersonal.innerHTML = '<tr><td colspan="4" class="message">Ingrese criterios y haga clic en "Buscar"</td></tr>';
+  } catch (error) {
+    console.error("❌ Error al cargar personal.json:", error);
+    tablaPersonal.innerHTML = `<tr><td colspan="4" class="message error">
+      ❌ Error: ${error.message}<br>
+      Verifique que el archivo "personal.json" exista y sea un JSON válido.
+    </td></tr>`;
+  }
+}
+
+// Función de búsqueda segura (adaptada al modal)
+function buscarPersonal() {
+  const nombreFiltro = filtroNombre.value.trim().toLowerCase();
+  const cedulaFiltro = filtroCedula.value.trim().replace(/\D/g, ''); // Solo dígitos
+  const puestoFiltro = filtroPuesto.value;
+
+  tablaPersonal.innerHTML = '<tr><td colspan="4" class="message loading">Buscando...</td></tr>';
+
+  setTimeout(() => {
+    const resultados = listaPersonal.filter(p => {
+      // Filtro por puesto
+      if (puestoFiltro && p.puesto !== puestoFiltro) return false;
+
+      // Filtro por nombre
+      if (nombreFiltro) {
+        const nombreNormalizado = (p.nombre || '').toLowerCase();
+        if (!nombreNormalizado.includes(nombreFiltro)) return false;
+      }
+
+      // Filtro por cédula
+      if (cedulaFiltro) {
+        const cedulaStr = (p.cedula != null) ? p.cedula.toString() : '';
+        if (!cedulaStr.includes(cedulaFiltro)) return false;
+      }
+
+      return true;
+    });
+
+    if (resultados.length === 0) {
+      tablaPersonal.innerHTML = '<tr><td colspan="4" class="message error">❌ No se encontraron coincidencias</td></tr>';
+    } else {
+      const resultadosAMostrar = resultados.slice(0, 100);
+      tablaPersonal.innerHTML = resultadosAMostrar.map(p => `
+        <tr>
+          <td>${p.cedula != null ? p.cedula : '—'}</td>
+          <td>${p.nombre || '—'}</td>
+          <td>${p.puesto || '—'}</td>
+          <td>
+            <button class="btn-primary" onclick="seleccionarPersona('${(p.cedula != null ? p.cedula : '').replace(/'/g, "\\'")}', '${(p.nombre || '').replace(/'/g, "\\'")}')">
+              Seleccionar
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      if (resultados.length > 100) {
+        const filaAdvertencia = document.createElement("tr");
+        filaAdvertencia.innerHTML = `<td colspan="4" class="message">... y ${resultados.length - 100} más (mostrando solo 100)</td>`;
+        tablaPersonal.appendChild(filaAdvertencia);
+      }
+    }
+  }, 150);
+}
+
+// Eventos del modal
+btnBuscarPersonal.addEventListener("click", async () => {
+  modalPersonal.style.display = "flex";
+  if (listaPersonal.length === 0) {
+    await cargarPersonal();
+  }
+  tablaPersonal.innerHTML = '<tr><td colspan="4">Ingrese criterios y haga clic en "Buscar"</td></tr>';
+});
+
+cerrarPersonalBtn.addEventListener("click", () => {
+  modalPersonal.style.display = "none";
+});
+
+btnBuscarEnModal.addEventListener("click", buscarPersonal);
+
+btnLimpiarFiltros.addEventListener("click", () => {
+  filtroNombre.value = "";
+  filtroCedula.value = "";
+  filtroPuesto.value = "";
+  tablaPersonal.innerHTML = '<tr><td colspan="4">Filtros limpiados. Haga clic en "Buscar".</td></tr>';
+});
+
+// Permitir búsqueda con Enter dentro del modal
+modalPersonal.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    buscarPersonal();
+  }
+});
   </script>
 </body>
 </html>
