@@ -212,7 +212,6 @@
     .dia-libre3 { background-color: #d7bde2; border-left: 4px solid #9b59b6; }
     .dia-vacaciones { background-color: #d6eaf8; border-left: 4px solid #3498db; }
     .dia-licencia { background-color: #d5dbdb; border-left: 4px solid #95a5a6; }
-    .dia-Biologico { background-color: #d5fbdb; border-left: 4px solid #75a5a6; }
     
     body.dark-mode .dia-laborado { background-color: #1e5a3a; border-left-color: #27ae60; }
     body.dark-mode .dia-no_laborado { background-color: #5a2a27; border-left-color: #c0392b; }
@@ -579,7 +578,6 @@
       <div class="stat">Libre 3: <span id="stat-libre3">0</span></div>
       <div class="stat">Vacaciones: <span id="stat-vacaciones">0</span></div>
       <div class="stat">Licencia: <span id="stat-licencia">0</span></div>
-      <div class="stat">Biologico: <span id="stat-Biologico">0</span></div>
     </div>
 
     <div class="leyenda">
@@ -630,7 +628,6 @@
           <option value="libre3">🟣 Libre 3</option>
           <option value="vacaciones">🏖️ Vacaciones</option>
           <option value="licencia">🏥 Licencia</option>
-          <option value="Biologico">🏥 Biologico</option>
         </select>
       </div>
       
@@ -705,7 +702,7 @@
 
     // 🔹 Validar datos antes de guardar
     function validarDatosDia(tipo, comentario) {
-      const tiposValidos = ["laborado", "no_laborado", "libre1", "libre2", "libre3", "vacaciones", "licencia" , "Biologico"];
+      const tiposValidos = ["laborado", "no_laborado", "libre1", "libre2", "libre3", "vacaciones", "licencia"];
       
       if (tipo && !tiposValidos.includes(tipo)) {
         throw new Error("Tipo de día inválido");
@@ -917,7 +914,6 @@
         case "libre3": icono = "🟣"; break;
         case "vacaciones": icono = "🏖️"; break;
         case "licencia": icono = "🏥"; break;
-        case "case "licencia": icono = "🏥"; break;": icono = "🏥"; break;
         default: icono = "";
       }
       
@@ -942,7 +938,6 @@
           "libre3": "Libre 3",
           "vacaciones": "Vacaciones",
           "licencia": "Licencia"
-          "Biologico": "Biologico"
         };
         ariaLabel += `, ${tiposTexto[tipoDia]}`;
       }
@@ -1034,7 +1029,6 @@
         libre3: 0,
         vacaciones: 0,
         licencia: 0
-        Biologigico: 0
       };
       
       datosCalendario.forEach(datos => {
@@ -1050,7 +1044,6 @@
       document.getElementById("stat-libre3").textContent = estadisticas.libre3;
       document.getElementById("stat-vacaciones").textContent = estadisticas.vacaciones;
       document.getElementById("stat-licencia").textContent = estadisticas.licencia;
-      document.getElementById("stat-Biologico").textContent = estadisticas.Biologico;
     }
 
     // 🔹 Cambiar vista
@@ -1107,8 +1100,6 @@
           case "libre3": icono = "🟣"; break;
           case "vacaciones": icono = "🏖️"; break;
           case "licencia": icono = "🏥"; break;
-          case "Biologico": icono = "🏥"; break;
-
           default: icono = "⚪";
         }
         
