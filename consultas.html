@@ -263,6 +263,59 @@
       color: #8e44ad;
       font-weight: 600;
     }
+
+     /* ✅ Estilos para el mini calendario - versión compacta */
+    .calendario-container {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px; /* Reducido */
+      margin: 10px 0;
+      max-height: 220px; /* Límite de altura */
+      overflow-y: auto; /* Scroll si es necesario */
+      padding: 4px;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
+    .calendario-header {
+      text-align: center;
+      font-weight: bold;
+      color: #2c3e50;
+      padding: 3px; /* Reducido */
+      font-size: 10px; /* Más pequeño */
+    }
+    .calendario-dia {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 10px; /* Reducido */
+      cursor: pointer;
+      user-select: none;
+      padding: 0;
+    }
+    .calendario-dia:hover {
+      background-color: #f0f8ff;
+    }
+    .calendario-dia.dia-nombramiento {
+      background-color: #e8f4f8;
+      border-color: #3498db;
+    }
+    .calendario-dia.dia-seleccionado {
+      background-color: #9b59b6;
+      color: white;
+    }
+    .calendario-dia.dia-fuera {
+      color: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* Asegurar que el modal tenga scroll si es muy alto */
+    .modal-contenido {
+      max-height: 90vh;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -350,8 +403,8 @@
           <p><strong>Área:</strong> <span id="detalleArea"></span></p>
         </div>
         <div class="dias-seleccion">
-          <h4>Días del período (<span id="totalDias"></span> días totales)</h4>
-          <div id="diasContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin: 15px 0;"></div>
+          <h4>Seleccionar días libres en el mes de <span id="mesCalendario"></span></h4>
+          <div class="calendario-container" id="calendarioContainer"></div>
         </div>
         <div class="form-group">
           <label for="tipoAusencia">Tipo de Ausencia:</label>
@@ -360,6 +413,10 @@
             <option value="libre1">Libre 1</option>
             <option value="libre2">Libre 2</option>
             <option value="libre3">Libre 3</option>
+            <option value="libre4">Libre 4</option>
+            <option value="libreBiologico">Libre Biológico</option>
+            <option value="libreAcumulado">Libre Acumulado</option>
+            <option value="permisoSinGozo">Permiso sin Goce Salarial</option>
             <option value="vacaciones">Vacaciones</option>
             <option value="incapacidad">Incapacidad</option>
             <option value="licencia">Licencia</option>
@@ -411,6 +468,8 @@
     let datosOriginales = null;
     let documentoDetalleActual = null;
     let diasSeleccionados = new Set();
+    let rangoNombramiento = { inicio: null, final: null };
+
     // 🔹 Extrae mes y año directamente del string YYYY-MM-DD (evita zona horaria)
     function extraerMesYAnioDeFechaString(fechaStr) {
       if (!fechaStr || !/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
@@ -420,155 +479,157 @@
       const [anio, mes] = fechaStr.split("-").map(Number);
       return { mes, anio };
     }
- // 🔹 Cargar registros con filtro desde Firestore (FILTRANDO POR USUARIO ACTIVO)
-async function cargarRegistros() {
-  const mesSeleccionado = document.getElementById("mes")?.value;
-  const anioSeleccionado = parseInt(document.getElementById("anio")?.value);
-  const tbody = document.getElementById("tablaRegistros");
-  const mensaje = document.getElementById("mensajeSinDatos");
-  const tabla = document.getElementById("tablaNombramientos");
-  const mensajeError = document.getElementById("mensajeError");
-  // Ocultar mensajes previos
-  mensajeError.style.display = "none";
-  mensaje.style.display = "none";
-  // ✅ Validar que año sea un número válido
-  if (isNaN(anioSeleccionado)) {
-    tbody.innerHTML = `<tr><td colspan="12" style="color:red;">⚠️ Por favor, seleccione un año válido.</td></tr>`;
-    tabla.style.display = "table";
-    return;
-  }
-  console.log("🔍 Filtrando por Mes:", mesSeleccionado, "Año:", anioSeleccionado, "Usuario:", usuario.cedula);
-  // Mostrar estado de carga
-  tbody.innerHTML = `<tr><td colspan="12" class="cargando">Cargando datos...</td></tr>`;
-  tabla.style.display = "table";
-  try {
-    // Obtener documentos de la colección "nombramientos" filtrados por usuarioCedula
-    const nombramientosRef = collection(db, "nombramientos");
-    // Crear query que filtre por usuarioCedula del usuario activo
-    const q = query(nombramientosRef, where("usuarioCedula", "==", usuario.cedula));
-    const querySnapshot = await getDocs(q);
-    // Array para almacenar registros filtrados
-    const registrosFiltrados = [];
-    // Procesar cada documento
-querySnapshot.forEach((docSnapshot) => {
-  const r = docSnapshot.data();
-  // 🔹 Validación robusta: verificar que el documento tenga datos válidos
-  if (!r || typeof r !== 'object' || Array.isArray(r)) {
-    console.warn("📄 Documento inválido (sin datos, no es objeto, o es array):", docSnapshot.id);
-    return;
-  }
-  // Verificar que el documento tenga la fecha de inicio
-  if (!r.inicio) {
-    console.warn("📄 Documento sin campo 'inicio':", docSnapshot.id);
-    return;
-  }
-  // Extraer mes y año de la fecha de inicio
-  const fecha = extraerMesYAnioDeFechaString(r.inicio);
-  if (!fecha) {
-    console.warn("📄 Fecha inválida:", r.inicio, "en documento", docSnapshot.id);
-    return;
-  }
-  // Filtrar por año seleccionado
-  if (fecha.anio !== anioSeleccionado) {
-    return;
-  }
-  // Si se seleccionó un mes específico, filtrar también por mes
-  if (mesSeleccionado !== "" && fecha.mes !== parseInt(mesSeleccionado)) {
-    return;
-  }
-  // 🔹 Validación adicional: asegurar que los campos críticos existan
-  // Esto previene errores al renderizar la tabla
-  const camposCriticos = ['personaSustituirNombre', 'personaSustituirCedula', 'area', 'codArea', 'inicio', 'dias', 'salario', 'estado'];
-  const faltanCampos = camposCriticos.filter(campo => r[campo] === undefined);
-  if (faltanCampos.length > 0) {
-    console.warn(`📄 Documento incompleto, faltan campos: ${faltanCampos.join(', ')}`, docSnapshot.id);
-    // Podemos seguir procesando el documento, pero usaremos valores por defecto al renderizar
-  }
-  // Agregar a registros filtrados - asegurando que data sea el objeto r
-  registrosFiltrados.push({
-    id: docSnapshot.id,
-    data: r  // ← Usar 'data' explícitamente en lugar de spread
-  });
-});
-    // 🔥 ORDENAR por fecha de inicio (ascendente: más antiguo primero) - versión segura
-    registrosFiltrados.sort((a, b) => {
-      // Verificar que ambos registros tengan datos y campo 'inicio'
-      const inicioA = a.data?.inicio;
-      const inicioB = b.data?.inicio;
-      // Si alguno no tiene fecha de inicio, colocarlo al final
-      if (!inicioA && !inicioB) return 0;
-      if (!inicioA) return 1; // a va después de b
-      if (!inicioB) return -1; // b va después de a
-      const fechaA = new Date(inicioA);
-      const fechaB = new Date(inicioB);
-      // Manejar fechas inválidas
-      if (isNaN(fechaA.getTime()) && isNaN(fechaB.getTime())) return 0;
-      if (isNaN(fechaA.getTime())) return 1;
-      if (isNaN(fechaB.getTime())) return -1;
-      return fechaA - fechaB;
-    });
-    // Renderizar los registros ordenados
-tbody.innerHTML = "";
-if (registrosFiltrados.length === 0) {
-  tabla.style.display = "none";
-  mensaje.style.display = "block";
-  console.log("📭 No se encontraron datos para este filtro.");
-} else {
-  registrosFiltrados.forEach(registro => {
-    // 🔹 Asegurar que registro.data exista
-    if (!registro.data) {
-      console.warn("📄 Registro sin datos:", registro.id);
-      return;
+
+    // 🔹 Cargar registros con filtro desde Firestore (FILTRANDO POR USUARIO ACTIVO)
+    async function cargarRegistros() {
+      const mesSeleccionado = document.getElementById("mes")?.value;
+      const anioSeleccionado = parseInt(document.getElementById("anio")?.value);
+      const tbody = document.getElementById("tablaRegistros");
+      const mensaje = document.getElementById("mensajeSinDatos");
+      const tabla = document.getElementById("tablaNombramientos");
+      const mensajeError = document.getElementById("mensajeError");
+      // Ocultar mensajes previos
+      mensajeError.style.display = "none";
+      mensaje.style.display = "none";
+      // ✅ Validar que año sea un número válido
+      if (isNaN(anioSeleccionado)) {
+        tbody.innerHTML = `<tr><td colspan="12" style="color:red;">⚠️ Por favor, seleccione un año válido.</td></tr>`;
+        tabla.style.display = "table";
+        return;
+      }
+      console.log("🔍 Filtrando por Mes:", mesSeleccionado, "Año:", anioSeleccionado, "Usuario:", usuario.cedula);
+      // Mostrar estado de carga
+      tbody.innerHTML = `<tr><td colspan="12" class="cargando">Cargando datos...</td></tr>`;
+      tabla.style.display = "table";
+      try {
+        // Obtener documentos de la colección "nombramientos" filtrados por usuarioCedula
+        const nombramientosRef = collection(db, "nombramientos");
+        // Crear query que filtre por usuarioCedula del usuario activo
+        const q = query(nombramientosRef, where("usuarioCedula", "==", usuario.cedula));
+        const querySnapshot = await getDocs(q);
+        // Array para almacenar registros filtrados
+        const registrosFiltrados = [];
+        // Procesar cada documento
+        querySnapshot.forEach((docSnapshot) => {
+          const r = docSnapshot.data();
+          // 🔹 Validación robusta: verificar que el documento tenga datos válidos
+          if (!r || typeof r !== 'object' || Array.isArray(r)) {
+            console.warn("📄 Documento inválido (sin datos, no es objeto, o es array):", docSnapshot.id);
+            return;
+          }
+          // Verificar que el documento tenga la fecha de inicio
+          if (!r.inicio) {
+            console.warn("📄 Documento sin campo 'inicio':", docSnapshot.id);
+            return;
+          }
+          // Extraer mes y año de la fecha de inicio
+          const fecha = extraerMesYAnioDeFechaString(r.inicio);
+          if (!fecha) {
+            console.warn("📄 Fecha inválida:", r.inicio, "en documento", docSnapshot.id);
+            return;
+          }
+          // Filtrar por año seleccionado
+          if (fecha.anio !== anioSeleccionado) {
+            return;
+          }
+          // Si se seleccionó un mes específico, filtrar también por mes
+          if (mesSeleccionado !== "" && fecha.mes !== parseInt(mesSeleccionado)) {
+            return;
+          }
+          // 🔹 Validación adicional: asegurar que los campos críticos existan
+          // Esto previene errores al renderizar la tabla
+          const camposCriticos = ['personaSustituirNombre', 'personaSustituirCedula', 'area', 'codArea', 'inicio', 'dias', 'salario', 'estado'];
+          const faltanCampos = camposCriticos.filter(campo => r[campo] === undefined);
+          if (faltanCampos.length > 0) {
+            console.warn(`📄 Documento incompleto, faltan campos: ${faltanCampos.join(', ')}`, docSnapshot.id);
+            // Podemos seguir procesando el documento, pero usaremos valores por defecto al renderizar
+          }
+          // Agregar a registros filtrados - asegurando que data sea el objeto r
+          registrosFiltrados.push({
+            id: docSnapshot.id,
+            data: r  // ← Usar 'data' explícitamente en lugar de spread
+          });
+        });
+        // 🔥 ORDENAR por fecha de inicio (ascendente: más antiguo primero) - versión segura
+        registrosFiltrados.sort((a, b) => {
+          // Verificar que ambos registros tengan datos y campo 'inicio'
+          const inicioA = a.data?.inicio;
+          const inicioB = b.data?.inicio;
+          // Si alguno no tiene fecha de inicio, colocarlo al final
+          if (!inicioA && !inicioB) return 0;
+          if (!inicioA) return 1; // a va después de b
+          if (!inicioB) return -1; // b va después de a
+          const fechaA = new Date(inicioA);
+          const fechaB = new Date(inicioB);
+          // Manejar fechas inválidas
+          if (isNaN(fechaA.getTime()) && isNaN(fechaB.getTime())) return 0;
+          if (isNaN(fechaA.getTime())) return 1;
+          if (isNaN(fechaB.getTime())) return -1;
+          return fechaA - fechaB;
+        });
+        // Renderizar los registros ordenados
+        tbody.innerHTML = "";
+        if (registrosFiltrados.length === 0) {
+          tabla.style.display = "none";
+          mensaje.style.display = "block";
+          console.log("📭 No se encontraron datos para este filtro.");
+        } else {
+          registrosFiltrados.forEach(registro => {
+            // 🔹 Asegurar que registro.data exista
+            if (!registro.data) {
+              console.warn("📄 Registro sin datos:", registro.id);
+              return;
+            }
+            const r = registro.data;
+            // Formatear los datos para mostrar - con valores por defecto seguros
+            const personaSustituirNombre = (r.personaSustituirNombre !== undefined) ? r.personaSustituirNombre : "SIN DATOS";
+            const personaSustituirCedula = (r.personaSustituirCedula !== undefined) ? r.personaSustituirCedula : "N/A";
+            const area = (r.area !== undefined) ? r.area : "N/A";
+            const codArea = (r.codArea !== undefined) ? r.codArea : "N/A";
+            const fechaFinal = (r.final !== undefined) ? r.final : "N/A";
+            const horario = `${(r.horarioEntrada !== undefined) ? r.horarioEntrada : 'N/A'} - ${(r.horarioSalida !== undefined) ? r.horarioSalida : 'N/A'}`;
+            const dias = (r.dias !== undefined) ? r.dias : 0;
+            const salario = parseFloat((r.salario !== undefined) ? r.salario : 0).toLocaleString('es-CR', { minimumFractionDigits: 2 });
+            const estado = (r.estado !== undefined) ? (r.estado ? "✅ Pagado" : "⏳ Pendiente") : "⏳ Pendiente";
+            // ✅ NUEVO: Formatear días libres
+            const diasLibres = (r.diasLibres !== undefined && Array.isArray(r.diasLibres)) ? r.diasLibres : [];
+            const diasLibresTexto = diasLibres.length > 0 
+              ? `${diasLibres.length} día${diasLibres.length !== 1 ? 's' : ''}`
+              : "Ninguno";
+            // Crear la fila de la tabla
+            const fila = document.createElement('tr');
+            fila.dataset.id = registro.id;
+            fila.innerHTML = `
+              <td>${personaSustituirCedula}</td>
+              <td>${personaSustituirNombre}</td>
+              <td>${area}</td>
+              <td>${codArea}</td>
+              <td>${r.inicio}</td>
+              <td>${fechaFinal}</td>
+              <td>${horario}</td>
+              <td>${dias}</td>
+              <td>₡${salario}</td>
+              <td>${estado}</td>
+              <td class="dias-libres-info" title="${diasLibres.length > 0 ? 'Fechas: ' + diasLibres.join(', ') : ''}">${diasLibresTexto}</td>
+              <td class="acciones">
+                <button class="btn-detalle" onclick='abrirDetalle("${registro.id}", JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(r))}")))'>📋 Detalles</button>
+                <button class="btn-editar" onclick="iniciarEdicion('${registro.id}', this)">✏️ Editar</button>
+                <button class="btn-guardar" onclick="guardarCambios('${registro.id}', this)">💾 Guardar</button>
+                <button class="btn-cancelar" onclick="cancelarEdicion('${registro.id}', this)">❌ Cancelar</button>
+              </td>
+            `;
+            tbody.appendChild(fila);
+          });
+          console.log(`✅ Se cargaron y ordenaron ${registrosFiltrados.length} registros.`);
+        }
+      } catch (error) {
+        console.error("❌ Error al cargar registros de Firestore:", error);
+        mensajeError.textContent = "Error al cargar datos: " + error.message;
+        mensajeError.style.display = "block";
+        tbody.innerHTML = `<tr><td colspan="12" style="color:red;">Error al cargar datos de la base de datos. Por favor, intente nuevamente.</td></tr>`;
+      }
     }
-    const r = registro.data;
-    // Formatear los datos para mostrar - con valores por defecto seguros
-    const personaSustituirNombre = (r.personaSustituirNombre !== undefined) ? r.personaSustituirNombre : "SIN DATOS";
-    const personaSustituirCedula = (r.personaSustituirCedula !== undefined) ? r.personaSustituirCedula : "N/A";
-    const area = (r.area !== undefined) ? r.area : "N/A";
-    const codArea = (r.codArea !== undefined) ? r.codArea : "N/A";
-    const fechaFinal = (r.final !== undefined) ? r.final : "N/A";
-    const horario = `${(r.horarioEntrada !== undefined) ? r.horarioEntrada : 'N/A'} - ${(r.horarioSalida !== undefined) ? r.horarioSalida : 'N/A'}`;
-    const dias = (r.dias !== undefined) ? r.dias : 0;
-    const salario = parseFloat((r.salario !== undefined) ? r.salario : 0).toLocaleString('es-CR', { minimumFractionDigits: 2 });
-    const estado = (r.estado !== undefined) ? (r.estado ? "✅ Pagado" : "⏳ Pendiente") : "⏳ Pendiente";
-    // ✅ NUEVO: Formatear días libres
-    const diasLibres = (r.diasLibres !== undefined && Array.isArray(r.diasLibres)) ? r.diasLibres : [];
-    const diasLibresTexto = diasLibres.length > 0 
-      ? `${diasLibres.length} día${diasLibres.length !== 1 ? 's' : ''}`
-      : "Ninguno";
-    // Crear la fila de la tabla
-    const fila = document.createElement('tr');
-    fila.dataset.id = registro.id;
-    fila.innerHTML = `
-      <td>${personaSustituirCedula}</td>
-      <td>${personaSustituirNombre}</td>
-      <td>${area}</td>
-      <td>${codArea}</td>
-      <td>${r.inicio}</td>
-      <td>${fechaFinal}</td>
-      <td>${horario}</td>
-      <td>${dias}</td>
-      <td>₡${salario}</td>
-      <td>${estado}</td>
-      <td class="dias-libres-info" title="${diasLibres.length > 0 ? 'Fechas: ' + diasLibres.join(', ') : ''}">${diasLibresTexto}</td>
-      <td class="acciones">
-        <button class="btn-detalle" onclick='abrirDetalle("${registro.id}", JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(r))}")))'>📋 Detalles</button>
-        <button class="btn-editar" onclick="iniciarEdicion('${registro.id}', this)">✏️ Editar</button>
-        <button class="btn-guardar" onclick="guardarCambios('${registro.id}', this)">💾 Guardar</button>
-        <button class="btn-cancelar" onclick="cancelarEdicion('${registro.id}', this)">❌ Cancelar</button>
-      </td>
-    `;
-    tbody.appendChild(fila);
-  });
-  console.log(`✅ Se cargaron y ordenaron ${registrosFiltrados.length} registros.`);
-}
-  } catch (error) {
-    console.error("❌ Error al cargar registros de Firestore:", error);
-    mensajeError.textContent = "Error al cargar datos: " + error.message;
-    mensajeError.style.display = "block";
-    tbody.innerHTML = `<tr><td colspan="12" style="color:red;">Error al cargar datos de la base de datos. Por favor, intente nuevamente.</td></tr>`;
-  }
-}
+
     // 🔹 Iniciar edición de un registro
     window.iniciarEdicion = function(docId, boton) {
       const fila = boton.closest('tr');
@@ -795,109 +856,130 @@ if (registrosFiltrados.length === 0) {
     // 🔹 Abrir modal de detalle
     window.abrirDetalle = function(docId, datos) {
       documentoDetalleActual = docId;
+      rangoNombramiento = {
+        inicio: datos.inicio,
+        final: datos.final
+      };
       // Mostrar información básica
       document.getElementById('detalleFuncionario').textContent = datos.personaSustituirNombre || 'SIN DATOS';
       document.getElementById('detallePeriodo').textContent = `${datos.inicio} - ${datos.final || 'N/A'}`;
       document.getElementById('detalleArea').textContent = datos.area || 'N/A';
-      // Generar checkboxes para cada día del período
-      generarDiasPeriodo(datos.inicio, datos.final);
+      
+      // Extraer mes y año del inicio
+      const fechaInicio = new Date(datos.inicio);
+      const mes = fechaInicio.getMonth();
+      const anio = fechaInicio.getFullYear();
+      const nombreMes = fechaInicio.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+      document.getElementById('mesCalendario').textContent = nombreMes;
+
+      // Generar calendario
+      generarCalendario(mes, anio, datos.inicio, datos.final);
+      
       // Cargar datos existentes si los hay
       cargarDatosDetalle(datos);
+      
       // Mostrar modal
       document.getElementById('modalDetalle').style.display = 'flex';
     };
 
-    // 🔹 ✅ FUNCIÓN CORREGIDA: Generar checkboxes para cada día del período (sin errores de zona horaria)
-    function generarDiasPeriodo(fechaInicio, fechaFinal) {
-      const container = document.getElementById('diasContainer');
-      const totalDiasElem = document.getElementById('totalDias');
-
-      if (!fechaInicio || !fechaFinal) {
-        container.innerHTML = '<p style="color: red;">Fechas inválidas</p>';
-        totalDiasElem.textContent = '0';
-        return;
-      }
-
-      // Validar formato YYYY-MM-DD
-      const regex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!regex.test(fechaInicio) || !regex.test(fechaFinal)) {
-        container.innerHTML = '<p style="color: red;">Formato de fecha incorrecto (debe ser AAAA-MM-DD)</p>';
-        totalDiasElem.textContent = '0';
-        return;
-      }
-
-      // Generar rango usando comparación lexicográfica (seguro)
-      const dias = [];
-      let fechaActual = fechaInicio;
-
-      while (fechaActual <= fechaFinal) {
-        dias.push(fechaActual);
-
-        // Avanzar un día
-        const [año, mes, dia] = fechaActual.split('-').map(Number);
-        const nuevaFecha = new Date(año, mes - 1, dia + 1); // mes es 0-indexado en JS
-        fechaActual = nuevaFecha.toISOString().split('T')[0];
-      }
-
-      totalDiasElem.textContent = dias.length;
+    // 🔹 ✅ NUEVA FUNCIÓN: Generar mini calendario del mes
+    function generarCalendario(mes, anio, inicioNombramiento, finalNombramiento) {
+      const container = document.getElementById('calendarioContainer');
       container.innerHTML = '';
 
-      dias.forEach(fechaStr => {
-        const fechaObj = new Date(fechaStr);
-        const diaSemana = fechaObj.toLocaleDateString('es-ES', { weekday: 'short' });
-        const fechaFormateada = fechaObj.toLocaleDateString('es-ES'); // DD/MM/AAAA
+      // Añadir encabezados de días
+      const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+      diasSemana.forEach(dia => {
+        const header = document.createElement('div');
+        header.className = 'calendario-header';
+        header.textContent = dia;
+        container.appendChild(header);
+      });
 
-        const div = document.createElement('div');
-        div.style.display = 'flex';
-        div.style.alignItems = 'center';
-        div.style.gap = '8px';
+      // Primer día del mes
+      const primerDia = new Date(anio, mes, 1);
+      // Último día del mes
+      const ultimoDia = new Date(anio, mes + 1, 0);
+      const totalDias = ultimoDia.getDate();
 
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = `dia_${fechaStr}`;
-        checkbox.value = fechaStr;
-        checkbox.dataset.fecha = fechaStr;
+      // Día de la semana del primer día (0 = dom, 6 = sáb)
+      const diaSemanaInicio = primerDia.getDay();
 
-        const label = document.createElement('label');
-        label.htmlFor = `dia_${fechaStr}`;
-        label.textContent = `${fechaFormateada} (${diaSemana})`;
-        label.style.cursor = 'pointer';
+      // Rellenar días vacíos al inicio
+      for (let i = 0; i < diaSemanaInicio; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'calendario-dia dia-fuera';
+        empty.textContent = '';
+        container.appendChild(empty);
+      }
 
-        div.appendChild(checkbox);
-        div.appendChild(label);
-        container.appendChild(div);
+      // Convertir fechas de nombramiento a objetos Date para comparación
+      const fechaInicioNom = new Date(inicioNombramiento);
+      const fechaFinalNom = new Date(finalNombramiento);
 
-        checkbox.addEventListener('change', function () {
-          if (this.checked) {
-            diasSeleccionados.add(this.value);
+      // Añadir días del mes
+      for (let dia = 1; dia <= totalDias; dia++) {
+        const diaDiv = document.createElement('div');
+        diaDiv.className = 'calendario-dia';
+        diaDiv.textContent = dia;
+
+        const fechaActual = new Date(anio, mes, dia);
+        const fechaStr = fechaActual.toISOString().split('T')[0];
+
+        // Verificar si está dentro del rango del nombramiento
+        const dentroRango = fechaActual >= fechaInicioNom && fechaActual <= fechaFinalNom;
+        if (dentroRango) {
+          diaDiv.classList.add('dia-nombramiento');
+        }
+
+        // Evento de clic
+        diaDiv.addEventListener('click', () => {
+         //if (!dentroRango) return; // Solo permitir seleccionar días dentro del nombramiento
+          diaDiv.classList.toggle('dia-seleccionado');
+          if (diaDiv.classList.contains('dia-seleccionado')) {
+            diasSeleccionados.add(fechaStr);
           } else {
-            diasSeleccionados.delete(this.value);
+            diasSeleccionados.delete(fechaStr);
           }
         });
-      });
+
+        container.appendChild(diaDiv);
+      }
     }
 
     // 🔹 Cargar datos existentes del detalle
     function cargarDatosDetalle(datos) {
       // Resetear selección
       diasSeleccionados.clear();
-      document.querySelectorAll('#diasContainer input[type="checkbox"]').forEach(cb => {
-        cb.checked = false;
+      document.querySelectorAll('.calendario-dia.dia-seleccionado').forEach(el => {
+        el.classList.remove('dia-seleccionado');
       });
+      
       // Cargar días seleccionados existentes
       const diasLibres = datos.diasLibres || [];
       diasLibres.forEach(fecha => {
-        const checkbox = document.querySelector(`#dia_${fecha}`);
-        if (checkbox) {
-          checkbox.checked = true;
-          diasSeleccionados.add(fecha);
-        }
+        const fechaObj = new Date(fecha);
+        const dia = fechaObj.getDate();
+        const elementos = document.querySelectorAll('.calendario-dia');
+        elementos.forEach(el => {
+          if (el.textContent == dia && !el.classList.contains('dia-fuera')) {
+            const fechaEl = new Date(rangoNombramiento.inicio);
+            fechaEl.setMonth(fechaEl.getMonth(), dia);
+            const fechaElStr = fechaEl.toISOString().split('T')[0];
+            if (fechaElStr === fecha) {
+              el.classList.add('dia-seleccionado');
+              diasSeleccionados.add(fecha);
+            }
+          }
+        });
       });
+      
       // Cargar tipo de ausencia
       document.getElementById('tipoAusencia').value = datos.tipoAusencia || '';
       // Cargar comentario
       document.getElementById('comentarioAusencia').value = datos.comentarioAusencia || '';
     }
+
     // 🔹 Guardar detalles del nombramiento
     document.getElementById('btnGuardarDetalle').addEventListener('click', async function() {
       if (!documentoDetalleActual) return;
@@ -938,10 +1020,12 @@ if (registrosFiltrados.length === 0) {
         alert('❌ Error al guardar los detalles: ' + error.message);
       }
     });
+
     // 🔹 Cerrar modal de detalle
     document.getElementById('btnCerrarDetalle').addEventListener('click', function() {
       document.getElementById('modalDetalle').style.display = 'none';
     });
+
     // Cerrar modal al hacer clic fuera
     window.addEventListener('click', function(event) {
       const modal = document.getElementById('modalDetalle');
@@ -949,6 +1033,7 @@ if (registrosFiltrados.length === 0) {
         modal.style.display = 'none';
       }
     });
+
     // 🔹 Exportar tabla a PDF usando html2pdf
     function exportarPDF() {
       const element = document.getElementById('tablaNombramientos');
@@ -995,6 +1080,7 @@ if (registrosFiltrados.length === 0) {
       // Generar el PDF
       html2pdf().set(opt).from(pdfContainer).save();
     }
+
     // 🔹 Mostrar resumen de días libres
     function mostrarResumenDiasLibres() {
       const modal = document.createElement('div');
@@ -1017,6 +1103,7 @@ if (registrosFiltrados.length === 0) {
         document.body.removeChild(modal);
       };
     }
+
     async function cargarResumenDiasLibres() {
       try {
         const mesSeleccionado = document.getElementById("mes")?.value;
@@ -1150,6 +1237,7 @@ if (registrosFiltrados.length === 0) {
           '<p style="color: red;">❌ Error al cargar el resumen: ' + error.message + '</p>';
       }
     }
+
     // ✅ Inicialización segura al cargar la página
     document.addEventListener("DOMContentLoaded", () => {
       const hoy = new Date();
@@ -1173,6 +1261,7 @@ if (registrosFiltrados.length === 0) {
         cargarRegistros();
       }, 500);
     });
+
     // ✅ Asignar eventos a botones y filtros automáticos
     document.addEventListener("DOMContentLoaded", () => {
       const btnFiltrar = document.getElementById("btnFiltrar");
