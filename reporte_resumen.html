@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📊 Reporte Resumen - Nombramientos</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #2c3e50;
+    }
+    .filtros {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    .filtros > div {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .filtros label {
+      font-weight: 600;
+      color: #34495e;
+    }
+    .filtros select, .filtros button {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .filtros button {
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .filtros button:hover {
+      background-color: #2980b9;
+    }
+    .resumen-cards {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    .card {
+      background: #f8f9fa;
+      border-left: 4px solid #3498db;
+      padding: 15px;
+      border-radius: 8px;
+      flex: 1;
+      min-width: 200px;
+    }
+    .card h3 {
+      color: #7f8c8d;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .card .valor {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .card.pendiente {
+      border-left-color: #e74c3c;
+    }
+    .card.dias {
+      border-left-color: #27ae60;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #f8f9fa;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    tr:hover {
+      background-color: #f8f9fa;
+    }
+    .sin-datos {
+      text-align: center;
+      padding: 30px;
+      color: #7f8c8d;
+      font-style: italic;
+    }
+    .cargando {
+      text-align: center;
+      padding: 30px;
+      color: #3498db;
+    }
+    .btn-volver {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #9b59b6;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .btn-volver:hover {
+      background-color: #8e44ad;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Reporte Resumen de Nombramientos</h1>
+
+    <div class="filtros">
+      <div>
+        <label for="mes">Mes:</label>
+        <select id="mes">
+          <option value="">Todos los meses</option>
+          <option value="1">Enero</option>
+          <option value="2">Febrero</option>
+          <option value="3">Marzo</option>
+          <option value="4">Abril</option>
+          <option value="5">Mayo</option>
+          <option value="6">Junio</option>
+          <option value="7">Julio</option>
+          <option value="8">Agosto</option>
+          <option value="9">Septiembre</option>
+          <option value="10">Octubre</option>
+          <option value="11">Noviembre</option>
+          <option value="12">Diciembre</option>
+        </select>
+      </div>
+      <div>
+        <label for="anio">Año:</label>
+        <select id="anio">
+          <!-- Se llenará con JS -->
+        </select>
+      </div>
+      <button id="btnFiltrar">Filtrar</button>
+    </div>
+
+    <div class="resumen-cards">
+      <div class="card dias">
+        <h3>Total de Días Laborados</h3>
+        <div class="valor" id="totalDiasLaborados">0</div>
+      </div>
+      <div class="card pendiente">
+        <h3>Monto Pendiente de Pago</h3>
+        <div class="valor" id="totalPendiente">₡0.00</div>
+      </div>
+    </div>
+
+    <h2>📅 Días Libres Registrados</h2>
+    <div id="tablaDiasLibres">
+      <p class="cargando">Cargando datos...</p>
+    </div>
+
+    <a href="javascript:history.back()" class="btn-volver">⬅️ Volver</a>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
+      authDomain: "interinos-ccss.firebaseapp.com",
+      projectId: "interinos-ccss",
+      storageBucket: "interinos-ccss.firebasestorage.app",
+      messagingSenderId: "1098694984589",
+      appId: "1:1098694984589:web:180af36da33ff6a161b3c4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!usuario) {
+      alert("⚠️ Sesión no válida. Redirigiendo al login...");
+      window.location.href = "login.html";
+    }
+
+    // Función para extraer mes y año de una fecha YYYY-MM-DD
+    function extraerMesYAnio(fechaStr) {
+      if (!fechaStr || !/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) return null;
+      const [anio, mes] = fechaStr.split("-").map(Number);
+      return { mes, anio };
+    }
+
+    async function cargarReporte() {
+      const mesSeleccionado = document.getElementById("mes").value;
+      const anioSeleccionado = parseInt(document.getElementById("anio").value);
+
+      if (isNaN(anioSeleccionado)) {
+        document.getElementById('tablaDiasLibres').innerHTML = '<p style="color:red; text-align:center;">⚠️ Seleccione un año válido.</p>';
+        return;
+      }
+
+      try {
+        const nombramientosRef = collection(db, "nombramientos");
+        const q = query(nombramientosRef, where("usuarioCedula", "==", usuario.cedula));
+        const querySnapshot = await getDocs(q);
+
+        let totalDiasLaborados = 0;
+        let totalPendiente = 0;
+        const todosDiasLibres = [];
+
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          if (!data || !data.inicio) return;
+
+          // Extraer mes y año del inicio
+          const fechaNombramiento = extraerMesYAnio(data.inicio);
+          if (!fechaNombramiento) return;
+
+          // Aplicar filtro
+          if (fechaNombramiento.anio !== anioSeleccionado) return;
+          if (mesSeleccionado !== "" && fechaNombramiento.mes !== parseInt(mesSeleccionado)) return;
+
+          // Sumar días laborados
+          const dias = parseInt(data.dias) || 0;
+          totalDiasLaborados += dias;
+
+          // Sumar monto pendiente (solo si estado es false)
+          if (data.estado === false) {
+            const salario = parseFloat(data.salario) || 0;
+            totalPendiente += salario;
+          }
+
+          // Recopilar días libres con detalles
+          const diasLibres = data.diasLibres || [];
+          const tipoAusencia = data.tipoAusencia || "Sin tipo";
+          const comentario = data.comentarioAusencia || "";
+          const funcionario = data.personaSustituirNombre || "SIN DATOS";
+          const periodo = `${data.inicio || 'N/A'} - ${data.final || 'N/A'}`;
+
+          diasLibres.forEach(fecha => {
+            // Filtrar también los días libres por el mismo período
+            const fechaLibreInfo = extraerMesYAnio(fecha);
+            if (!fechaLibreInfo) return;
+            if (fechaLibreInfo.anio !== anioSeleccionado) return;
+            if (mesSeleccionado !== "" && fechaLibreInfo.mes !== parseInt(mesSeleccionado)) return;
+
+            todosDiasLibres.push({
+              fecha,
+              tipo: tipoAusencia,
+              comentario,
+              funcionario,
+              periodo
+            });
+          });
+        });
+
+        // Mostrar resumen
+        document.getElementById('totalDiasLaborados').textContent = totalDiasLaborados;
+        document.getElementById('totalPendiente').textContent = 
+          new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(totalPendiente);
+
+        // Mostrar tabla de días libres
+        const contenedor = document.getElementById('tablaDiasLibres');
+        if (todosDiasLibres.length === 0) {
+          contenedor.innerHTML = '<p class="sin-datos">📭 No hay días libres registrados para este filtro.</p>';
+        } else {
+          let html = `
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Tipo de Ausencia</th>
+                  <th>Comentario</th>
+                  <th>Funcionario</th>
+                  <th>Período</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+          todosDiasLibres.forEach(dia => {
+            html += `
+              <tr>
+                <td>${dia.fecha}</td>
+                <td>${dia.tipo}</td>
+                <td>${dia.comentario || "—"}</td>
+                <td>${dia.funcionario}</td>
+                <td>${dia.periodo}</td>
+              </tr>
+            `;
+          });
+          html += `</tbody></table>`;
+          contenedor.innerHTML = html;
+        }
+
+      } catch (error) {
+        console.error("Error al cargar el reporte:", error);
+        document.getElementById('tablaDiasLibres').innerHTML = 
+          `<p style="color:red; text-align:center;">❌ Error al cargar los datos: ${error.message}</p>`;
+      }
+    }
+
+    // Inicializar selectores
+    document.addEventListener("DOMContentLoaded", () => {
+      const hoy = new Date();
+      const mesSelect = document.getElementById("mes");
+      const anioSelect = document.getElementById("anio");
+
+      // Llenar años
+      anioSelect.innerHTML = "";
+      for (let year = 2020; year <= 2025; year++) {
+        const option = document.createElement("option");
+        option.value = year;
+        option.textContent = year;
+        anioSelect.appendChild(option);
+      }
+      anioSelect.value = hoy.getFullYear();
+      mesSelect.value = hoy.getMonth() + 1;
+
+      // Cargar reporte inicial
+      setTimeout(cargarReporte, 300);
+
+      // Eventos
+      document.getElementById("btnFiltrar").addEventListener("click", cargarReporte);
+      document.getElementById("mes").addEventListener("change", cargarReporte);
+      document.getElementById("anio").addEventListener("change", cargarReporte);
+    });
+  </script>
+</body>
+</html>
