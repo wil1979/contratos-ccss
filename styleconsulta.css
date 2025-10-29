@@ -4,34 +4,29 @@
       padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    
     body {
       background-color: #f5f7fa;
       padding: 20px;
     }
-    
     .container {
-      max-width: 1400px; /* Aumentado para acomodar la nueva columna */
+      max-width: 1400px;
       margin: 0 auto;
       background: white;
       padding: 25px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    
     h2 {
       text-align: center;
       margin-bottom: 25px;
       color: #2c3e50;
     }
-    
     .usuario-info {
       background-color: #e8f4f8;
       padding: 15px;
       border-radius: 8px;
       margin-bottom: 20px;
     }
-    
     .filtros {
       display: flex;
       gap: 15px;
@@ -39,84 +34,68 @@
       flex-wrap: wrap;
       align-items: end;
     }
-    
     .filtros > div {
       display: flex;
       flex-direction: column;
       gap: 5px;
     }
-    
     .filtros label {
       font-weight: 600;
       color: #34495e;
     }
-    
     .filtros select, .filtros button {
       padding: 8px 12px;
       border: 1px solid #ddd;
       border-radius: 6px;
       font-size: 14px;
     }
-    
     .filtros button {
       background-color: #3498db;
       color: white;
       cursor: pointer;
       font-weight: 600;
     }
-    
     .filtros button:hover {
       background-color: #2980b9;
     }
-    
     #btnExportarPDF {
       background-color: #27ae60;
     }
-    
     #btnExportarPDF:hover {
       background-color: #219653;
     }
-    
     #btnVerDiasLibres {
       background-color: #9b59b6;
     }
-    
     #btnVerDiasLibres:hover {
       background-color: #8e44ad;
     }
-    
     .tabla-container {
       overflow-x: auto;
     }
-    
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 15px;
     }
-    
     th, td {
       padding: 12px;
       text-align: left;
       border-bottom: 1px solid #eee;
     }
-    
     th {
       background-color: #f8f9fa;
       color: #2c3e50;
       font-weight: 600;
     }
-    
     tr:hover {
       background-color: #f8f9fa;
     }
-    
     .acciones {
       display: flex;
       gap: 5px;
       flex-wrap: wrap;
     }
-    
     .btn-detalle, .btn-editar, .btn-guardar, .btn-cancelar {
       padding: 6px 10px;
       border: none;
@@ -125,59 +104,47 @@
       font-size: 12px;
       white-space: nowrap;
     }
-    
     .btn-detalle {
       background-color: #9b59b6;
       color: white;
     }
-    
     .btn-detalle:hover {
       background-color: #8e44ad;
     }
-    
     .btn-editar {
       background-color: #3498db;
       color: white;
     }
-    
     .btn-editar:hover {
       background-color: #2980b9;
     }
-    
     .btn-guardar {
       background-color: #27ae60;
       color: white;
       display: none;
     }
-    
     .btn-guardar:hover {
       background-color: #219653;
     }
-    
     .btn-cancelar {
       background-color: #e74c3c;
       color: white;
       display: none;
     }
-    
     .btn-cancelar:hover {
       background-color: #c0392b;
     }
-    
     .cargando, .sin-datos, .error {
       text-align: center;
       padding: 20px;
       font-style: italic;
     }
-    
     .error {
       color: #e74c3c;
     }
-    
     .sin-datos {
       color: #7f8c8d;
     }
-    
     /* Modal de Confirmación */
     .modal {
       display: none;
@@ -189,7 +156,6 @@
       height: 100%;
       background-color: rgba(0,0,0,0.5);
     }
-    
     .modal-contenido {
       background-color: white;
       margin: 5% auto;
@@ -199,20 +165,17 @@
       width: 90%;
       position: relative;
     }
-    
     .modal-titulo {
       margin-bottom: 20px;
       color: #2c3e50;
       text-align: center;
     }
-    
     .modal-botones {
       display: flex;
       justify-content: center;
       gap: 15px;
       margin-top: 20px;
     }
-    
     .btn-modal {
       padding: 10px 20px;
       border: none;
@@ -221,25 +184,20 @@
       font-size: 15px;
       font-weight: 600;
     }
-    
     .btn-aceptar {
       background-color: #27ae60;
       color: white;
     }
-    
     .btn-aceptar:hover {
       background-color: #219653;
     }
-    
     .btn-cancelar-modal {
       background-color: #95a5a6;
       color: white;
     }
-    
     .btn-cancelar-modal:hover {
       background-color: #7f8c8d;
     }
-    
     /* Modal de Detalle */
     .detalle-info {
       background-color: #f8f9fa;
@@ -247,27 +205,22 @@
       border-radius: 8px;
       margin-bottom: 20px;
     }
-    
     .detalle-info p {
       margin: 8px 0;
     }
-    
     .dias-seleccion h4 {
       margin-bottom: 15px;
       color: #34495e;
     }
-    
     .form-group {
       margin-bottom: 15px;
     }
-    
     .form-group label {
       display: block;
       margin-bottom: 5px;
       font-weight: 600;
       color: #34495e;
     }
-    
     .form-control, textarea {
       width: 100%;
       padding: 10px;
@@ -275,12 +228,10 @@
       border-radius: 6px;
       font-size: 14px;
     }
-    
     textarea {
       resize: vertical;
       min-height: 80px;
     }
-    
     .btn-flotante-inicio {
       position: fixed;
       bottom: 20px;
@@ -294,16 +245,67 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       z-index: 100;
     }
-    
     .btn-flotante-inicio:hover {
       background-color: #2980b9;
       transform: scale(1.05);
       transition: transform 0.2s;
     }
-    
     /* Estilo para días libres */
     .dias-libres-info {
       font-size: 12px;
       color: #8e44ad;
       font-weight: 600;
+    }
+
+     /* ✅ Estilos para el mini calendario - versión compacta */
+    .calendario-container {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px; /* Reducido */
+      margin: 10px 0;
+      max-height: 220px; /* Límite de altura */
+      overflow-y: auto; /* Scroll si es necesario */
+      padding: 4px;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
+    .calendario-header {
+      text-align: center;
+      font-weight: bold;
+      color: #2c3e50;
+      padding: 3px; /* Reducido */
+      font-size: 10px; /* Más pequeño */
+    }
+    .calendario-dia {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 10px; /* Reducido */
+      cursor: pointer;
+      user-select: none;
+      padding: 0;
+    }
+    .calendario-dia:hover {
+      background-color: #f0f8ff;
+    }
+    .calendario-dia.dia-nombramiento {
+      background-color: #e8f4f8;
+      border-color: #3498db;
+    }
+    .calendario-dia.dia-seleccionado {
+      background-color: #9b59b6;
+      color: white;
+    }
+    .calendario-dia.dia-fuera {
+      color: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* Asegurar que el modal tenga scroll si es muy alto */
+    .modal-contenido {
+      max-height: 90vh;
+      overflow-y: auto;
     }

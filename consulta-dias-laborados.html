@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔍 Consulta de Días Registrados</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #2c3e50;
+    }
+    .usuario-info {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #34495e;
+    }
+    .filtros {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    .filtros > div {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .filtros label {
+      font-weight: 600;
+      color: #34495e;
+    }
+    .filtros select, .filtros button {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .filtros button {
+      background-color: #27ae60;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .filtros button:hover {
+      background-color: #219653;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #f8f9fa;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    tr:hover {
+      background-color: #f8f9fa;
+    }
+    .btn-eliminar {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-eliminar:hover {
+      background-color: #c0392b;
+    }
+    .sin-datos {
+      text-align: center;
+      padding: 30px;
+      color: #7f8c8d;
+      font-style: italic;
+    }
+    .cargando {
+      text-align: center;
+      padding: 30px;
+      color: #27ae60;
+    }
+    .tipo-icono {
+      font-size: 18px;
+      margin-right: 8px;
+    }
+    .btn-volver {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #9b59b6;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .btn-volver:hover {
+      background-color: #8e44ad;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Consulta y Eliminación de Días Registrados</h1>
+
+    <div class="usuario-info">
+      <p>Usuario: <strong id="nombreUsuario">Cargando...</strong></p>
+    </div>
+
+    <div class="filtros">
+      <div>
+        <label for="mes">Mes:</label>
+        <select id="mes">
+          <option value="">Todos los meses</option>
+          <option value="0">Enero</option>
+          <option value="1">Febrero</option>
+          <option value="2">Marzo</option>
+          <option value="3">Abril</option>
+          <option value="4">Mayo</option>
+          <option value="5">Junio</option>
+          <option value="6">Julio</option>
+          <option value="7">Agosto</option>
+          <option value="8">Septiembre</option>
+          <option value="9">Octubre</option>
+          <option value="10">Noviembre</option>
+          <option value="11">Diciembre</option>
+        </select>
+      </div>
+      <div>
+        <label for="anio">Año:</label>
+        <select id="anio">
+          <!-- Se llenará con JS -->
+        </select>
+      </div>
+      <button id="btnFiltrar">Filtrar</button>
+      <button id="btnImprimir">🖨️ Imprimir</button>
+      <button id="btnExportarPDF">📄 Exportar a PDF</button>
+    </div>
+
+    <div id="tablaContenedor">
+      <p class="cargando">Cargando días registrados...</p>
+    </div>
+
+    <a href="javascript:history.back()" class="btn-volver">⬅️ Volver</a>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getFirestore, collection, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
+      authDomain: "interinos-ccss.firebaseapp.com",
+      projectId: "interinos-ccss",
+      storageBucket: "interinos-ccss.firebasestorage.app",
+      messagingSenderId: "1098694984589",
+      appId: "1:1098694984589:web:180af36da33ff6a161b3c4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!usuario) {
+      alert("⚠️ Sesión no válida. Redirigiendo al login...");
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("nombreUsuario").textContent = usuario.nombre || "Usuario";
+    }
+
+    // Mapeo de tipos a iconos y texto
+    const tipoTexto = {
+      'laborado': '✅ Laborado',
+      'no_laborado': '❌ No Laborado',
+      'libre1': '🔴 Libre 1',
+      'libre2': '🟠 Libre 2',
+      'libre3': '🟣 Libre 3',
+      'vacaciones': '🏖️ Vacaciones',
+      'licencia': '🏥 Licencia'
+    };
+
+    // Cargar años
+    function llenarAnios() {
+      const anioSelect = document.getElementById("anio");
+      const hoy = new Date();
+      anioSelect.innerHTML = "";
+      for (let year = hoy.getFullYear() - 2; year <= hoy.getFullYear() + 1; year++) {
+        const option = document.createElement("option");
+        option.value = year;
+        option.textContent = year;
+        anioSelect.appendChild(option);
+      }
+      anioSelect.value = hoy.getFullYear();
+    }
+
+    // Extraer mes y año de fecha
+    function extraerMesAnio(fechaStr) {
+      const [anio, mes] = fechaStr.split('-').map(Number);
+      return { anio, mes: mes - 1 }; // Mes en JS es 0-11
+    }
+
+    // Eliminar un día
+    async function eliminarDia(fecha, docId) {
+      if (!confirm(`¿Eliminar el registro del día ${fecha}? Esta acción no se puede deshacer.`)) return;
+
+      try {
+        const docRef = doc(collection(db, "calendar"), docId);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data[fecha]) {
+            delete data[fecha];
+            await deleteDoc(doc(db, "calendar", docId)); // Opcional: podrías hacer setDoc con data actualizado
+            // Pero si data queda vacío, mejor eliminar el doc
+            if (Object.keys(data).length > 0) {
+              await setDoc(docRef, data);
+            }
+          }
+        }
+        // Recargar
+        cargarDias();
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+        alert("❌ Error al eliminar el día: " + error.message);
+      }
+    }
+
+    // Cargar días desde calendar
+    async function cargarDias() {
+      const mesSel = document.getElementById("mes").value;
+      const anioSel = parseInt(document.getElementById("anio").value);
+      const contenedor = document.getElementById("tablaContenedor");
+
+      if (isNaN(anioSel)) {
+        contenedor.innerHTML = '<p style="color:red; text-align:center;">⚠️ Año inválido.</p>';
+        return;
+      }
+
+      contenedor.innerHTML = '<p class="cargando">Buscando registros...</p>';
+
+      try {
+        const registros = [];
+        // Consultar documentos del rango de años posibles
+        for (let mes = 0; mes <= 11; mes++) {
+          const docId = `${usuario.cedula}_${anioSel}_${mes}`;
+          const docRef = doc(collection(db, "calendar"), docId);
+          const snap = await getDoc(docRef);
+          if (snap.exists()) {
+            const data = snap.data();
+            Object.keys(data).forEach(fecha => {
+              const reg = data[fecha];
+              if (reg.usuario?.cedula === usuario.cedula) {
+                const info = extraerMesAnio(fecha);
+                if (info.anio !== anioSel) return;
+                if (mesSel !== "" && info.mes !== parseInt(mesSel)) return;
+                registros.push({ fecha, ...reg, docId });
+              }
+            });
+          }
+        }
+
+        // Ordenar por fecha
+        registros.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+        if (registros.length === 0) {
+          contenedor.innerHTML = '<p class="sin-datos">📭 No hay días registrados para este filtro.</p>';
+        } else {
+          let html = `
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Tipo de Día</th>
+                  <th>Comentario</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+          registros.forEach(reg => {
+            const tipo = tipoTexto[reg.tipo] || reg.tipo;
+            const comentario = reg.comentario || "—";
+            html += `
+              <tr>
+                <td>${reg.fecha}</td>
+                <td>${tipo}</td>
+                <td>${comentario}</td>
+                <td>
+                  <button class="btn-eliminar" onclick="eliminar('${reg.fecha}', '${reg.docId}')">🗑️ Eliminar</button>
+                </td>
+              </tr>
+            `;
+          });
+          html += `</tbody></table>`;
+          contenedor.innerHTML = html;
+        }
+
+      } catch (error) {
+        console.error("Error al cargar días:", error);
+        contenedor.innerHTML = `<p style="color:red; text-align:center;">❌ Error: ${error.message}</p>`;
+      }
+    }
+
+    // 🔹 IMPRIMIR
+function imprimirTabla() {
+  const printContent = document.getElementById("tablaContenedor").innerHTML;
+  const originalContent = document.body.innerHTML;
+
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Impresión - Días Registrados</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .sin-datos, .cargando { text-align: center; padding: 20px; }
+      </style>
+    </head>
+    <body>
+      <h2>📅 Días Registrados - ${usuario.nombre || 'Usuario'}</h2>
+      <p><strong>Filtro:</strong> 
+        ${document.getElementById("mes").options[document.getElementById("mes").selectedIndex]?.text || 'Todos los meses'} 
+        ${document.getElementById("anio").value}
+      </p>
+      ${printContent}
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
+}
+
+// 🔹 EXPORTAR A PDF
+function exportarPDF() {
+  const element = document.getElementById("tablaContenedor");
+  const mes = document.getElementById("mes").options[document.getElementById("mes").selectedIndex]?.text || 'Todos los meses';
+  const anio = document.getElementById("anio").value;
+
+  const filas = element.querySelectorAll("tr");
+  if (filas.length === 0 || element.querySelector(".sin-datos") || element.querySelector(".cargando")) {
+    alert("No hay datos para exportar.");
+    return;
+  }
+
+  const pdfContainer = document.createElement('div');
+  pdfContainer.innerHTML = `
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h2 style="color: #2c3e50;">📅 Días Registrados</h2>
+      <p><strong>Usuario:</strong> ${usuario.nombre || 'Usuario'}</p>
+      <p><strong>Filtro:</strong> ${mes} ${anio}</p>
+      <p><em>Fecha de generación: ${new Date().toLocaleDateString('es-CR')}</em></p>
+    </div>
+  `;
+  pdfContainer.appendChild(element.cloneNode(true));
+
+  const opt = {
+    margin: 10,
+    filename: `dias_registrados_${usuario.cedula}_${mes}_${anio}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+  };
+
+  html2pdf().set(opt).from(pdfContainer).save();
+}
+
+    // Función global para eliminar (accesible desde onclick)
+    window.eliminar = eliminarDia;
+
+    // Inicializar
+    document.addEventListener("DOMContentLoaded", () => {
+      llenarAnios();
+      setTimeout(cargarDias, 300);
+
+      document.getElementById("btnFiltrar").addEventListener("click", cargarDias);
+      document.getElementById("mes").addEventListener("change", cargarDias);
+      document.getElementById("anio").addEventListener("change", cargarDias);
+      document.getElementById("btnImprimir").addEventListener("click", imprimirTabla);
+      document.getElementById("btnExportarPDF").addEventListener("click", exportarPDF);
+    });
+
+
+  </script>
+</body>
+</html>

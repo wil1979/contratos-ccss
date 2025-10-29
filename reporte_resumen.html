@@ -186,7 +186,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, where, getDoc, doc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
@@ -206,7 +206,6 @@
       window.location.href = "login.html";
     }
 
-    // Función para extraer mes y año de una fecha YYYY-MM-DD
     function extraerMesYAnio(fechaStr) {
       if (!fechaStr || !/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) return null;
       const [anio, mes] = fechaStr.split("-").map(Number);
@@ -223,76 +222,119 @@
       }
 
       try {
+        // 1. Cargar nombramientos para obtener rangos activos
         const nombramientosRef = collection(db, "nombramientos");
         const q = query(nombramientosRef, where("usuarioCedula", "==", usuario.cedula));
         const querySnapshot = await getDocs(q);
 
         let totalDiasLaborados = 0;
         let totalPendiente = 0;
-        const todosDiasLibres = [];
+        const rangos = [];
 
         querySnapshot.forEach(doc => {
           const data = doc.data();
           if (!data || !data.inicio) return;
 
-          // Extraer mes y año del inicio
           const fechaNombramiento = extraerMesYAnio(data.inicio);
           if (!fechaNombramiento) return;
-
-          // Aplicar filtro
           if (fechaNombramiento.anio !== anioSeleccionado) return;
           if (mesSeleccionado !== "" && fechaNombramiento.mes !== parseInt(mesSeleccionado)) return;
 
-          // Sumar días laborados
-          const dias = parseInt(data.dias) || 0;
-          totalDiasLaborados += dias;
-
-          // Sumar monto pendiente (solo si estado es false)
+          totalDiasLaborados += parseInt(data.dias) || 0;
           if (data.estado === false) {
-            const salario = parseFloat(data.salario) || 0;
-            totalPendiente += salario;
+            totalPendiente += parseFloat(data.salario) || 0;
           }
 
-          // Recopilar días libres con detalles
-          const diasLibres = data.diasLibres || [];
-          const tipoAusencia = data.tipoAusencia || "Sin tipo";
-          const comentario = data.comentarioAusencia || "";
-          const funcionario = data.personaSustituirNombre || "SIN DATOS";
-          const periodo = `${data.inicio || 'N/A'} - ${data.final || 'N/A'}`;
-
-          diasLibres.forEach(fecha => {
-            // Filtrar también los días libres por el mismo período
-            const fechaLibreInfo = extraerMesYAnio(fecha);
-            if (!fechaLibreInfo) return;
-            if (fechaLibreInfo.anio !== anioSeleccionado) return;
-            if (mesSeleccionado !== "" && fechaLibreInfo.mes !== parseInt(mesSeleccionado)) return;
-
-            todosDiasLibres.push({
-              fecha,
-              tipo: tipoAusencia,
-              comentario,
-              funcionario,
-              periodo
-            });
+          rangos.push({
+            inicio: data.inicio,
+            final: data.final || data.inicio,
+            funcionario: data.personaSustituirNombre || "SIN DATOS",
+            periodo: `${data.inicio} - ${data.final || 'N/A'}`
           });
         });
+
+        // 2. Consultar días desde CALENDAR
+        const todosDiasLibres = [];
+        const mesesAConsultar = new Set();
+
+        for (const rango of rangos) {
+          const inicio = new Date(rango.inicio);
+          const final = new Date(rango.final);
+          let current = new Date(inicio.getFullYear(), inicio.getMonth(), 1);
+          const finRango = new Date(final.getFullYear(), final.getMonth(), 1);
+          while (current <= finRango) {
+            mesesAConsultar.add(`${current.getFullYear()}-${current.getMonth()}`);
+            current.setMonth(current.getMonth() + 1);
+          }
+        }
+
+        for (const mesKey of mesesAConsultar) {
+          const [anioDoc, mesDoc] = mesKey.split('-').map(Number);
+          const docId = `${usuario.cedula}_${anioDoc}_${mesDoc}`;
+          const docRef = doc(collection(db, "calendar"), docId);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            Object.keys(data).forEach(fecha => {
+              const registro = data[fecha];
+              if (!registro || registro.usuario?.cedula !== usuario.cedula) return;
+
+              const fechaObj = new Date(fecha);
+              const fechaInfo = extraerMesYAnio(fecha);
+              if (!fechaInfo) return;
+              if (fechaInfo.anio !== anioSeleccionado) return;
+              if (mesSeleccionado !== "" && fechaInfo.mes !== parseInt(mesSeleccionado)) return;
+
+              const enRango = rangos.some(r => {
+                const inicioR = new Date(r.inicio);
+                const finalR = new Date(r.final);
+                return fechaObj >= inicioR && fechaObj <= finalR;
+              });
+
+              if (enRango && registro.tipo !== 'laborado') {
+                const rangoAsociado = rangos.find(r => {
+                  const inicioR = new Date(r.inicio);
+                  const finalR = new Date(r.final);
+                  return fechaObj >= inicioR && fechaObj <= finalR;
+                });
+
+                todosDiasLibres.push({
+                  fecha,
+                  tipo: registro.tipo,
+                  comentario: registro.comentario || "",
+                  funcionario: rangoAsociado?.funcionario || "SIN DATOS",
+                  periodo: rangoAsociado?.periodo || "N/A"
+                });
+              }
+            });
+          }
+        }
 
         // Mostrar resumen
         document.getElementById('totalDiasLaborados').textContent = totalDiasLaborados;
         document.getElementById('totalPendiente').textContent = 
           new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(totalPendiente);
 
-        // Mostrar tabla de días libres
         const contenedor = document.getElementById('tablaDiasLibres');
         if (todosDiasLibres.length === 0) {
           contenedor.innerHTML = '<p class="sin-datos">📭 No hay días libres registrados para este filtro.</p>';
         } else {
+          // Eliminar duplicados
+          const fechasUnicas = new Map();
+          todosDiasLibres.forEach(d => {
+            if (!fechasUnicas.has(d.fecha)) {
+              fechasUnicas.set(d.fecha, d);
+            }
+          });
+          const listaUnica = Array.from(fechasUnicas.values());
+
           let html = `
             <table>
               <thead>
                 <tr>
                   <th>Fecha</th>
-                  <th>Tipo de Ausencia</th>
+                  <th>Tipo de Día</th>
                   <th>Comentario</th>
                   <th>Funcionario</th>
                   <th>Período</th>
@@ -300,11 +342,20 @@
               </thead>
               <tbody>
           `;
-          todosDiasLibres.forEach(dia => {
+          listaUnica.forEach(dia => {
+            const tipoTexto = {
+              'no_laborado': '❌ No Laborado',
+              'libre1': '🔴 Libre 1',
+              'libre2': '🟠 Libre 2',
+              'libre3': '🟣 Libre 3',
+              'vacaciones': '🏖️ Vacaciones',
+              'licencia': '🏥 Licencia'
+            }[dia.tipo] || dia.tipo;
+
             html += `
               <tr>
                 <td>${dia.fecha}</td>
-                <td>${dia.tipo}</td>
+                <td>${tipoTexto}</td>
                 <td>${dia.comentario || "—"}</td>
                 <td>${dia.funcionario}</td>
                 <td>${dia.periodo}</td>
@@ -322,13 +373,12 @@
       }
     }
 
-    // Inicializar selectores
+    // Inicializar
     document.addEventListener("DOMContentLoaded", () => {
       const hoy = new Date();
       const mesSelect = document.getElementById("mes");
       const anioSelect = document.getElementById("anio");
 
-      // Llenar años
       anioSelect.innerHTML = "";
       for (let year = 2020; year <= 2025; year++) {
         const option = document.createElement("option");
@@ -339,10 +389,8 @@
       anioSelect.value = hoy.getFullYear();
       mesSelect.value = hoy.getMonth() + 1;
 
-      // Cargar reporte inicial
       setTimeout(cargarReporte, 300);
 
-      // Eventos
       document.getElementById("btnFiltrar").addEventListener("click", cargarReporte);
       document.getElementById("mes").addEventListener("change", cargarReporte);
       document.getElementById("anio").addEventListener("change", cargarReporte);
