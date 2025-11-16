@@ -114,7 +114,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
     import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
-    // 🔑 Configuración Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
       authDomain: "interinos-ccss.firebaseapp.com",
@@ -126,7 +125,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
     const mensaje = document.getElementById("mensaje");
 
     // ========================
@@ -171,7 +169,8 @@
           return;
         }
 
-        await addDoc(collection(db, "usuarios"), { cedula, nombre, password });
+        // 👇 Asignamos rol "usuario" por defecto
+        await addDoc(collection(db, "usuarios"), { cedula, nombre, password, rol: "usuario" });
         mensaje.style.color = "green";
         mensaje.textContent = "✅ Usuario registrado con éxito.";
         registroForm.reset();
@@ -206,6 +205,13 @@
         if (user.password !== password) {
           mensaje.textContent = "❌ Contraseña incorrecta.";
           return;
+        }
+
+        // 🔐 Asignar rol de administrador si es la cédula especial
+        if (user.cedula === "110350666") {
+          user.rol = "administrador";
+        } else if (!user.rol) {
+          user.rol = "usuario"; // compatibilidad con usuarios antiguos
         }
 
         localStorage.setItem("usuarioActivo", JSON.stringify(user));

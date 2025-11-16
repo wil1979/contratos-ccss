@@ -4,10 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Menu Interinos CCSS | Gestión de Personal</title>
-   <link rel="stylesheet" href="styleconsulta.css">
+  <link rel="stylesheet" href="styleconsulta.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn > * {
+      animation: fadeIn 0.5s ease-out both;
+    }
+  </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
   <nav class="bg-white shadow-sm">
@@ -16,19 +25,22 @@
         <i data-lucide="shield-plus" class="text-blue-600 w-6 h-6"></i>
         <span class="text-xl font-bold text-gray-800">Menu Interinos CCSS</span>
       </div>
-      <div class="flex items-center space-x-4">
+      <div class="flex flex-col items-end">
         <span id="usuarioNombre" class="text-sm font-medium text-gray-600"></span>
-        <button onclick="cerrarSesion()" class="flex items-center space-x-1 bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors">
-          <i data-lucide="log-out" class="w-4 h-4"></i>
-          <span class="text-sm">Salir</span>
-        </button>
+        <span id="etiquetaAdmin" class="hidden mt-1 px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">ADMIN</span>
       </div>
+      <button onclick="cerrarSesion()" class="flex items-center space-x-1 bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors">
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+        <span class="text-sm">Salir</span>
+      </button>
     </div>
   </nav>
 
   <main class="max-w-7xl mx-auto px-4 py-8">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
-      <button onclick="location.href='nombramientos.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-blue-500 border-2 border-transparent">
+      
+      <!-- ✅ Acceso para todos -->
+      <button id="btn-registrar-nombramientos" onclick="location.href='nombramientos.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-blue-500 border-2 border-transparent">
         <div class="flex items-center space-x-4">
           <div class="bg-blue-100 p-3 rounded-lg">
             <i data-lucide="file-text" class="w-6 h-6 text-blue-600"></i>
@@ -40,7 +52,7 @@
         </div>
       </button>
 
-      <button onclick="location.href='consultas.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
+      <button id="btn-consultar-nombramientos" onclick="location.href='consultas.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
         <div class="flex items-center space-x-4">
           <div class="bg-green-100 p-3 rounded-lg">
             <i data-lucide="search" class="w-6 h-6 text-green-600"></i>
@@ -52,90 +64,98 @@
         </div>
       </button>
 
-       <button onclick="location.href='reporte_resumen.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
-        <div class="flex items-center space-x-4">
-          <div class="bg-green-100 p-3 rounded-lg">
-            <i data-lucide="search" class="w-6 h-6 text-yellow-600"></i>
-          </div>
-          <div class="text-left">
-            <h3 class="font-semibold text-gray-800">Reporte Nombramientos</h3>
-            <p class="text-sm text-gray-500 mt-1">Búsqueda y visualización</p>
-          </div>
-        </div>
-      </button>
-
-      <button onclick="location.href='consulta-dias-laborados.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
-        <div class="flex items-center space-x-4">
-          <div class="bg-green-100 p-3 rounded-lg">
-            <i data-lucide="search" class="w-6 h-6 text-yellow-600"></i>
-          </div>
-          <div class="text-left">
-            <h3 class="font-semibold text-gray-800">Consulta Días Laborados</h3>
-            <p class="text-sm text-gray-500 mt-1">Búsqueda y Eliminación</p>
-          </div>
-        </div>
-      </button>
-
-<button onclick="location.href='tiempo_extra.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
+      <button id="btn-tiempo-extra" onclick="location.href='tiempo_extra.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
         <div class="flex items-center space-x-4">
           <div class="bg-red-100 p-3 rounded-lg">
-            <i data-lucide="search" class="w-6 h-6 text-green-600"></i>
+            <i data-lucide="clock" class="w-6 h-6 text-red-600"></i>
           </div>
           <div class="text-left">
             <h3 class="font-semibold text-gray-800">Registrar Tiempo extraordinario</h3>
-            <p class="text-sm text-gray-500 mt-1">Registro de datos</p>
+            <p class="text-sm text-gray-500 mt-1">Registro de horas extras</p>
           </div>
         </div>
       </button>
 
-<button onclick="location.href='personal.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
-        <div class="flex items-center space-x-4">
-          <div class="bg-pink-100 p-3 rounded-lg">
-            <i data-lucide="search" class="w-6 h-6 text-green-600"></i>
-          </div>
-          <div class="text-left">
-            <h3 class="font-semibold text-gray-800">Consultar Personal</h3>
-            <p class="text-sm text-black-500 mt-1">Visualización</p>
-          </div>
-        </div>
-      </button>
-
-      <button onclick="location.href='calendar.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-green-500 border-2 border-transparent">
+      <button id="btn-calendario" onclick="location.href='calendar.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-orange-500 border-2 border-transparent">
         <div class="flex items-center space-x-4">
           <div class="bg-orange-100 p-3 rounded-lg">
-            <i data-lucide="search" class="w-6 h-6 text-red-600"></i>
+            <i data-lucide="calendar" class="w-6 h-6 text-orange-600"></i>
           </div>
           <div class="text-left">
             <h3 class="font-semibold text-gray-800">Calendario laboral</h3>
-            <p class="text-sm text-gray-500 mt-1">Registro y Visualización</p>
+            <p class="text-sm text-gray-500 mt-1">Registro y visualización</p>
           </div>
         </div>
       </button>
 
-      <!-- Resto de botones con estructura similar -->
+      <!-- 🔒 Solo para administradores -->
+      <button id="btn-reporte" onclick="location.href='reporte_resumen.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-yellow-500 border-2 border-transparent">
+        <div class="flex items-center space-x-4">
+          <div class="bg-yellow-100 p-3 rounded-lg">
+            <i data-lucide="file-bar-chart" class="w-6 h-6 text-yellow-600"></i>
+          </div>
+          <div class="text-left">
+            <h3 class="font-semibold text-gray-800">Reporte Nombramientos</h3>
+            <p class="text-sm text-gray-500 mt-1">Resúmenes y estadísticas</p>
+          </div>
+        </div>
+      </button>
+
+      <button id="btn-dias-laborados" onclick="location.href='consulta-dias-laborados.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-purple-500 border-2 border-transparent">
+        <div class="flex items-center space-x-4">
+          <div class="bg-purple-100 p-3 rounded-lg">
+            <i data-lucide="calendar-days" class="w-6 h-6 text-purple-600"></i>
+          </div>
+          <div class="text-left">
+            <h3 class="font-semibold text-gray-800">Consulta Días Laborados</h3>
+            <p class="text-sm text-gray-500 mt-1">Búsqueda y eliminación</p>
+          </div>
+        </div>
+      </button>
+
+      <button id="btn-consultar-personal" onclick="location.href='personal.html'" class="dashboard-card bg-white p-6 rounded-xl shadow-md hover:border-pink-500 border-2 border-transparent">
+        <div class="flex items-center space-x-4">
+          <div class="bg-pink-100 p-3 rounded-lg">
+            <i data-lucide="users" class="w-6 h-6 text-pink-600"></i>
+          </div>
+          <div class="text-left">
+            <h3 class="font-semibold text-gray-800">Consultar Personal</h3>
+            <p class="text-sm text-gray-500 mt-1">Listado completo</p>
+          </div>
+        </div>
+      </button>
+
     </div>
   </main>
 
   <script>
     lucide.createIcons();
-    // Animación inicial
+
     document.querySelectorAll('.dashboard-card').forEach((card, index) => {
       card.style.animation = `fadeIn 0.5s ease-out ${index * 0.1}s both`;
     });
 
-    // Resto del código JavaScript original
-
-
- 
-    // Verificar usuario en sesión
     const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
     if (!usuario) {
       window.location.href = "login.html";
     } else {
       document.getElementById("usuarioNombre").textContent = usuario.nombre + " (" + usuario.cedula + ")";
+      
+      // 👑 Mostrar etiqueta si es administrador
+      if (usuario.rol === "administrador") {
+        document.getElementById("etiquetaAdmin").classList.remove("hidden");
+      }
+
+      // 🚫 Ocultar funciones sensibles si no es admin
+      if (usuario.rol !== "administrador") {
+        const botonesAdmin = ["btn-reporte", "btn-dias-laborados", "btn-consultar-personal"];
+        botonesAdmin.forEach(id => {
+          const btn = document.getElementById(id);
+          if (btn) btn.style.display = "none";
+        });
+      }
     }
 
-    // Cerrar sesión
     function cerrarSesion() {
       localStorage.removeItem("usuarioActivo");
       window.location.href = "login.html";
