@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Administrar Usuarios | CCSS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .fade-in { animation: fadeIn 0.4s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="users" class="text-blue-600 w-6 h-6"></i>
+        <h1 class="text-xl font-bold text-gray-800">Gestión de Usuarios</h1>
+      </div>
+      <div>
+        <span id="usuarioNombre" class="text-sm font-medium text-gray-600 mr-4"></span>
+        <button onclick="location.href='dashboard.html'" class="text-sm text-blue-600 hover:underline">← Volver</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenido principal -->
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <div class="bg-white shadow rounded-lg p-6 fade-in">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-lg font-semibold text-gray-800">Lista de Usuarios</h2>
+        <button onclick="crearNuevoUsuario()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-1">
+          <i data-lucide="user-plus" class="w-4 h-4"></i>
+          <span>Nuevo Usuario</span>
+        </button>
+      </div>
+
+      <div id="tablaUsuarios" class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cédula</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rol</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTabla" class="divide-y divide-gray-200 bg-white">
+            <!-- Los datos se cargarán aquí -->
+          </tbody>
+        </table>
+        <p id="cargando" class="text-center py-4 text-gray-500">Cargando...</p>
+        <p id="sinDatos" class="text-center py-4 text-gray-500 hidden">No hay usuarios registrados.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal para editar/crear -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-lg w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 id="tituloModal" class="text-lg font-semibold">Editar Usuario</h3>
+        <button onclick="cerrarModal()" class="text-gray-500 hover:text-gray-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="formularioUsuario">
+        <input type="hidden" id="docId" />
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700">Cédula</label>
+          <input type="text" id="cedula" class="w-full mt-1 p-2 border border-gray-300 rounded" required readonly />
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700">Nombre</label>
+          <input type="text" id="nombre" class="w-full mt-1 p-2 border border-gray-300 rounded" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+          <input type="password" id="password" class="w-full mt-1 p-2 border border-gray-300 rounded" placeholder="Dejar vacío para no cambiar" />
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700">Rol</label>
+          <select id="rol" class="w-full mt-1 p-2 border border-gray-300 rounded">
+            <option value="usuario">Usuario</option>
+            <option value="administrador">Administrador</option>
+          </select>
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button type="button" onclick="cerrarModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      updateDoc,
+      deleteDoc,
+      addDoc,
+      query,
+      where
+    } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
+      authDomain: "interinos-ccss.firebaseapp.com",
+      projectId: "interinos-ccss",
+      storageBucket: "interinos-ccss.firebasestorage.app",
+      messagingSenderId: "1098694984589",
+      appId: "1:1098694984589:web:180af36da33ff6a161b3c4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Verificar acceso administrativo
+    const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!usuarioActivo || usuarioActivo.rol !== "administrador") {
+      alert("Acceso denegado. Solo administradores.");
+      window.location.href = "dashboard.html";
+    } else {
+      document.getElementById("usuarioNombre").textContent = usuarioActivo.nombre;
+    }
+
+    lucide.createIcons();
+
+    const cuerpoTabla = document.getElementById("cuerpoTabla");
+    const cargando = document.getElementById("cargando");
+    const sinDatos = document.getElementById("sinDatos");
+    const modal = document.getElementById("modal");
+    const form = document.getElementById("formularioUsuario");
+
+    // Cargar usuarios
+    async function cargarUsuarios() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "usuarios"));
+        cuerpoTabla.innerHTML = "";
+        if (querySnapshot.empty) {
+          sinDatos.classList.remove("hidden");
+        } else {
+          sinDatos.classList.add("hidden");
+          querySnapshot.forEach((doc) => {
+            const u = doc.data();
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td class="px-4 py-3 text-sm font-mono">${u.cedula}</td>
+              <td class="px-4 py-3 text-sm">${u.nombre}</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-1 text-xs rounded-full ${
+                  u.rol === "administrador" ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800"
+                }">${u.rol}</span>
+              </td>
+              <td class="px-4 py-3">
+                <button onclick="editarUsuario('${doc.id}', '${u.cedula}', '${u.nombre}', '${u.password || ''}', '${u.rol}')" 
+                  class="text-blue-600 hover:text-blue-900 mr-3">
+                  <i data-lucide="edit" class="w-4 h-4 inline"></i>
+                </button>
+                <button onclick="eliminarUsuario('${doc.id}', '${u.nombre}')" 
+                  class="text-red-600 hover:text-red-900">
+                  <i data-lucide="trash-2" class="w-4 h-4 inline"></i>
+                </button>
+              </td>
+            `;
+            cuerpoTabla.appendChild(tr);
+          });
+          lucide.createIcons();
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Error al cargar usuarios.");
+      } finally {
+        cargando.classList.add("hidden");
+      }
+    }
+
+    // Funciones globales accesibles desde botones
+    window.editarUsuario = function(id, cedula, nombre, password, rol) {
+      document.getElementById("docId").value = id;
+      document.getElementById("cedula").value = cedula;
+      document.getElementById("nombre").value = nombre;
+      document.getElementById("password").value = ""; // no mostramos la contraseña real por seguridad
+      document.getElementById("rol").value = rol;
+      document.getElementById("tituloModal").textContent = "Editar Usuario";
+      modal.classList.remove("hidden");
+    };
+
+    window.eliminarUsuario = async function(id, nombre) {
+      if (!confirm(`¿Eliminar al usuario "${nombre}"? Esta acción no se puede deshacer.`)) return;
+      try {
+        await deleteDoc(doc(db, "usuarios", id));
+        alert("Usuario eliminado.");
+        cargarUsuarios();
+      } catch (e) {
+        console.error(e);
+        alert("Error al eliminar.");
+      }
+    };
+
+    window.crearNuevoUsuario = function() {
+      document.getElementById("docId").value = "";
+      document.getElementById("cedula").value = "";
+      document.getElementById("nombre").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("rol").value = "usuario";
+      document.getElementById("cedula").readOnly = false;
+      document.getElementById("tituloModal").textContent = "Nuevo Usuario";
+      modal.classList.remove("hidden");
+    };
+
+    function cerrarModal() {
+      modal.classList.add("hidden");
+    }
+
+    window.cerrarModal = cerrarModal;
+
+    // Guardar (crear o actualizar)
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const docId = document.getElementById("docId").value;
+      const cedula = document.getElementById("cedula").value.trim();
+      const nombre = document.getElementById("nombre").value.trim();
+      const password = document.getElementById("password").value;
+      const rol = document.getElementById("rol").value;
+
+      if (!cedula || !nombre) {
+        alert("Cédula y nombre son obligatorios.");
+        return;
+      }
+
+      try {
+        if (docId) {
+          // Actualizar
+          const updateData = { nombre, rol };
+          if (password) updateData.password = password;
+          await updateDoc(doc(db, "usuarios", docId), updateData);
+          alert("Usuario actualizado.");
+        } else {
+          // Crear nuevo
+          const q = query(collection(db, "usuarios"), where("cedula", "==", cedula));
+          const snap = await getDocs(q);
+          if (!snap.empty) {
+            alert("Ya existe un usuario con esa cédula.");
+            return;
+          }
+          await addDoc(collection(db, "usuarios"), { cedula, nombre, password, rol });
+          alert("Usuario creado.");
+        }
+        cerrarModal();
+        cargarUsuarios();
+      } catch (e) {
+        console.error(e);
+        alert("Error al guardar.");
+      }
+    });
+
+    // Iniciar
+    cargarUsuarios();
+  </script>
+</body>
+</html>
