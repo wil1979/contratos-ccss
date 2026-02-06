@@ -129,88 +129,61 @@ function initializeEventListeners() {
 // ===============================
 async function validateCedulaWithHacienda() {
     const cedulaInput = document.getElementById('cedula');
-    const nombreInput = document.getElementById('nombre');
+    const cedula = cedulaInput.value.trim();
     const messageDiv = document.getElementById('cedulaMessage');
-    
-    if (!cedulaInput || !nombreInput || !messageDiv) return;
 
-    // Limpiar cédula: eliminar todo lo que no sea dígito
-    const cedula = cedulaInput.value.trim().replace(/\D/g, "");
-    
-    // Limpiar mensaje anterior
-    messageDiv.textContent = "";
-    messageDiv.style.display = 'none';
-    messageDiv.className = 'validation-message';
-
-    // Validar longitud (solo 9 dígitos para cédulas físicas)
-    if (cedula.length !== 9) {
-        if (cedula.length > 0) {
-            messageDiv.textContent = "ℹ️ Solo cédulas físicas (9 dígitos) se consultan en Hacienda";
-            messageDiv.className = 'validation-message error';
-            messageDiv.style.display = 'block';
-        }
+    if (!cedula) {
+        showToast('Por favor ingrese un número de cédula');
         return;
     }
 
-    // Mostrar loading
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.style.display = 'flex';
-    }
-    
-    messageDiv.textContent = "⏳ Buscando en Hacienda...";
-    messageDiv.className = 'validation-message';
-    messageDiv.style.display = 'block';
+    messageDiv.style.display = 'none';
 
-    try {
-        // Llamar a la API de Hacienda
-        const res = await fetch(`${HACIENDA_API_URL}?identificacion=${cedula}`);
-        
-        if (!res.ok) {
-            throw new Error("No encontrado en Hacienda");
-        }
-        
-        const data = await res.json();
-        
-        // Obtener nombre de la respuesta
-        const nombre = data.nombre || data.nombre_completo || data.datos?.nombre || data.response?.nombre;
-        
-        if (nombre) {
-            nombreInput.value = nombre;
-            messageDiv.textContent = `✅ ${nombre}`;
-            messageDiv.className = 'validation-message success';
-            messageDiv.style.display = 'block';
-            updateCVPreview();
-            showToast('Datos obtenidos exitosamente de Hacienda');
-        } else {
-            messageDiv.textContent = "⚠️ Cédula válida, pero no se encontró el nombre";
-            messageDiv.className = 'validation-message error';
-            messageDiv.style.display = 'block';
-        }
-        /*
-    } catch (err) {
-        console.warn("Error al consultar Hacienda:", err);
-        messageDiv.textContent = "⚠️ No se pudo contactar a Hacienda. Intente nuevamente.";
+    if (!validateCostaRicanCedula(cedula)) {
+        messageDiv.textContent = '❌ Cédula inválida (persona física, 9 dígitos)';
         messageDiv.className = 'validation-message error';
         messageDiv.style.display = 'block';
-        showToast('Error al conectar con Hacienda');
-    */} finally {
-        // Ocultar loading
+        return;
+    }
+
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) loadingOverlay.style.display = 'flex';
+
+    try {
+        const nombreCompleto = simulateHaciendaResponse(
+            cedula.replace(/\D/g, '')
+        );
+
+        document.getElementById('nombre').value = nombreCompleto;
+
+        messageDiv.textContent = `✅ Validación demo: ${nombreCompleto}`;
+        messageDiv.className = 'validation-message success';
+        messageDiv.style.display = 'block';
+
+        updateCVPreview();
+        showToast('Consulta simulada de Hacienda');
+
+    } catch (err) {
+        messageDiv.textContent = '❌ Error al validar la cédula';
+        messageDiv.className = 'validation-message error';
+        messageDiv.style.display = 'block';
+    } finally {
         if (loadingOverlay) {
-            setTimeout(() => {
-                loadingOverlay.style.display = 'none';
-            }, 300);
+            setTimeout(() => loadingOverlay.style.display = 'none', 300);
         }
     }
 }
 
 // Validar formato de cédula costarricense (simplificado)
 function validateCostaRicanCedula(cedula) {
-    // Eliminar todo lo que no sea dígito
     const cedulaLimpia = cedula.replace(/\D/g, '');
-    
-    // Verificar que tenga exactamente 9 dígitos
-    return cedulaLimpia.length === 9 && /^\d{9}$/.test(cedulaLimpia);
+
+    if (cedulaLimpia.length !== 9) return false;
+
+    const primerDigito = parseInt(cedulaLimpia[0], 10);
+
+    // Personas físicas en Costa Rica: 1–7
+    return primerDigito >= 1 && primerDigito <= 7;
 }
 
 // Cargar datos guardados
@@ -463,7 +436,7 @@ function updateDocumentInfo(docType, infoId, labelId) {
         // Sin archivo
         infoDiv.className = 'file-info';
         infoDiv.innerHTML = '';
-        labelSpan.textContent = docType === 'docCedula' ? 'Seleccionar Archivo' : 'Seleccionar Archivos';
+        labelSpan.textContent = docType === 'cedula' ? 'Seleccionar Archivo' : 'Seleccionar Archivos';
     }
 }
 
