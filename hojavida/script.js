@@ -147,7 +147,7 @@ async function validateCedulaWithHacienda() {
         
         // Aquí iría la llamada real a la API de Hacienda
         // Para este ejemplo, simulamos la respuesta
-        const nombreCompleto = await simulateHaciendaAPI(cedula);
+        const nombreCompleto = await validateCedulaWithHaciendaReal(cedula);
         
         if (nombreCompleto) {
             document.getElementById('nombre').value = nombreCompleto;
@@ -180,30 +180,12 @@ function validateCostaRicanCedula(cedula) {
 }
 
 // Simular API de Hacienda (en producción usar la API real)
-function simulateHaciendaAPI(cedula) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            // Para demostración, devolvemos un nombre basado en la cédula
-            // En producción, aquí iría la llamada fetch real a la API
-            const nombres = [
-                'Juan Carlos Pérez Rodríguez',
-                'María Fernanda Gómez López',
-                'Carlos Alberto Ramírez Sánchez',
-                'Ana Patricia Morales Vargas',
-                'Roberto Antonio Jiménez Torres'
-            ];
-            
-            // Simular éxito 80% del tiempo
-            if (Math.random() > 0.2) {
-                const randomIndex = Math.floor(Math.random() * nombres.length);
-                resolve(nombres[randomIndex]);
-            } else {
-                reject(new Error('No se encontraron datos en el sistema de Hacienda'));
-            }
-        }, 1500); // Simular tiempo de respuesta
-    });
+// Reemplazar la función validateCedulaWithHaciendaReal con:
+async function validateCedulaWithHaciendaReal(cedula) {
+    const response = await fetch(`https://api.hacienda.go.cr/fe/ae?identificacion=${cedula}`);
+    const data = await response.json();
+    return data.nombre;
 }
-
 // Cargar datos guardados
 function loadSavedData() {
     const savedData = localStorage.getItem('cvData');
