@@ -9,6 +9,9 @@ let documents = {
     otros: []
 };
 
+// URL de la API de Hacienda (simulada para este ejemplo)
+const HACIENDA_API_URL = 'https://api.hacienda.go.cr/fe/ae';
+
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
@@ -26,6 +29,18 @@ function initializeEventListeners() {
     document.getElementById('addSkillBtn').addEventListener('click', addSkillInput);
     document.getElementById('addExperienceBtn').addEventListener('click', addExperienceItem);
     document.getElementById('addReferenceBtn').addEventListener('click', addReferenceItem);
+    document.getElementById('uploadPhotoBtn').addEventListener('click', function() {
+        document.getElementById('foto').click();
+    });
+    document.getElementById('validateCedulaBtn').addEventListener('click', validateCedulaWithHacienda);
+
+    // Botones de upload de documentos
+    document.querySelectorAll('.upload-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            document.getElementById(targetId).click();
+        });
+    });
 
     // Inputs del formulario
     document.getElementById('nombre').addEventListener('input', updateCVPreview);
@@ -42,16 +57,16 @@ function initializeEventListeners() {
 
     // Documentos adjuntos
     document.getElementById('docCedula').addEventListener('change', function(e) {
-        handleDocumentUpload(e, 'cedula', 'docCedulaPreview');
+        handleDocumentUpload(e, 'cedula', 'docCedulaInfo', 'docCedulaLabel');
     });
     document.getElementById('docDiplomas').addEventListener('change', function(e) {
-        handleDocumentUpload(e, 'diplomas', 'docDiplomasPreview', true);
+        handleDocumentUpload(e, 'diplomas', 'docDiplomasInfo', 'docDiplomasLabel', true);
     });
     document.getElementById('docRecomendaciones').addEventListener('change', function(e) {
-        handleDocumentUpload(e, 'recomendaciones', 'docRecomendacionesPreview', true);
+        handleDocumentUpload(e, 'recomendaciones', 'docRecomendacionesInfo', 'docRecomendacionesLabel', true);
     });
     document.getElementById('docOtros').addEventListener('change', function(e) {
-        handleDocumentUpload(e, 'otros', 'docOtrosPreview', true);
+        handleDocumentUpload(e, 'otros', 'docOtrosInfo', 'docOtrosLabel', true);
     });
 
     // Color picker
@@ -106,6 +121,86 @@ function initializeEventListeners() {
             e.target.classList.contains('ref-email')) {
             updateCVPreview();
         }
+    });
+}
+
+// Validar cédula con API de Hacienda
+async function validateCedulaWithHacienda() {
+    const cedulaInput = document.getElementById('cedula');
+    const cedula = cedulaInput.value.trim();
+    const messageDiv = document.getElementById('cedulaMessage');
+    
+    if (!cedula) {
+        showToast('Por favor ingrese un número de cédula');
+        return;
+    }
+    
+    // Mostrar loading
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    messageDiv.style.display = 'none';
+    
+    try {
+        // Validar formato de cédula costarricense
+        if (!validateCostaRicanCedula(cedula)) {
+            throw new Error('Formato de cédula inválido. Debe tener formato: 1-1234-5678');
+        }
+        
+        // Aquí iría la llamada real a la API de Hacienda
+        // Para este ejemplo, simulamos la respuesta
+        const nombreCompleto = await simulateHaciendaAPI(cedula);
+        
+        if (nombreCompleto) {
+            document.getElementById('nombre').value = nombreCompleto;
+            messageDiv.textContent = `✅ Cédula validada: ${nombreCompleto}`;
+            messageDiv.className = 'validation-message success';
+            messageDiv.style.display = 'block';
+            updateCVPreview();
+            showToast('Datos obtenidos exitosamente de Hacienda');
+        } else {
+            throw new Error('No se encontraron datos para esta cédula');
+        }
+    } catch (error) {
+        messageDiv.textContent = `❌ Error: ${error.message}`;
+        messageDiv.className = 'validation-message error';
+        messageDiv.style.display = 'block';
+        showToast('Error al validar cédula');
+    } finally {
+        // Ocultar loading
+        setTimeout(() => {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }, 500);
+    }
+}
+
+// Validar formato de cédula costarricense
+function validateCostaRicanCedula(cedula) {
+    // Formato: 1-1234-5678 o 112345678
+    const pattern = /^(\d{1}-\d{4}-\d{4}|\d{9})$/;
+    return pattern.test(cedula);
+}
+
+// Simular API de Hacienda (en producción usar la API real)
+function simulateHaciendaAPI(cedula) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            // Para demostración, devolvemos un nombre basado en la cédula
+            // En producción, aquí iría la llamada fetch real a la API
+            const nombres = [
+                'Juan Carlos Pérez Rodríguez',
+                'María Fernanda Gómez López',
+                'Carlos Alberto Ramírez Sánchez',
+                'Ana Patricia Morales Vargas',
+                'Roberto Antonio Jiménez Torres'
+            ];
+            
+            // Simular éxito 80% del tiempo
+            if (Math.random() > 0.2) {
+                const randomIndex = Math.floor(Math.random() * nombres.length);
+                resolve(nombres[randomIndex]);
+            } else {
+                reject(new Error('No se encontraron datos en el sistema de Hacienda'));
+            }
+        }, 1500); // Simular tiempo de respuesta
     });
 }
 
@@ -237,6 +332,9 @@ function clearAllData() {
             input.value = '';
         });
         
+        // Limpiar mensaje de validación
+        document.getElementById('cedulaMessage').style.display = 'none';
+        
         // Limpiar habilidades
         document.getElementById('skillsContainer').innerHTML = '';
         addSkillInput();
@@ -291,9 +389,12 @@ function updatePhotoPreview(url) {
     preview.innerHTML = `<img src="${url}" alt="Foto de perfil">`;
 }
 
-// Manejar subida de documentos
-function handleDocumentUpload(e, docType, previewId, isMultiple = false) {
+// Manejar subida de documentos - CORREGIDO
+function handleDocumentUpload(e, docType, infoId, labelId, isMultiple = false) {
     const files = e.target.files;
+    const infoDiv = document.getElementById(infoId);
+    const labelSpan = document.getElementById(labelId);
+    
     if (files.length > 0) {
         if (isMultiple) {
             documents[docType] = [];
@@ -303,9 +404,10 @@ function handleDocumentUpload(e, docType, previewId, isMultiple = false) {
                     documents[docType].push({
                         name: file.name,
                         url: event.target.result,
-                        type: file.type
+                        type: file.type,
+                        size: file.size
                     });
-                    updateDocumentPreviews();
+                    updateDocumentInfo(docType, infoId, labelId);
                 };
                 reader.readAsDataURL(file);
             });
@@ -316,9 +418,10 @@ function handleDocumentUpload(e, docType, previewId, isMultiple = false) {
                 documents[docType] = {
                     name: file.name,
                     url: event.target.result,
-                    type: file.type
+                    type: file.type,
+                    size: file.size
                 };
-                updateDocumentPreviews();
+                updateDocumentInfo(docType, infoId, labelId);
                 showToast(`Documento ${docType} cargado exitosamente`);
             };
             reader.readAsDataURL(file);
@@ -326,46 +429,49 @@ function handleDocumentUpload(e, docType, previewId, isMultiple = false) {
     }
 }
 
+function updateDocumentInfo(docType, infoId, labelId) {
+    const infoDiv = document.getElementById(infoId);
+    const labelSpan = document.getElementById(labelId);
+    
+    if (Array.isArray(documents[docType]) && documents[docType].length > 0) {
+        // Múltiples archivos
+        const count = documents[docType].length;
+        infoDiv.className = 'file-info has-file';
+        infoDiv.innerHTML = `
+            <i class="fas fa-check-circle"></i> ${count} archivo${count > 1 ? 's' : ''} seleccionado${count > 1 ? 's' : ''}
+            <br><small>${formatFileSize(documents[docType].reduce((sum, file) => sum + file.size, 0))}</small>
+        `;
+        labelSpan.textContent = `Cambiar Archivos (${count})`;
+    } else if (documents[docType]) {
+        // Un solo archivo
+        infoDiv.className = 'file-info has-file';
+        infoDiv.innerHTML = `
+            <i class="fas fa-check-circle"></i> ${documents[docType].name}
+            <br><small>${formatFileSize(documents[docType].size)}</small>
+        `;
+        labelSpan.textContent = 'Cambiar Archivo';
+    } else {
+        // Sin archivo
+        infoDiv.className = 'file-info';
+        infoDiv.innerHTML = '';
+        labelSpan.textContent = docType === 'docCedula' ? 'Seleccionar Archivo' : 'Seleccionar Archivos';
+    }
+}
+
 function updateDocumentPreviews() {
-    // Cédula
-    const cedulaPreview = document.getElementById('docCedulaPreview');
-    if (documents.cedula) {
-        cedulaPreview.className = 'file-preview has-file';
-        cedulaPreview.innerHTML = `
-            <i class="fas fa-id-card"></i>
-            <span>${documents.cedula.name}</span>
-        `;
-    }
-    
-    // Diplomas
-    const diplomasPreview = document.getElementById('docDiplomasPreview');
-    if (documents.diplomas && documents.diplomas.length > 0) {
-        diplomasPreview.className = 'file-preview has-file';
-        diplomasPreview.innerHTML = `
-            <i class="fas fa-graduation-cap"></i>
-            <span>${documents.diplomas.length} archivo(s)</span>
-        `;
-    }
-    
-    // Recomendaciones
-    const recomendacionesPreview = document.getElementById('docRecomendacionesPreview');
-    if (documents.recomendaciones && documents.recomendaciones.length > 0) {
-        recomendacionesPreview.className = 'file-preview has-file';
-        recomendacionesPreview.innerHTML = `
-            <i class="fas fa-file-alt"></i>
-            <span>${documents.recomendaciones.length} archivo(s)</span>
-        `;
-    }
-    
-    // Otros
-    const otrosPreview = document.getElementById('docOtrosPreview');
-    if (documents.otros && documents.otros.length > 0) {
-        otrosPreview.className = 'file-preview has-file';
-        otrosPreview.innerHTML = `
-            <i class="fas fa-folder"></i>
-            <span>${documents.otros.length} archivo(s)</span>
-        `;
-    }
+    // Actualizar todos los previews de documentos
+    updateDocumentInfo('cedula', 'docCedulaInfo', 'docCedulaLabel');
+    updateDocumentInfo('diplomas', 'docDiplomasInfo', 'docDiplomasLabel');
+    updateDocumentInfo('recomendaciones', 'docRecomendacionesInfo', 'docRecomendacionesLabel');
+    updateDocumentInfo('otros', 'docOtrosInfo', 'docOtrosLabel');
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
 
 // Obtener habilidades de los inputs
@@ -404,6 +510,7 @@ function removeSkillInput(button) {
     } else {
         group.querySelector('.skill-input').value = '';
     }
+    updateCVPreview();
 }
 
 // Agregar habilidad sugerida
@@ -580,7 +687,7 @@ function getReferencesData() {
     return references;
 }
 
-// Actualizar vista previa del CV
+// Actualizar vista previa del CV - CORREGIDO
 function updateCVPreview() {
     const nombre = document.getElementById('nombre').value || 'Tu Nombre Completo';
     const cedula = document.getElementById('cedula').value || 'XXXXXXXX';
@@ -593,7 +700,7 @@ function updateCVPreview() {
     const institucion = document.getElementById('institucion').value || 'Institución';
     const anio = document.getElementById('anioGraduacion').value || 'Año';
     
-    // Habilidades
+    // Habilidades - CORREGIDO
     const skills = getSkillsFromInputs();
     
     // Experiencia laboral
@@ -613,15 +720,20 @@ function updateCVPreview() {
     document.getElementById('educationInstitution').textContent = institucion;
     document.getElementById('educationYear').textContent = anio;
     
-    // Actualizar habilidades
+    // Actualizar habilidades - CORREGIDO
     const skillsList = document.getElementById('cvSkills');
     skillsList.innerHTML = '';
-    skills.forEach(skill => {
-        const span = document.createElement('span');
-        span.className = 'skill-tag';
-        span.textContent = skill;
-        skillsList.appendChild(span);
-    });
+    
+    if (skills.length > 0) {
+        skills.forEach(skill => {
+            const span = document.createElement('span');
+            span.className = 'skill-tag';
+            span.textContent = skill;
+            skillsList.appendChild(span);
+        });
+    } else {
+        skillsList.innerHTML = '<span class="no-data">Sin habilidades registradas</span>';
+    }
     
     // Actualizar experiencia laboral
     const expList = document.getElementById('cvExperience');
@@ -647,7 +759,7 @@ function updateCVPreview() {
                 <div class="exp-title">${exp.cargo || 'Cargo'} - ${exp.empresa || 'Empresa'}</div>
                 <div class="exp-period">${exp.inicio || ''}${exp.inicio && exp.fin ? ' - ' : ''}${exp.fin || ''}</div>
                 <div class="exp-responsibilities">
-                    ${responsibilitiesHTML || '<p>Sin responsabilidades especificadas</p>'}
+                    ${responsibilitiesHTML || '<p class="no-data">Sin responsabilidades especificadas</p>'}
                 </div>
             `;
             expList.appendChild(expDiv);
@@ -755,14 +867,19 @@ function exportToPDF() {
         margin: 10,
         filename: `CV_${nombre.replace(/\s+/g, '_')}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
+        html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            logging: false
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
     // Importar html2pdf desde CDN
     loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js', function() {
-        html2pdf().set(opt).from(element).save();
-        showToast('PDF generado exitosamente');
+        html2pdf().set(opt).from(element).save().then(() => {
+            showToast('PDF generado exitosamente');
+        });
     });
 }
 
