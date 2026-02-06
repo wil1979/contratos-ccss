@@ -31,13 +31,19 @@
 
                 <div class="form-section">
                     <div class="form-group">
-                        <label for="nombre"><i class="fas fa-user"></i> Nombre Completo *</label>
-                        <input type="text" id="nombre" class="form-control" placeholder="Ingrese su nombre completo" required>
+                        <label for="cedula"><i class="fas fa-id-card"></i> Cédula *</label>
+                        <div class="input-with-button">
+                            <input type="text" id="cedula" class="form-control" placeholder="Ingrese su número de cédula" required>
+                            <button class="btn btn-sm btn-info" id="validateCedulaBtn" title="Validar con Hacienda">
+                                <i class="fas fa-search"></i> Validar
+                            </button>
+                        </div>
+                        <div class="validation-message" id="cedulaMessage"></div>
                     </div>
 
                     <div class="form-group">
-                        <label for="cedula"><i class="fas fa-id-card"></i> Cédula *</label>
-                        <input type="text" id="cedula" class="form-control" placeholder="Ingrese su número de cédula" required>
+                        <label for="nombre"><i class="fas fa-user"></i> Nombre Completo *</label>
+                        <input type="text" id="nombre" class="form-control" placeholder="Ingrese su nombre completo" required>
                     </div>
 
                     <div class="form-group">
@@ -62,6 +68,9 @@
                             <span id="fotoText">Sin foto</span>
                         </div>
                         <input type="file" id="foto" class="form-control-file" accept="image/*">
+                        <button class="btn btn-sm btn-secondary btn-block" id="uploadPhotoBtn">
+                            <i class="fas fa-upload"></i> Subir Foto
+                        </button>
                     </div>
                 </div>
 
@@ -101,7 +110,7 @@
                     </div>
                 </div>
 
-                <!-- HISTORIAL LABORAL - NUEVA SECCIÓN -->
+                <!-- HISTORIAL LABORAL -->
                 <div class="sidebar-header">
                     <h2><i class="fas fa-briefcase"></i> Historial Laboral</h2>
                 </div>
@@ -141,7 +150,7 @@
                     </button>
                 </div>
 
-                <!-- Habilidades -->
+                <!-- HABILIDADES -->
                 <div class="sidebar-header">
                     <h2><i class="fas fa-star"></i> Habilidades Blandas</h2>
                 </div>
@@ -168,7 +177,7 @@
                     </button>
                 </div>
 
-                <!-- RECOMENDACIONES - NUEVA SECCIÓN -->
+                <!-- RECOMENDACIONES -->
                 <div class="sidebar-header">
                     <h2><i class="fas fa-user-check"></i> Recomendaciones</h2>
                 </div>
@@ -221,7 +230,7 @@
                     </button>
                 </div>
 
-                <!-- DOCUMENTOS ADJUNTOS - NUEVA SECCIÓN -->
+                <!-- DOCUMENTOS ADJUNTOS -->
                 <div class="sidebar-header">
                     <h2><i class="fas fa-paperclip"></i> Documentos Adjuntos</h2>
                 </div>
@@ -230,46 +239,38 @@
                     <div class="documents-section">
                         <div class="document-item">
                             <label><i class="fas fa-id-card"></i> Copia de Cédula</label>
-                            <div class="file-upload">
-                                <input type="file" id="docCedula" class="form-control-file" accept=".pdf,.jpg,.jpeg,.png">
-                                <div class="file-preview" id="docCedulaPreview">
-                                    <i class="fas fa-file"></i>
-                                    <span>Sin archivo</span>
-                                </div>
-                            </div>
+                            <button class="btn btn-sm btn-secondary btn-block upload-btn" data-target="docCedula">
+                                <i class="fas fa-upload"></i> <span id="docCedulaLabel">Seleccionar Archivo</span>
+                            </button>
+                            <input type="file" id="docCedula" class="hidden-file-input" accept=".pdf,.jpg,.jpeg,.png">
+                            <div class="file-info" id="docCedulaInfo"></div>
                         </div>
 
                         <div class="document-item">
                             <label><i class="fas fa-graduation-cap"></i> Diplomas/Certificados</label>
-                            <div class="file-upload">
-                                <input type="file" id="docDiplomas" class="form-control-file" accept=".pdf,.jpg,.jpeg,.png" multiple>
-                                <div class="file-preview" id="docDiplomasPreview">
-                                    <i class="fas fa-file"></i>
-                                    <span>Sin archivos</span>
-                                </div>
-                            </div>
+                            <button class="btn btn-sm btn-secondary btn-block upload-btn" data-target="docDiplomas">
+                                <i class="fas fa-upload"></i> <span id="docDiplomasLabel">Seleccionar Archivos</span>
+                            </button>
+                            <input type="file" id="docDiplomas" class="hidden-file-input" accept=".pdf,.jpg,.jpeg,.png" multiple>
+                            <div class="file-info" id="docDiplomasInfo"></div>
                         </div>
 
                         <div class="document-item">
                             <label><i class="fas fa-file-alt"></i> Cartas de Recomendación</label>
-                            <div class="file-upload">
-                                <input type="file" id="docRecomendaciones" class="form-control-file" accept=".pdf,.doc,.docx" multiple>
-                                <div class="file-preview" id="docRecomendacionesPreview">
-                                    <i class="fas fa-file"></i>
-                                    <span>Sin archivos</span>
-                                </div>
-                            </div>
+                            <button class="btn btn-sm btn-secondary btn-block upload-btn" data-target="docRecomendaciones">
+                                <i class="fas fa-upload"></i> <span id="docRecomendacionesLabel">Seleccionar Archivos</span>
+                            </button>
+                            <input type="file" id="docRecomendaciones" class="hidden-file-input" accept=".pdf,.doc,.docx" multiple>
+                            <div class="file-info" id="docRecomendacionesInfo"></div>
                         </div>
 
                         <div class="document-item">
                             <label><i class="fas fa-folder-plus"></i> Otros Documentos</label>
-                            <div class="file-upload">
-                                <input type="file" id="docOtros" class="form-control-file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
-                                <div class="file-preview" id="docOtrosPreview">
-                                    <i class="fas fa-file"></i>
-                                    <span>Sin archivos</span>
-                                </div>
-                            </div>
+                            <button class="btn btn-sm btn-secondary btn-block upload-btn" data-target="docOtros">
+                                <i class="fas fa-upload"></i> <span id="docOtrosLabel">Seleccionar Archivos</span>
+                            </button>
+                            <input type="file" id="docOtros" class="hidden-file-input" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
+                            <div class="file-info" id="docOtrosInfo"></div>
                         </div>
                     </div>
                 </div>
@@ -361,9 +362,7 @@
                         <div class="cv-section">
                             <h3><i class="fas fa-star"></i> Habilidades</h3>
                             <div class="skills-list" id="cvSkills">
-                                <span class="skill-tag">Comunicación</span>
-                                <span class="skill-tag">Trabajo en Equipo</span>
-                                <span class="skill-tag">Liderazgo</span>
+                                <!-- Las habilidades se mostrarán aquí -->
                             </div>
                         </div>
 
@@ -391,6 +390,12 @@
     <div class="toast" id="toast">
         <i class="fas fa-check-circle"></i>
         <span id="toastMessage">Mensaje</span>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Validando cédula con Hacienda...</p>
     </div>
 
     <script src="skills-data.js"></script>
