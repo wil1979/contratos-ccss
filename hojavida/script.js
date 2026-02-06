@@ -32,7 +32,7 @@ function initializeEventListeners() {
     document.getElementById('uploadPhotoBtn').addEventListener('click', function() {
         document.getElementById('foto').click();
     });
-    document.getElementById('validateCedulaBtn').addEventListener('click', validateCedulaWithHacienda);
+    //document.getElementById('validateCedulaBtn').addEventListener('click', validateCedulaWithHacienda);
 
     // Botones de upload de documentos
     document.querySelectorAll('.upload-btn').forEach(button => {
