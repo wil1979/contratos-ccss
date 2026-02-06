@@ -184,38 +184,59 @@ async function validateCedulaWithHacienda() {
 }
 
 // Validar formato de cédula costarricense
+// Validar formato de cédula costarricense (SIMPLIFICADO)
 function validateCostaRicanCedula(cedula) {
-    // Eliminar guiones para validación
-    const cedulaSinGuiones = cedula.replace(/-/g, '');
+    // Eliminar guiones y espacios
+    const cedulaLimpia = cedula.replace(/[-\s]/g, '');
     
-    // Validar que sea numérico y tenga 9 dígitos
-    if (!/^\d{9}$/.test(cedulaSinGuiones)) {
+    // Verificar que tenga exactamente 9 dígitos
+    if (!/^\d{9}$/.test(cedulaLimpia)) {
         return false;
     }
     
-    // Validar dígito verificador (algoritmo costarricense)
-    return validateCedulaChecksum(cedulaSinGuiones);
+    // Verificar que no sea todo ceros
+    if (cedulaLimpia === '000000000') {
+        return false;
+    }
+    
+    // Verificar que el primer dígito sea 1, 2, 3, 4, 5, 6, 7 o 8
+    // (1-7 para personas físicas, 8 para personas jurídicas)
+    const primerDigito = parseInt(cedulaLimpia[0]);
+    if (primerDigito < 1 || primerDigito > 8) {
+        return false;
+    }
+    
+    return true;
 }
 
-// Validar dígito verificador de cédula costarricense
+// Validar dígito verificador (OPCIONAL - la API de Hacienda lo valida)
 function validateCedulaChecksum(cedula) {
     const digits = cedula.split('').map(Number);
-    const verificationDigit = digits.pop(); // Último dígito
     
-    // Pesos para el cálculo del dígito verificador
-    const weights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+    // Pesos para cada posición
+    const weights = [1, 2, 3, 4, 5, 6, 7, 8];
     
-    // Calcular suma ponderada (solo primeros 8 dígitos)
+    // Calcular suma ponderada de los primeros 8 dígitos
     let sum = 0;
     for (let i = 0; i < 8; i++) {
         sum += digits[i] * weights[i];
     }
     
+    // Calcular el residuo
+    const remainder = sum % 11;
+    
     // Calcular dígito verificador esperado
-    const calculatedDigit = (11 - (sum % 11)) % 11;
+    let expectedDigit = remainder === 0 ? 0 : 11 - remainder;
+    
+    // Casos especiales
+    if (expectedDigit === 10) {
+        expectedDigit = 1;
+    } else if (expectedDigit === 11) {
+        expectedDigit = 0;
+    }
     
     // Comparar con el dígito real
-    return calculatedDigit === verificationDigit;
+    return expectedDigit === digits[8];
 }
 
 // Llamar a la API REAL de Hacienda de Costa Rica
