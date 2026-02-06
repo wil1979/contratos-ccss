@@ -187,13 +187,14 @@ async function validateCedulaWithHacienda() {
             messageDiv.className = 'validation-message error';
             messageDiv.style.display = 'block';
         }
+        /*
     } catch (err) {
         console.warn("Error al consultar Hacienda:", err);
         messageDiv.textContent = "⚠️ No se pudo contactar a Hacienda. Intente nuevamente.";
         messageDiv.className = 'validation-message error';
         messageDiv.style.display = 'block';
         showToast('Error al conectar con Hacienda');
-    } finally {
+    */} finally {
         // Ocultar loading
         if (loadingOverlay) {
             setTimeout(() => {
