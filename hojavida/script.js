@@ -129,56 +129,43 @@ async function validateCedulaWithHacienda() {
     const cedulaInput = document.getElementById('cedula');
     const cedula = cedulaInput.value.trim();
     const messageDiv = document.getElementById('cedulaMessage');
-    
+
     if (!cedula) {
         showToast('Por favor ingrese un número de cédula');
         return;
     }
-    
-    // Limpiar mensaje anterior
+
     messageDiv.style.display = 'none';
-    
-    // Validar formato de cédula costarricense
+
     if (!validateCostaRicanCedula(cedula)) {
-        messageDiv.textContent = '❌ Formato de cédula inválido. Use: 110350666 (9 dígitos)';
+        messageDiv.textContent = '❌ Cédula inválida (9 dígitos, persona física)';
         messageDiv.className = 'validation-message error';
         messageDiv.style.display = 'block';
-        showToast('Formato de cédula incorrecto');
         return;
     }
-    
-    // Mostrar loading
+
     const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.style.display = 'flex';
-    }
-    
+    if (loadingOverlay) loadingOverlay.style.display = 'flex';
+
     try {
-        // Llamar a la API REAL de Hacienda
-        const nombreCompleto = await callHaciendaAPI(cedula);
-        
-        if (nombreCompleto) {
-            document.getElementById('nombre').value = nombreCompleto;
-            messageDiv.textContent = `✅ Cédula validada: ${nombreCompleto}`;
-            messageDiv.className = 'validation-message success';
-            messageDiv.style.display = 'block';
-            updateCVPreview();
-            showToast('Datos obtenidos exitosamente de Hacienda');
-        } else {
-            throw new Error('No se encontraron datos para esta cédula');
-        }
-    } catch (error) {
-        console.error('Error al validar cédula:', error);
-        messageDiv.textContent = `❌ Error: ${error.message || 'No se pudo validar la cédula'}`;
+        const nombreCompleto = await simulateHaciendaResponse(
+            cedula.replace(/[^0-9]/g, '')
+        );
+
+        document.getElementById('nombre').value = nombreCompleto;
+        messageDiv.textContent = `✅ Cédula validada (demo): ${nombreCompleto}`;
+        messageDiv.className = 'validation-message success';
+        messageDiv.style.display = 'block';
+
+        updateCVPreview();
+        showToast('Consulta simulada de Hacienda');
+    } catch (err) {
+        messageDiv.textContent = '❌ No se pudo validar la cédula';
         messageDiv.className = 'validation-message error';
         messageDiv.style.display = 'block';
-        showToast('Error al validar cédula con Hacienda');
     } finally {
-        // Ocultar loading
         if (loadingOverlay) {
-            setTimeout(() => {
-                loadingOverlay.style.display = 'none';
-            }, 300);
+            setTimeout(() => loadingOverlay.style.display = 'none', 300);
         }
     }
 }
