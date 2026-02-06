@@ -26,7 +26,7 @@
             <!-- Sidebar - Formulario -->
             <aside class="sidebar">
                 <div class="sidebar-header">
-                    <h2><i class="fas fa-edit"></i> Datos Personales</h2>
+                    <h2><i class="fas fa-user"></i> Datos Personales</h2>
                 </div>
 
                 <div class="form-section">
@@ -101,6 +101,46 @@
                     </div>
                 </div>
 
+                <!-- HISTORIAL LABORAL - NUEVA SECCIÓN -->
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-briefcase"></i> Historial Laboral</h2>
+                </div>
+
+                <div class="form-section">
+                    <div id="experienceContainer">
+                        <div class="experience-item">
+                            <div class="form-group">
+                                <label><i class="fas fa-building"></i> Empresa</label>
+                                <input type="text" class="form-control exp-empresa" placeholder="Nombre de la empresa">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-user-tie"></i> Cargo</label>
+                                <input type="text" class="form-control exp-cargo" placeholder="Cargo o posición">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-alt"></i> Período</label>
+                                <div class="periodo-group">
+                                    <input type="text" class="form-control exp-inicio" placeholder="Desde (Ej: Ene 2020)">
+                                    <span>a</span>
+                                    <input type="text" class="form-control exp-fin" placeholder="Hasta (Ej: Dic 2023)">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-tasks"></i> Responsabilidades</label>
+                                <textarea class="form-control exp-responsabilidades" rows="3" placeholder="Describa sus responsabilidades y logros"></textarea>
+                            </div>
+                            <button class="btn btn-sm btn-danger exp-remove">
+                                <i class="fas fa-trash"></i> Eliminar Experiencia
+                            </button>
+                            <hr>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary btn-block" id="addExperienceBtn">
+                        <i class="fas fa-plus"></i> Agregar Experiencia Laboral
+                    </button>
+                </div>
+
                 <!-- Habilidades -->
                 <div class="sidebar-header">
                     <h2><i class="fas fa-star"></i> Habilidades Blandas</h2>
@@ -128,6 +168,112 @@
                     </button>
                 </div>
 
+                <!-- RECOMENDACIONES - NUEVA SECCIÓN -->
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-user-check"></i> Recomendaciones</h2>
+                </div>
+
+                <div class="form-section">
+                    <div id="referencesContainer">
+                        <div class="reference-item">
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Nombre del Referente</label>
+                                <input type="text" class="form-control ref-nombre" placeholder="Nombre completo">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-briefcase"></i> Cargo/Posición</label>
+                                <input type="text" class="form-control ref-cargo" placeholder="Cargo o relación">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-building"></i> Empresa/Organización</label>
+                                <input type="text" class="form-control ref-empresa" placeholder="Empresa o institución">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-phone"></i> Teléfono</label>
+                                <input type="tel" class="form-control ref-telefono" placeholder="Número de contacto">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> Correo Electrónico</label>
+                                <input type="email" class="form-control ref-email" placeholder="Correo electrónico">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-comment"></i> Relación</label>
+                                <select class="form-control ref-relacion">
+                                    <option value="">Seleccione la relación...</option>
+                                    <option value="Jefe Directo">Jefe Directo</option>
+                                    <option value="Supervisor">Supervisor</option>
+                                    <option value="Colega">Colega</option>
+                                    <option value="Profesor">Profesor</option>
+                                    <option value="Cliente">Cliente</option>
+                                    <option value="Proveedor">Proveedor</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-sm btn-danger ref-remove">
+                                <i class="fas fa-trash"></i> Eliminar Referencia
+                            </button>
+                            <hr>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary btn-block" id="addReferenceBtn">
+                        <i class="fas fa-plus"></i> Agregar Referencia
+                    </button>
+                </div>
+
+                <!-- DOCUMENTOS ADJUNTOS - NUEVA SECCIÓN -->
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-paperclip"></i> Documentos Adjuntos</h2>
+                </div>
+
+                <div class="form-section">
+                    <div class="documents-section">
+                        <div class="document-item">
+                            <label><i class="fas fa-id-card"></i> Copia de Cédula</label>
+                            <div class="file-upload">
+                                <input type="file" id="docCedula" class="form-control-file" accept=".pdf,.jpg,.jpeg,.png">
+                                <div class="file-preview" id="docCedulaPreview">
+                                    <i class="fas fa-file"></i>
+                                    <span>Sin archivo</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="document-item">
+                            <label><i class="fas fa-graduation-cap"></i> Diplomas/Certificados</label>
+                            <div class="file-upload">
+                                <input type="file" id="docDiplomas" class="form-control-file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+                                <div class="file-preview" id="docDiplomasPreview">
+                                    <i class="fas fa-file"></i>
+                                    <span>Sin archivos</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="document-item">
+                            <label><i class="fas fa-file-alt"></i> Cartas de Recomendación</label>
+                            <div class="file-upload">
+                                <input type="file" id="docRecomendaciones" class="form-control-file" accept=".pdf,.doc,.docx" multiple>
+                                <div class="file-preview" id="docRecomendacionesPreview">
+                                    <i class="fas fa-file"></i>
+                                    <span>Sin archivos</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="document-item">
+                            <label><i class="fas fa-folder-plus"></i> Otros Documentos</label>
+                            <div class="file-upload">
+                                <input type="file" id="docOtros" class="form-control-file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
+                                <div class="file-preview" id="docOtrosPreview">
+                                    <i class="fas fa-file"></i>
+                                    <span>Sin archivos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Diseño y Personalización -->
                 <div class="sidebar-header">
                     <h2><i class="fas fa-palette"></i> Personalización</h2>
@@ -137,7 +283,7 @@
                     <div class="form-group">
                         <label><i class="fas fa-paint-brush"></i> Color del Diseño</label>
                         <div class="color-picker">
-                            <button class="color-option" data-color="#FFD700" style="background-color: #FFD700;"></button>
+                            <button class="color-option active" data-color="#FFD700" style="background-color: #FFD700;"></button>
                             <button class="color-option" data-color="#228B22" style="background-color: #228B22;"></button>
                             <button class="color-option" data-color="#1E90FF" style="background-color: #1E90FF;"></button>
                             <button class="color-option" data-color="#9370DB" style="background-color: #9370DB;"></button>
@@ -172,7 +318,6 @@
                 </div>
 
                 <div class="cv-container" id="cvContainer">
-                    <!-- CV se generará dinámicamente -->
                     <div class="cv-template classic" id="cvTemplate">
                         <div class="cv-header">
                             <div class="cv-photo" id="cvPhoto">
@@ -196,12 +341,44 @@
                             </div>
                         </div>
 
+                        <!-- Sección de Experiencia Laboral -->
+                        <div class="cv-section">
+                            <h3><i class="fas fa-briefcase"></i> Experiencia Laboral</h3>
+                            <div class="experience-list" id="cvExperience">
+                                <div class="experience-item">
+                                    <div class="exp-title">Cargo - Empresa</div>
+                                    <div class="exp-period">Ene 2020 - Dic 2023</div>
+                                    <div class="exp-responsibilities">
+                                        <ul>
+                                            <li>Responsabilidad 1</li>
+                                            <li>Responsabilidad 2</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="cv-section">
                             <h3><i class="fas fa-star"></i> Habilidades</h3>
                             <div class="skills-list" id="cvSkills">
                                 <span class="skill-tag">Comunicación</span>
                                 <span class="skill-tag">Trabajo en Equipo</span>
                                 <span class="skill-tag">Liderazgo</span>
+                            </div>
+                        </div>
+
+                        <!-- Sección de Referencias -->
+                        <div class="cv-section">
+                            <h3><i class="fas fa-user-check"></i> Referencias</h3>
+                            <div class="references-list" id="cvReferences">
+                                <div class="reference-item">
+                                    <div class="ref-name">Nombre del Referente</div>
+                                    <div class="ref-position">Cargo - Empresa</div>
+                                    <div class="ref-contact">
+                                        <span><i class="fas fa-phone"></i> Teléfono</span>
+                                        <span><i class="fas fa-envelope"></i> Correo</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
