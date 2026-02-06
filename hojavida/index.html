@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creador de Currículum Vitae Profesional</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-file-alt"></i>
+                <h1>CV Builder Pro</h1>
+            </div>
+            <div class="user-controls">
+                <button class="btn btn-primary" id="exportBtn">
+                    <i class="fas fa-download"></i> Exportar PDF
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Sidebar - Formulario -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-edit"></i> Datos Personales</h2>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="nombre"><i class="fas fa-user"></i> Nombre Completo *</label>
+                        <input type="text" id="nombre" class="form-control" placeholder="Ingrese su nombre completo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cedula"><i class="fas fa-id-card"></i> Cédula *</label>
+                        <input type="text" id="cedula" class="form-control" placeholder="Ingrese su número de cédula" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="direccion"><i class="fas fa-map-marker-alt"></i> Dirección *</label>
+                        <input type="text" id="direccion" class="form-control" placeholder="Ingrese su dirección completa" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono"><i class="fas fa-phone"></i> Teléfono</label>
+                        <input type="tel" id="telefono" class="form-control" placeholder="Ingrese su número de teléfono">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> Correo Electrónico</label>
+                        <input type="email" id="email" class="form-control" placeholder="Ingrese su correo electrónico">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="foto"><i class="fas fa-camera"></i> Foto de Perfil</label>
+                        <div class="foto-preview" id="fotoPreview">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="fotoText">Sin foto</span>
+                        </div>
+                        <input type="file" id="foto" class="form-control-file" accept="image/*">
+                    </div>
+                </div>
+
+                <!-- Estudios -->
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-graduation-cap"></i> Información de Estudios</h2>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="nivelEstudio"><i class="fas fa-school"></i> Nivel de Estudio</label>
+                        <select id="nivelEstudio" class="form-control">
+                            <option value="">Seleccione...</option>
+                            <option value="Primaria">Primaria</option>
+                            <option value="Secundaria">Secundaria</option>
+                            <option value="Bachillerato">Bachillerato</option>
+                            <option value="Técnico">Técnico</option>
+                            <option value="Universitario">Universitario</option>
+                            <option value="Maestría">Maestría</option>
+                            <option value="Doctorado">Doctorado</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="institucion"><i class="fas fa-building"></i> Institución</label>
+                        <input type="text" id="institucion" class="form-control" placeholder="Nombre de la institución">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="titulo"><i class="fas fa-certificate"></i> Título Obtenido</label>
+                        <input type="text" id="titulo" class="form-control" placeholder="Título o certificado">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="anioGraduacion"><i class="fas fa-calendar"></i> Año de Graduación</label>
+                        <input type="number" id="anioGraduacion" class="form-control" placeholder="Año" min="1950" max="2026">
+                    </div>
+                </div>
+
+                <!-- Habilidades -->
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-star"></i> Habilidades Blandas</h2>
+                </div>
+
+                <div class="form-section">
+                    <div class="skills-container" id="skillsContainer">
+                        <div class="skill-input-group">
+                            <input type="text" class="form-control skill-input" placeholder="Ingrese una habilidad">
+                            <button class="btn btn-sm btn-danger skill-remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="skill-suggestions">
+                        <h4><i class="fas fa-lightbulb"></i> Habilidades Sugeridas:</h4>
+                        <div class="suggestions-grid" id="suggestionsGrid">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary btn-block" id="addSkillBtn">
+                        <i class="fas fa-plus"></i> Agregar Habilidad
+                    </button>
+                </div>
+
+                <!-- Diseño y Personalización -->
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-palette"></i> Personalización</h2>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-group">
+                        <label><i class="fas fa-paint-brush"></i> Color del Diseño</label>
+                        <div class="color-picker">
+                            <button class="color-option" data-color="#FFD700" style="background-color: #FFD700;"></button>
+                            <button class="color-option" data-color="#228B22" style="background-color: #228B22;"></button>
+                            <button class="color-option" data-color="#1E90FF" style="background-color: #1E90FF;"></button>
+                            <button class="color-option" data-color="#9370DB" style="background-color: #9370DB;"></button>
+                            <button class="color-option" data-color="#FF6B6B" style="background-color: #FF6B6B;"></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-columns"></i> Diseño del CV</label>
+                        <select id="templateSelect" class="form-control">
+                            <option value="classic">Clásico</option>
+                            <option value="modern">Moderno</option>
+                            <option value="creative">Creativo</option>
+                            <option value="minimalist">Minimalista</option>
+                        </select>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content - Vista Previa CV -->
+            <main class="cv-preview">
+                <div class="preview-header">
+                    <h2><i class="fas fa-eye"></i> Vista Previa del Currículum</h2>
+                    <div class="preview-actions">
+                        <button class="btn btn-success" id="saveBtn">
+                            <i class="fas fa-save"></i> Guardar Datos
+                        </button>
+                        <button class="btn btn-info" id="clearBtn">
+                            <i class="fas fa-trash"></i> Limpiar Todo
+                        </button>
+                    </div>
+                </div>
+
+                <div class="cv-container" id="cvContainer">
+                    <!-- CV se generará dinámicamente -->
+                    <div class="cv-template classic" id="cvTemplate">
+                        <div class="cv-header">
+                            <div class="cv-photo" id="cvPhoto">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="cv-name" id="cvName">Tu Nombre Completo</div>
+                            <div class="cv-contact" id="cvContact">
+                                <span id="cvCedula">Cédula: XXXXXXXX</span>
+                                <span id="cvDireccion"><i class="fas fa-map-marker-alt"></i> Dirección</span>
+                                <span id="cvTelefono"><i class="fas fa-phone"></i> Teléfono</span>
+                                <span id="cvEmail"><i class="fas fa-envelope"></i> Correo</span>
+                            </div>
+                        </div>
+
+                        <div class="cv-section">
+                            <h3><i class="fas fa-graduation-cap"></i> Educación</h3>
+                            <div class="education-item" id="educationItem">
+                                <div class="education-title" id="educationTitle">Título</div>
+                                <div class="education-institution" id="educationInstitution">Institución</div>
+                                <div class="education-year" id="educationYear">Año</div>
+                            </div>
+                        </div>
+
+                        <div class="cv-section">
+                            <h3><i class="fas fa-star"></i> Habilidades</h3>
+                            <div class="skills-list" id="cvSkills">
+                                <span class="skill-tag">Comunicación</span>
+                                <span class="skill-tag">Trabajo en Equipo</span>
+                                <span class="skill-tag">Liderazgo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Mensaje</span>
+    </div>
+
+    <script src="skills-data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
