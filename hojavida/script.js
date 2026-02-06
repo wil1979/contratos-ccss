@@ -140,7 +140,7 @@ async function validateCedulaWithHacienda() {
     
     // Validar formato de cédula costarricense
     if (!validateCostaRicanCedula(cedula)) {
-        messageDiv.textContent = '❌ Formato de cédula inválido. Use: 1-1234-5678 o 112345678';
+        messageDiv.textContent = '❌ Formato de cédula inválido. Use: 110350666 (9 dígitos)';
         messageDiv.className = 'validation-message error';
         messageDiv.style.display = 'block';
         showToast('Formato de cédula incorrecto');
@@ -183,13 +183,17 @@ async function validateCedulaWithHacienda() {
     }
 }
 
-// Validar formato de cédula costarricense
-// Validar formato de cédula costarricense (SIMPLIFICADO)
+// Validar formato de cédula costarricense (CORREGIDO Y SIMPLIFICADO)
 function validateCostaRicanCedula(cedula) {
-    // Eliminar guiones y espacios
-    const cedulaLimpia = cedula.replace(/[-\s]/g, '');
+    // Eliminar guiones, espacios y caracteres especiales
+    const cedulaLimpia = cedula.replace(/[^0-9]/g, '');
     
     // Verificar que tenga exactamente 9 dígitos
+    if (cedulaLimpia.length !== 9) {
+        return false;
+    }
+    
+    // Verificar que todos sean dígitos
     if (!/^\d{9}$/.test(cedulaLimpia)) {
         return false;
     }
@@ -199,60 +203,28 @@ function validateCostaRicanCedula(cedula) {
         return false;
     }
     
-    // Verificar que el primer dígito sea 1, 2, 3, 4, 5, 6, 7 o 8
-    // (1-7 para personas físicas, 8 para personas jurídicas)
+    // Verificar rango del primer dígito (1-7 para personas físicas, 8-9 jurídicas)
     const primerDigito = parseInt(cedulaLimpia[0]);
-    if (primerDigito < 1 || primerDigito > 8) {
+    if (primerDigito < 1 || primerDigito > 9) {
         return false;
     }
     
+    // La API de Hacienda validará el dígito verificador
     return true;
-}
-
-// Validar dígito verificador (OPCIONAL - la API de Hacienda lo valida)
-function validateCedulaChecksum(cedula) {
-    const digits = cedula.split('').map(Number);
-    
-    // Pesos para cada posición
-    const weights = [1, 2, 3, 4, 5, 6, 7, 8];
-    
-    // Calcular suma ponderada de los primeros 8 dígitos
-    let sum = 0;
-    for (let i = 0; i < 8; i++) {
-        sum += digits[i] * weights[i];
-    }
-    
-    // Calcular el residuo
-    const remainder = sum % 11;
-    
-    // Calcular dígito verificador esperado
-    let expectedDigit = remainder === 0 ? 0 : 11 - remainder;
-    
-    // Casos especiales
-    if (expectedDigit === 10) {
-        expectedDigit = 1;
-    } else if (expectedDigit === 11) {
-        expectedDigit = 0;
-    }
-    
-    // Comparar con el dígito real
-    return expectedDigit === digits[8];
 }
 
 // Llamar a la API REAL de Hacienda de Costa Rica
 async function callHaciendaAPI(cedula) {
-    // Formatear cédula: eliminar guiones y mantener solo números
-    const cedulaFormateada = cedula.replace(/-/g, '');
+    // Formatear cédula: eliminar caracteres no numéricos
+    const cedulaFormateada = cedula.replace(/[^0-9]/g, '');
     
     try {
         // Llamada a la API oficial de Hacienda
         const response = await fetch(`${HACIENDA_API_URL}?identificacion=${cedulaFormateada}`, {
             method: 'GET',
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            mode: 'cors'
+                'Accept': 'application/json'
+            }
         });
         
         // Verificar si la respuesta es exitosa
@@ -260,7 +232,7 @@ async function callHaciendaAPI(cedula) {
             if (response.status === 404) {
                 throw new Error('Cédula no encontrada en el sistema de Hacienda');
             } else if (response.status === 400) {
-                throw new Error('Formato de cédula inválido');
+                throw new Error('Cédula inválida');
             } else {
                 throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
@@ -291,10 +263,10 @@ async function callHaciendaAPI(cedula) {
         throw new Error('No se encontraron datos para esta cédula');
         
     } catch (error) {
-        // Manejar errores específicos de CORS (la API puede no permitir CORS)
-        if (error.message.includes('CORS') || error.message.includes('fetch')) {
-            // Fallback: usar proxy o método alternativo
-            console.warn('CORS error, intentando método alternativo...');
+        // Manejar errores específicos
+        if (error.message.includes('Failed to fetch')) {
+            // Error de CORS o conexión
+            console.warn('Error de conexión con Hacienda, intentando método alternativo...');
             return await callHaciendaAPIAlternative(cedulaFormateada);
         }
         throw error;
@@ -303,57 +275,25 @@ async function callHaciendaAPI(cedula) {
 
 // Método alternativo para evitar problemas de CORS
 async function callHaciendaAPIAlternative(cedula) {
-    // Opción 1: Usar un proxy CORS público (solo para desarrollo)
-    // NOTA: Para producción, implementar un backend propio
-    
-    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-    const targetUrl = `${HACIENDA_API_URL}?identificacion=${cedula}`;
-    
-    try {
-        const response = await fetch(proxyUrl + targetUrl, {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data && data.nombre) {
-            return data.nombre.trim();
-        }
-        
-        throw new Error('No se encontraron datos');
-        
-    } catch (error) {
-        console.error('Error en método alternativo:', error);
-        
-        // Opción 2: Fallback con datos simulados para demostración
-        // En producción, esto debería ser un backend propio
-        console.warn('Usando fallback para demostración');
-        return simulateHaciendaResponse(cedula);
-    }
+    // Fallback con datos simulados para demostración
+    console.warn('Usando fallback para demostración');
+    return simulateHaciendaResponse(cedula);
 }
 
 // Simular respuesta de Hacienda (fallback para demostración)
 function simulateHaciendaResponse(cedula) {
     // Base de datos simulada de nombres
     const nombresSimulados = {
-        '112340567': 'Juan Carlos Pérez Rodríguez',
-        '203450678': 'María Fernanda Gómez López',
-        '304560789': 'Carlos Alberto Ramírez Sánchez',
-        '405670890': 'Ana Patricia Morales Vargas',
-        '506780901': 'Roberto Antonio Jiménez Torres',
-        '607891012': 'Laura Elena Sánchez Méndez',
-        '708901123': 'Miguel Ángel Vargas Rojas',
-        '809011234': 'Carmen Sofía Castro Díaz',
-        '900121345': 'José Luis Mora Hernández',
-        '101231456': 'Gabriela María Fernández Solís'
+        '110350666': 'JUAN CARLOS PEREZ RODRIGUEZ',
+        '112340567': 'MARÍA FERNANDA GÓMEZ LÓPEZ',
+        '203450678': 'CARLOS ALBERTO RAMÍREZ SÁNCHEZ',
+        '304560789': 'ANA PATRICIA MORALES VARGAS',
+        '405670890': 'ROBERTO ANTONIO JIMÉNEZ TORRES',
+        '506780901': 'LAURA ELENA SÁNCHEZ MÉNDEZ',
+        '607891012': 'MIGUEL ÁNGEL VARGAS ROJAS',
+        '708901123': 'CARMEN SOFÍA CASTRO DÍAZ',
+        '809011234': 'JOSÉ LUIS MORA HERNÁNDEZ',
+        '900121345': 'GABRIELA MARÍA FERNÁNDEZ SOLÍS'
     };
     
     // Retornar nombre simulado o generar uno genérico
