@@ -161,29 +161,52 @@ async function validateCedulaWithHacienda() {
     const messageDiv = document.getElementById('cedulaMessage');
     const overlay = document.getElementById('loadingOverlay');
     
+    // Limpiar la cédula: solo números
     const cedula = cedulaInput.value.trim().replace(/\D/g, "");
     
     if (cedula.length !== 9) {
-        showToast("ℹ️ Solo cédulas físicas (9 dígitos)");
+        showToast("ℹ️ Ingrese una cédula física de 9 dígitos (ej: 101230456)");
+        messageDiv.textContent = "Formato incorrecto";
+        messageDiv.style.color = "orange";
         return;
     }
 
     try {
         if (overlay) overlay.style.display = 'flex';
-        const res = await fetch(`${HACIENDA_API_URL}?identificacion=${cedula}`);
-        if (!res.ok) throw new Error("No encontrado");
+        messageDiv.textContent = "Consultando...";
+        messageDiv.style.color = "blue";
+
+        // Intentar la consulta a la API de Hacienda
+        const response = await fetch(`${HACIENDA_API_URL}?identificacion=${cedula}`);
         
-        const data = await res.json();
-        const nombre = data.nombre || data.nombre_completo;
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error("Cédula no encontrada en el registro de Hacienda");
+            } else {
+                throw new Error("Error en el servicio de Hacienda");
+            }
+        }
         
-        if (nombre) {
-            nombreInput.value = nombre;
-            messageDiv.textContent = `✅ ${nombre}`;
-            messageDiv.className = 'validation-message success';
+        const data = await response.json();
+        console.log("Datos recibidos de Hacienda:", data);
+
+        // La API de Hacienda devuelve el nombre en el campo 'nombre'
+        const nombreEncontrado = data.nombre || data.nombre_completo;
+        
+        if (nombreEncontrado) {
+            nombreInput.value = nombreEncontrado;
+            messageDiv.textContent = `✅ ${nombreEncontrado}`;
+            messageDiv.style.color = "green";
+            showToast("Cédula validada con éxito");
             updateCVPreview();
+        } else {
+            throw new Error("No se pudo extraer el nombre de la respuesta");
         }
     } catch (err) {
-        showToast("No se pudo validar la cédula");
+        console.error("Error validando cédula:", err);
+        messageDiv.textContent = `❌ ${err.message}`;
+        messageDiv.style.color = "red";
+        showToast(err.message);
     } finally {
         if (overlay) overlay.style.display = 'none';
     }
@@ -361,28 +384,5 @@ function updateCVStyling() {
 }
 
 function changeTemplate() {
-    selectedTemplate = document.getElementById('templateSelect').value;
-    const cvTemplate = document.getElementById('cvTemplate');
-    cvTemplate.className = `cv-template ${selectedTemplate}`;
-    showToast(`Diseño cambiado a: ${selectedTemplate}`);
-}
-
-function exportToPDF() {
-    const element = document.getElementById('cvTemplate');
-    const nombre = document.getElementById('nombre').value || 'CV';
-    
-    showToast('Generando PDF...');
-    
-    const opt = {
-        margin: 10,
-        filename: `CV_${nombre.replace(/\s+/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    if (typeof html2pdf === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        script.onload = () => html2pdf().set(opt).from(
+    selectedTemplate 
 (Content truncated due to size limit. Use line ranges to read remaining content)
