@@ -57,11 +57,19 @@ function initializeEventListeners() {
     document.getElementById('foto').addEventListener('change', handlePhotoUpload);
     document.getElementById('templateSelect').addEventListener('change', changeTemplate);
 
-    // Documentos adjuntos
-    document.getElementById('docCedula').addEventListener('change', (e) => handleDocumentUpload(e, 'cedula', 'docCedulaInfo', 'docCedulaLabel'));
-    document.getElementById('docDiplomas').addEventListener('change', (e) => handleDocumentUpload(e, 'diplomas', 'docDiplomasInfo', 'docDiplomasLabel', true));
-    document.getElementById('docRecomendaciones').addEventListener('change', (e) => handleDocumentUpload(e, 'recomendaciones', 'docRecomendacionesInfo', 'docRecomendacionesLabel', true));
-    document.getElementById('docOtros').addEventListener('change', (e) => handleDocumentUpload(e, 'otros', 'docOtrosInfo', 'docOtrosLabel', true));
+    // Documentos adjuntos (Restaurado del original)
+    document.getElementById('docCedula').addEventListener('change', function(e) {
+        handleDocumentUpload(e, 'cedula', 'docCedulaInfo', 'docCedulaLabel');
+    });
+    document.getElementById('docDiplomas').addEventListener('change', function(e) {
+        handleDocumentUpload(e, 'diplomas', 'docDiplomasInfo', 'docDiplomasLabel', true);
+    });
+    document.getElementById('docRecomendaciones').addEventListener('change', function(e) {
+        handleDocumentUpload(e, 'recomendaciones', 'docRecomendacionesInfo', 'docRecomendacionesLabel', true);
+    });
+    document.getElementById('docOtros').addEventListener('change', function(e) {
+        handleDocumentUpload(e, 'otros', 'docOtrosInfo', 'docOtrosLabel', true);
+    });
 
     // Color picker
     document.querySelectorAll('.color-option').forEach(button => {
@@ -92,21 +100,21 @@ function initializeEventListeners() {
 }
 
 // ===============================
-// ✅ Selector de Habilidades (Desplegable con Checkbox)
+// ✅ Selector de Habilidades (Mejorado)
 // ===============================
 function renderSkillsSelector() {
     const container = document.getElementById('skillsContainer');
     if (!container) return;
 
     container.innerHTML = `
-        <div class="skills-dropdown">
+        <div class="skills-dropdown" style="position: relative;">
             <button type="button" class="btn btn-secondary btn-block dropdown-toggle" id="skillsDropdownBtn">
                 Seleccionar Habilidades <i class="fas fa-chevron-down"></i>
             </button>
-            <div class="skills-dropdown-content" id="skillsDropdownContent" style="display:none; border: 1px solid #ccc; padding: 10px; max-height: 200px; overflow-y: auto; background: white; position: absolute; z-index: 100; width: 100%;">
+            <div class="skills-dropdown-content" id="skillsDropdownContent" style="display:none; border: 1px solid #ccc; padding: 10px; max-height: 200px; overflow-y: auto; background: white; position: absolute; z-index: 100; width: 100%; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                 ${availableSkills.map(skill => `
                     <div class="skill-option" style="margin-bottom: 5px;">
-                        <label style="display: flex; align-items: center; cursor: pointer; font-weight: normal;">
+                        <label style="display: flex; align-items: center; cursor: pointer; font-weight: normal; margin: 0;">
                             <input type="checkbox" class="skill-checkbox" value="${skill}" style="margin-right: 10px;"> ${skill}
                         </label>
                     </div>
@@ -119,16 +127,16 @@ function renderSkillsSelector() {
     const btn = document.getElementById('skillsDropdownBtn');
     const content = document.getElementById('skillsDropdownContent');
     
-    btn.onclick = () => {
+    btn.onclick = (e) => {
+        e.stopPropagation();
         content.style.display = content.style.display === 'none' ? 'block' : 'none';
     };
 
-    // Cerrar al hacer clic fuera
-    window.onclick = (event) => {
-        if (!event.target.matches('#skillsDropdownBtn') && !event.target.closest('.skills-dropdown-content')) {
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('.skills-dropdown')) {
             content.style.display = 'none';
         }
-    };
+    });
 
     document.querySelectorAll('.skill-checkbox').forEach(cb => {
         cb.onchange = () => {
@@ -142,7 +150,7 @@ function updateSelectedSkillsBadges() {
     const badgesContainer = document.getElementById('selectedSkillsBadges');
     const selected = Array.from(document.querySelectorAll('.skill-checkbox:checked')).map(cb => cb.value);
     badgesContainer.innerHTML = selected.map(skill => `
-        <span class="badge badge-info" style="background: #17a2b8; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.8em;">
+        <span class="badge" style="background: #17a2b8; color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.75em; display: flex; align-items: center; gap: 5px;">
             ${skill}
         </span>
     `).join('');
@@ -153,7 +161,7 @@ function getSkillsFromInputs() {
 }
 
 // ===============================
-// ✅ API Hacienda
+// ✅ API Hacienda (Mejorada)
 // ===============================
 async function validateCedulaWithHacienda() {
     const cedulaInput = document.getElementById('cedula');
@@ -161,59 +169,39 @@ async function validateCedulaWithHacienda() {
     const messageDiv = document.getElementById('cedulaMessage');
     const overlay = document.getElementById('loadingOverlay');
     
-    // Limpiar la cédula: solo números
     const cedula = cedulaInput.value.trim().replace(/\D/g, "");
     
     if (cedula.length !== 9) {
-        showToast("ℹ️ Ingrese una cédula física de 9 dígitos (ej: 101230456)");
-        messageDiv.textContent = "Formato incorrecto";
-        messageDiv.style.color = "orange";
+        showToast("ℹ️ Ingrese 9 dígitos");
         return;
     }
 
     try {
         if (overlay) overlay.style.display = 'flex';
         messageDiv.textContent = "Consultando...";
-        messageDiv.style.color = "blue";
-
-        // Intentar la consulta a la API de Hacienda
-        const response = await fetch(`${HACIENDA_API_URL}?identificacion=${cedula}`);
+        const res = await fetch(`${HACIENDA_API_URL}?identificacion=${cedula}`);
+        if (!res.ok) throw new Error("No encontrado");
         
-        if (!response.ok) {
-            if (response.status === 404) {
-                throw new Error("Cédula no encontrada en el registro de Hacienda");
-            } else {
-                throw new Error("Error en el servicio de Hacienda");
-            }
-        }
+        const data = await res.json();
+        const nombre = data.nombre || data.nombre_completo;
         
-        const data = await response.json();
-        console.log("Datos recibidos de Hacienda:", data);
-
-        // La API de Hacienda devuelve el nombre en el campo 'nombre'
-        const nombreEncontrado = data.nombre || data.nombre_completo;
-        
-        if (nombreEncontrado) {
-            nombreInput.value = nombreEncontrado;
-            messageDiv.textContent = `✅ ${nombreEncontrado}`;
+        if (nombre) {
+            nombreInput.value = nombre;
+            messageDiv.textContent = `✅ ${nombre}`;
             messageDiv.style.color = "green";
-            showToast("Cédula validada con éxito");
             updateCVPreview();
-        } else {
-            throw new Error("No se pudo extraer el nombre de la respuesta");
         }
     } catch (err) {
-        console.error("Error validando cédula:", err);
-        messageDiv.textContent = `❌ ${err.message}`;
+        messageDiv.textContent = "❌ No encontrado";
         messageDiv.style.color = "red";
-        showToast(err.message);
+        showToast("Error al consultar Hacienda");
     } finally {
         if (overlay) overlay.style.display = 'none';
     }
 }
 
 // ===============================
-// ✅ Manejo de Fotos y Documentos
+// ✅ Manejo de Fotos y Documentos (Restaurado y Mejorado)
 // ===============================
 function handlePhotoUpload(e) {
     const file = e.target.files[0];
@@ -231,7 +219,7 @@ function handlePhotoUpload(e) {
 function updatePhotoPreview(url) {
     const preview = document.getElementById('fotoPreview');
     if (preview) {
-        preview.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        preview.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
     }
 }
 
@@ -243,12 +231,13 @@ function handleDocumentUpload(e, type, infoId, labelId, multiple = false) {
     if (files.length > 0) {
         if (multiple) {
             documents[type] = Array.from(files).map(f => f.name);
-            infoDiv.textContent = `${files.length} archivo(s) seleccionados`;
+            infoDiv.innerHTML = `<small>${files.length} archivo(s): ${documents[type].join(', ')}</small>`;
         } else {
             documents[type] = files[0].name;
-            infoDiv.textContent = files[0].name;
+            infoDiv.innerHTML = `<small>${files[0].name}</small>`;
         }
-        labelSpan.textContent = "Cambiar Archivo";
+        labelSpan.textContent = "Archivo(s) Cargado(s)";
+        showToast("Documento adjuntado");
     }
 }
 
@@ -259,6 +248,10 @@ function addExperienceItem(expData = null) {
     const container = document.getElementById('experienceContainer');
     const div = document.createElement('div');
     div.className = 'experience-item';
+    div.style.border = "1px solid #eee";
+    div.style.padding = "10px";
+    div.style.marginBottom = "10px";
+    div.style.borderRadius = "5px";
     div.innerHTML = `
         <div class="form-group">
             <label>Empresa</label>
@@ -270,9 +263,8 @@ function addExperienceItem(expData = null) {
         </div>
         <div class="form-group">
             <label>Período</label>
-            <div class="periodo-group" style="display:flex; gap:5px; align-items:center;">
+            <div style="display:flex; gap:5px; align-items:center;">
                 <input type="text" class="form-control exp-inicio" placeholder="Desde" value="${expData?.inicio || ''}">
-                <span>a</span>
                 <input type="text" class="form-control exp-fin" placeholder="Hasta" value="${expData?.fin || ''}">
             </div>
         </div>
@@ -281,7 +273,6 @@ function addExperienceItem(expData = null) {
             <textarea class="form-control exp-responsabilidades" rows="2">${expData?.responsabilidades || ''}</textarea>
         </div>
         <button class="btn btn-sm btn-danger exp-remove"><i class="fas fa-trash"></i> Eliminar</button>
-        <hr>
     `;
     container.appendChild(div);
     updateCVPreview();
@@ -296,6 +287,10 @@ function addReferenceItem(refData = null) {
     const container = document.getElementById('referencesContainer');
     const div = document.createElement('div');
     div.className = 'reference-item';
+    div.style.border = "1px solid #eee";
+    div.style.padding = "10px";
+    div.style.marginBottom = "10px";
+    div.style.borderRadius = "5px";
     div.innerHTML = `
         <div class="form-group">
             <label>Nombre</label>
@@ -306,7 +301,6 @@ function addReferenceItem(refData = null) {
             <input type="tel" class="form-control ref-telefono" value="${refData?.telefono || ''}">
         </div>
         <button class="btn btn-sm btn-danger ref-remove"><i class="fas fa-trash"></i> Eliminar</button>
-        <hr>
     `;
     container.appendChild(div);
     updateCVPreview();
@@ -336,7 +330,7 @@ function updateCVPreview() {
     // Habilidades
     const skillsList = document.getElementById('cvSkills');
     const selectedSkills = getSkillsFromInputs();
-    skillsList.innerHTML = selectedSkills.map(s => `<span class="skill-tag" style="background:${selectedColor}; color:white; padding:2px 8px; border-radius:10px; margin:2px; display:inline-block;">${s}</span>`).join('') || 'Sin habilidades';
+    skillsList.innerHTML = selectedSkills.map(s => `<span class="skill-tag" style="background:${selectedColor}; color:white; padding:2px 8px; border-radius:10px; margin:2px; display:inline-block; font-size:0.85em;">${s}</span>`).join('') || '<small>Sin habilidades</small>';
 
     // Experiencia
     const expList = document.getElementById('cvExperience');
@@ -346,7 +340,8 @@ function updateCVPreview() {
         const cargo = item.querySelector('.exp-cargo').value;
         if (empresa || cargo) {
             const div = document.createElement('div');
-            div.innerHTML = `<strong>${cargo}</strong> en <em>${empresa}</em><br><small>${item.querySelector('.exp-inicio').value} - ${item.querySelector('.exp-fin').value}</small>`;
+            div.style.marginBottom = "10px";
+            div.innerHTML = `<strong>${cargo}</strong> en <em>${empresa}</em><br><small>${item.querySelector('.exp-inicio').value} - ${item.querySelector('.exp-fin').value}</small><br><p style="margin:0; font-size:0.9em;">${item.querySelector('.exp-responsabilidades').value}</p>`;
             expList.appendChild(div);
         }
     });
@@ -366,9 +361,9 @@ function updateCVPreview() {
     // Foto
     const cvPhoto = document.getElementById('cvPhoto');
     if (fotoURL) {
-        cvPhoto.innerHTML = `<img src="${fotoURL}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+        cvPhoto.innerHTML = `<img src="${fotoURL}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
     } else {
-        cvPhoto.innerHTML = `<i class="fas fa-user-circle" style="font-size: 80px;"></i>`;
+        cvPhoto.innerHTML = `<i class="fas fa-user-circle" style="font-size: 80px; color: #ccc;"></i>`;
     }
 
     updateCVStyling();
@@ -384,5 +379,7 @@ function updateCVStyling() {
 }
 
 function changeTemplate() {
-    selectedTemplate 
+    selectedTemplate = document.getElementById('templateSelect').value;
+    const cvTemplate = document.getElementById('cvTemplate');
+    cvTemplate.className = `cv-template ${selectedTemplat
 (Content truncated due to size limit. Use line ranges to read remaining content)
