@@ -3,9 +3,820 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Builder Pro - Creador de Currículum</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>CV Builder Pro by Wilbert CM- Creador de Currículum</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* =====================================
+        ESTILOS COMPLETOS - CV BUILDER PRO
+        ===================================== */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* =====================================
+        HEADER
+        ===================================== */
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 32px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .user-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* =====================================
+        MAIN CONTENT - GRID LAYOUT
+        ===================================== */
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+        
+        /* =====================================
+        SIDEBAR - FORMULARIO
+        ===================================== */
+        
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .sidebar-header {
+            margin: 20px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 18px;
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .form-section {
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            color: #333;
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+        
+        /* =====================================
+        FOTO DE PERFIL
+        ===================================== */
+        
+        #fotoPreview {
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #ced4da;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #fotoPreview:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        
+        #fotoPreview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        #fotoPreview i {
+            font-size: 32px;
+            color: #6c757d;
+        }
+        
+        /* =====================================
+        DOCUMENTOS
+        ===================================== */
+        
+        .document-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .file-info {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .file-info.has-file {
+            color: #28a745;
+            font-weight: 500;
+        }
+        
+        .file-info i {
+            margin-right: 5px;
+        }
+        
+        /* =====================================
+        VALIDACIÓN DE CÉDULA
+        ===================================== */
+        
+        .validation-message {
+            margin-top: 8px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            display: none;
+        }
+        
+        .validation-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .validation-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* =====================================
+        CV PREVIEW
+        ===================================== */
+        
+        .cv-preview {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .preview-header h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .preview-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .cv-container {
+            background: white;
+            padding: 30px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* =====================================
+        CV TEMPLATE - ESTILOS BASE
+        ===================================== */
+        
+        .cv-template {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cv-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .cv-photo {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 15px;
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            overflow: hidden;
+        }
+        
+        .cv-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .cv-photo i {
+            font-size: 64px;
+            color: #6c757d;
+        }
+        
+        .cv-name {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+        
+        .cv-contact {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .cv-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .cv-contact-item i {
+            font-size: 12px;
+            color: #667eea;
+        }
+        
+        .cv-section {
+            margin-bottom: 25px;
+        }
+        
+        .cv-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+            color: #667eea;
+        }
+        
+        /* =====================================
+        EDUCACIÓN
+        ===================================== */
+        
+        #cvEducation .education-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-left: 3px solid #667eea;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .edu-header {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        
+        .edu-icon {
+            font-size: 28px;
+            min-width: 35px;
+            text-align: center;
+        }
+        
+        .edu-content {
+            flex: 1;
+        }
+        
+        .edu-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 3px;
+            color: #333;
+        }
+        
+        .edu-institution {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 3px;
+        }
+        
+        .edu-period {
+            font-size: 13px;
+            color: #777;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .edu-type {
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .edu-detail {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #666;
+            padding-left: 10px;
+            border-left: 2px solid #dee2e6;
+            font-style: italic;
+        }
+        
+        /* =====================================
+        HABILIDADES
+        ===================================== */
+        
+        #cvSkills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .skill-tag {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .no-data {
+            color: #6c757d;
+            font-style: italic;
+            font-size: 14px;
+        }
+        
+        /* =====================================
+        EXPERIENCIA LABORAL
+        ===================================== */
+        
+        #cvExperience .experience-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-left: 3px solid #667eea;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .exp-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .exp-period {
+            font-size: 13px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .exp-responsibilities ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #555;
+        }
+        
+        .exp-responsibilities li {
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+        
+        /* =====================================
+        REFERENCIAS
+        ===================================== */
+        
+        #cvReferences .reference-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            background: #f8f9fa;
+        }
+        
+        .ref-name {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .ref-position {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .ref-contact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .ref-contact span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .ref-contact i {
+            color: #667eea;
+            font-size: 12px;
+        }
+        
+        /* =====================================
+        INPUTS DINÁMICOS
+        ===================================== */
+        
+        .skill-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .skill-input-group .form-control {
+            flex: 1;
+        }
+        
+        .periodo-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .periodo-group input {
+            flex: 1;
+            min-width: 100px;
+        }
+        
+        .periodo-group span {
+            color: #666;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        /* =====================================
+        SUGERENCIAS DE HABILIDADES
+        ===================================== */
+        
+        .skill-suggestions-section {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            margin-top: 15px;
+        }
+        
+        .skill-suggestions-section h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        #suggestionsGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .suggestion-btn {
+            padding: 6px 10px;
+            background: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: left;
+            transition: all 0.2s;
+            color: #495057;
+        }
+        
+        .suggestion-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+        }
+        
+        .suggestion-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* =====================================
+        TOAST NOTIFICATION
+        ===================================== */
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast i {
+            font-size: 20px;
+        }
+        
+        /* =====================================
+        LOADING OVERLAY
+        ===================================== */
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-overlay p {
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        /* =====================================
+        COLOR PICKER
+        ===================================== */
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid white;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.active {
+            border: 3px solid #333;
+            transform: scale(1.15);
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* =====================================
+        RESPONSIVE DESIGN
+        ===================================== */
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .user-controls {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            
+            .cv-contact {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .periodo-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .periodo-group span {
+                text-align: center;
+            }
+            
+            #suggestionsGrid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -15,6 +826,13 @@
                 <h1>CV Builder Pro</h1>
             </div>
             <div class="user-controls">
+                <button class="btn btn-success" id="exportDataBtn" title="Exportar configuración completa">
+                    <i class="fas fa-file-export"></i> Exportar Datos
+                </button>
+                <button class="btn btn-warning" id="importDataBtn" title="Importar configuración">
+                    <i class="fas fa-file-import"></i> Importar Datos
+                </button>
+                <input type="file" id="importFileInput" style="display:none;" accept=".json">
                 <button class="btn btn-primary" id="exportBtn">
                     <i class="fas fa-download"></i> Exportar PDF
                 </button>
@@ -53,7 +871,7 @@
                     </div>
                     <div class="form-group">
                         <label>Foto de Perfil</label>
-                        <div id="fotoPreview" style="width:80px; height:80px; border:1px dashed #ccc; margin-bottom:10px; display:flex; align-items:center; justify-content:center;">
+                        <div id="fotoPreview">
                             <i class="fas fa-camera"></i>
                         </div>
                         <input type="file" id="foto" style="display:none;" accept="image/*">
@@ -65,35 +883,20 @@
                     <h2><i class="fas fa-graduation-cap"></i> Estudios</h2>
                 </div>
                 <div class="form-section">
-                    <div class="form-group">
-                        <label for="nivelEstudio">Nivel</label>
-                        <select id="nivelEstudio" class="form-control">
-                            <option value="">Seleccione...</option>
-                            <option value="Bachillerato">Bachillerato</option>
-                            <option value="Universitario">Universitario</option>
-                            <option value="Técnico">Técnico</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="institucion">Institución</label>
-                        <input type="text" id="institucion" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="titulo">Título</label>
-                        <input type="text" id="titulo" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="anioGraduacion">Año</label>
-                        <input type="number" id="anioGraduacion" class="form-control">
-                    </div>
+                    <div id="educationContainer"></div>
+                    <button class="btn btn-secondary btn-block" id="addEducationBtn">
+                        <i class="fas fa-plus"></i> Agregar Estudio
+                    </button>
                 </div>
 
                 <div class="sidebar-header">
-                    <h2><i class="fas fa-briefcase"></i> Experiencia</h2>
+                    <h2><i class="fas fa-briefcase"></i> Experiencia Laboral</h2>
                 </div>
                 <div class="form-section">
                     <div id="experienceContainer"></div>
-                    <button class="btn btn-secondary btn-block" id="addExperienceBtn">Agregar Experiencia</button>
+                    <button class="btn btn-secondary btn-block" id="addExperienceBtn">
+                        <i class="fas fa-plus"></i> Agregar Experiencia
+                    </button>
                 </div>
 
                 <div class="sidebar-header">
@@ -101,6 +904,17 @@
                 </div>
                 <div class="form-section">
                     <div id="skillsContainer"></div>
+                    <button class="btn btn-secondary btn-block" id="addSkillBtn">
+                        <i class="fas fa-plus"></i> Agregar Habilidad
+                    </button>
+                    
+                    <!-- Sugerencias de habilidades -->
+                    <div class="skill-suggestions-section">
+                        <h4>
+                            <i class="fas fa-lightbulb"></i> Sugerencias populares:
+                        </h4>
+                        <div id="suggestionsGrid"></div>
+                    </div>
                 </div>
 
                 <div class="sidebar-header">
@@ -108,7 +922,9 @@
                 </div>
                 <div class="form-section">
                     <div id="referencesContainer"></div>
-                    <button class="btn btn-secondary btn-block" id="addReferenceBtn">Agregar Referencia</button>
+                    <button class="btn btn-secondary btn-block" id="addReferenceBtn">
+                        <i class="fas fa-plus"></i> Agregar Referencia
+                    </button>
                 </div>
 
                 <div class="sidebar-header">
@@ -151,15 +967,16 @@
                 <div class="form-section">
                     <div class="form-group">
                         <label>Color</label>
-                        <div class="color-picker" style="display:flex; gap:10px;">
-                            <button class="color-option active" data-color="#FFD700" style="background:#FFD700; width:25px; height:25px; border-radius:50%; border:2px solid #fff; cursor:pointer;"></button>
-                            <button class="color-option" data-color="#228B22" style="background:#228B22; width:25px; height:25px; border-radius:50%; border:2px solid #fff; cursor:pointer;"></button>
-                            <button class="color-option" data-color="#1E90FF" style="background:#1E90FF; width:25px; height:25px; border-radius:50%; border:2px solid #fff; cursor:pointer;"></button>
-                            <button class="color-option" data-color="#9370DB" style="background:#9370DB; width:25px; height:25px; border-radius:50%; border:2px solid #fff; cursor:pointer;"></button>
+                        <div class="color-picker">
+                            <button class="color-option active" data-color="#667eea" style="background:#667eea;"></button>
+                            <button class="color-option" data-color="#FFD700" style="background:#FFD700;"></button>
+                            <button class="color-option" data-color="#228B22" style="background:#228B22;"></button>
+                            <button class="color-option" data-color="#1E90FF" style="background:#1E90FF;"></button>
+                            <button class="color-option" data-color="#9370DB" style="background:#9370DB;"></button>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Diseño</label>
+                        <label>Template</label>
                         <select id="templateSelect" class="form-control">
                             <option value="classic">Clásico</option>
                             <option value="modern">Moderno</option>
@@ -170,45 +987,71 @@
             </aside>
 
             <main class="cv-preview">
-                <div class="preview-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2>Vista Previa</h2>
+                <div class="preview-header">
+                    <h2><i class="fas fa-eye"></i> Vista Previa del CV</h2>
                     <div class="preview-actions">
-                        <button class="btn btn-success" id="saveBtn">Guardar Datos</button>
-                        <button class="btn btn-info" id="clearBtn">Limpiar</button>
+                        <button class="btn btn-success" id="saveBtn">
+                            <i class="fas fa-save"></i> Guardar Datos
+                        </button>
+                        <button class="btn btn-secondary" id="clearBtn">
+                            <i class="fas fa-trash"></i> Limpiar Todo
+                        </button>
                     </div>
                 </div>
 
-                <div class="cv-container" id="cvContainer">
+                <div class="cv-container">
                     <div class="cv-template classic" id="cvTemplate">
                         <div class="cv-header">
-                            <div class="cv-photo" id="cvPhoto"></div>
-                            <div class="cv-name" id="cvName">Nombre</div>
+                            <div class="cv-photo" id="cvPhoto">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="cv-name" id="cvName">Tu Nombre Completo</div>
                             <div class="cv-contact">
-                                <span id="cvCedula">Cédula</span> | 
-                                <span id="cvDireccion">Dirección</span> | 
-                                <span id="cvTelefono">Teléfono</span> | 
-                                <span id="cvEmail">Correo</span>
+                                <div class="cv-contact-item">
+                                    <i class="fas fa-id-card"></i>
+                                    <span id="cvCedula">XXXXXXXX</span>
+                                </div>
+                                <div class="cv-contact-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span id="cvDireccion">Dirección</span>
+                                </div>
+                                <div class="cv-contact-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span id="cvTelefono">Teléfono</span>
+                                </div>
+                                <div class="cv-contact-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span id="cvEmail">Correo</span>
+                                </div>
                             </div>
                         </div>
+                        
                         <div class="cv-section">
-                            <h3>Educación</h3>
-                            <div id="educationItem">
-                                <div id="educationTitle" style="font-weight:bold;"></div>
-                                <div id="educationInstitution"></div>
-                                <div id="educationYear"></div>
+                            <h3><i class="fas fa-graduation-cap"></i> Educación</h3>
+                            <div id="cvEducation">
+                                <p class="no-data">Sin estudios registrados</p>
                             </div>
                         </div>
+                        
                         <div class="cv-section">
-                            <h3>Experiencia</h3>
-                            <div id="cvExperience"></div>
+                            <h3><i class="fas fa-briefcase"></i> Experiencia Laboral</h3>
+                            <div id="cvExperience">
+                                <p class="no-data">Sin experiencia laboral registrada</p>
+                            </div>
                         </div>
+                        
                         <div class="cv-section">
-                            <h3>Habilidades</h3>
-                            <div id="cvSkills"></div>
+                            <h3><i class="fas fa-star"></i> Habilidades</h3>
+                            <div id="cvSkills">
+                                <span class="no-data">Sin habilidades registradas</span>
+                            </div>
                         </div>
+                        
                         <div class="cv-section">
-                            <h3>Referencias</h3>
-                            <div id="cvReferences"></div>
+                            <h3><i class="fas fa-user-check"></i> Referencias</h3>
+                            <div id="cvReferences">
+                                <p class="no-data">Sin referencias registradas</p>
+                            </div>
                         </div>
                     </div>
                 </div>

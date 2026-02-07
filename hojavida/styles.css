@@ -7,8 +7,8 @@
     --primary-red: #FF6B6B;
     --bg-dark: #1a1a2e;
     --bg-light: #16213e;
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
+    --text-primary: #4822d4;
+    --text-secondary: #0a0a0a;
     --border-color: rgba(255, 255, 255, 0.1);
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
@@ -904,4 +904,171 @@ body {
         box-shadow: none !important;
         padding: 30px !important;
     }
+
+    .cv-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.cv-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cv-contact-item i {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Estilos para sugerencias de habilidades */
+.skill-suggestions-section {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.skill-suggestions-section h4 {
+    margin: 0 0 10px 0;
+    font-weight: 600;
+    color: #495057;
+}
+
+#suggestionsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.suggestion-btn {
+    padding: 6px 10px;
+    background: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    text-align: left;
+    transition: all 0.2s;
+    color: #495057;
+}
+
+.suggestion-btn:hover {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.suggestion-btn:active {
+    transform: translateY(0);
+}
+/* Estilos para Educación */
+.education-item {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-left: 3px solid #007bff;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.edu-header {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.edu-icon {
+    font-size: 24px;
+    min-width: 30px;
+    text-align: center;
+}
+
+.edu-content {
+    flex: 1;
+}
+
+.edu-title {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 3px;
+    color: #333;
+}
+
+.edu-institution {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 3px;
+}
+
+.edu-period {
+    font-size: 13px;
+    color: #777;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.edu-type {
+    background: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.edu-detail {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #666;
+    padding-left: 10px;
+    border-left: 2px solid #dee2e6;
+    font-style: italic;
+}
+
+.periodo-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.periodo-group input {
+    flex: 1;
+    min-width: 100px;
+}
+
+.periodo-group span {
+    color: #666;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.edu-remove {
+    margin-top: 10px;
+    width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .edu-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .periodo-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .periodo-group span {
+        text-align: center;
+    }
+}
 }
