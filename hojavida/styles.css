@@ -1072,3 +1072,25 @@ body {
     }
 }
 }
+/* Agregar en tu sección de estilos o en el <style> */
+.documents-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.document-item {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.document-item img {
+    max-height: 400px;
+    object-fit: contain;
+}
+
+@media print {
+    .document-item {
+        page-break-inside: avoid;
+    }
+}

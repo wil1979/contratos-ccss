@@ -1233,11 +1233,84 @@ function updateCVPreview() {
             cvPhoto.innerHTML = `<i class="fas fa-user-circle"></i>`;
         }
     }
-}
+    // ... (código existente de updateCVPreview) ...
 
 // =====================================
-// TEMPLATES Y ESTILOS
+// AGREGAR ESTO AL FINAL DE updateCVPreview()
 // =====================================
+
+// Renderizar documentos adjuntos
+const docsSection = document.getElementById('cvDocumentsSection');
+const docsList = document.getElementById('cvDocumentsList');
+
+if (docsSection && docsList) {
+    let docsHTML = '';
+    let hasDocs = false;
+    
+    // Función helper para agregar documento
+    const addDocToPreview = (doc, label) => {
+        if (doc && doc.url) {
+            hasDocs = true;
+            const isImage = doc.type.startsWith('image/');
+            
+            if (isImage) {
+                docsHTML += `
+                    <div class="document-item" style="margin-bottom: 20px; page-break-inside: avoid;">
+                        <div class="doc-label" style="font-weight: bold; margin-bottom: 8px; color: ${selectedColor};">
+                            📎 ${label}: ${doc.name}
+                        </div>
+                        <img src="${doc.url}" 
+                             alt="${doc.name}" 
+                             style="width: 100%; max-width: 500px; border: 1px solid #ddd; border-radius: 4px; display: block;">
+                    </div>
+                `;
+            } else {
+                // Para PDFs u otros archivos, mostrar icono
+                docsHTML += `
+                    <div class="document-item" style="margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-left: 3px solid ${selectedColor};">
+                        <div style="font-weight: bold; color: ${selectedColor};">📄 ${label}</div>
+                        <div style="font-size: 0.9em; color: #666;">${doc.name}</div>
+                        <div style="font-size: 0.8em; color: #999;">${formatFileSize(doc.size)}</div>
+                    </div>
+                `;
+            }
+        }
+    };
+    
+    // Cédula
+    addDocToPreview(documents.cedula, 'Cédula');
+    
+    // Diplomas
+    if (documents.diplomas && documents.diplomas.length > 0) {
+        documents.diplomas.forEach((doc, index) => {
+            addDocToPreview(doc, `Diploma ${index + 1}`);
+        });
+    }
+    
+    // Recomendaciones
+    if (documents.recomendaciones && documents.recomendaciones.length > 0) {
+        documents.recomendaciones.forEach((doc, index) => {
+            addDocToPreview(doc, `Recomendación ${index + 1}`);
+        });
+    }
+    
+    // Otros documentos
+    if (documents.otros && documents.otros.length > 0) {
+        documents.otros.forEach((doc, index) => {
+            addDocToPreview(doc, `Documento ${index + 1}`);
+        });
+    }
+    
+    if (hasDocs) {
+        docsSection.style.display = 'block';
+        docsList.innerHTML = docsHTML;
+    } else {
+        docsSection.style.display = 'none';
+        docsList.innerHTML = '';
+    }
+}
+}
+
 
 function changeTemplate() {
     selectedTemplate = document.getElementById('templateSelect').value;
@@ -1262,6 +1335,14 @@ function updateCVStyling() {
     const educationItems = document.querySelectorAll('.cv-education-item');
     const experienceItems = document.querySelectorAll('.cv-experience-item'); // ← Clase diferente
     const referenceItems = document.querySelectorAll('.cv-reference-item'); // ← Clase diferente
+
+    // En updateCVStyling, agrega:
+    const docItems = document.querySelectorAll('.doc-item');
+    docItems.forEach(item => {
+    item.style.marginBottom = '5px';
+    item.style.fontSize = '0.9em';
+    item.style.color = '#555';
+    });
     
     if (cvName) cvName.style.color = selectedColor;
     
