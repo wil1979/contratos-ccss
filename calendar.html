@@ -1118,10 +1118,10 @@
           <label class="form-label" for="tipoTurno">Turno</label>
           <select class="form-select" id="tipoTurno">
             <option value="">-- Ninguno --</option>
-            <option value="turno_normal">☀️ Normal 08:00-17:00</option>
-            <option value="turno_mixta">🌤️ Mixta 07:00-14:00</option>
-            <option value="turno_nocturna">🌙 Nocturna 22:00-08:00</option>
-            <option value="turno_festivo">🎄 Festivo 09:00-14:00</option>
+            <option value="turno_normal">☀️ Normal 06:00-14:00</option>
+            <option value="turno_mixta">🌤️ Mixta 14:00-22:00</option>
+            <option value="turno_nocturna">🌙 Nocturna 22:00-06:00</option>
+            <option value="turno_festivo">🎄 Festivo </option>
             <option value="turno_extra">⚡ Extraordinarias</option>
           </select>
           <span class="form-hint">Solo para días laborados</span>
@@ -1235,14 +1235,13 @@
       dia_banco: { label: 'Día Banco', icon: '🏦', horas: false }
     };
 
-    const TURNOS = {
-      turno_normal: { label: 'Normal', horas: 8, rango: '08:00-17:00' },
-      turno_mixta: { label: 'Mixta', horas: 7, rango: '07:00-14:00' },
-      turno_nocturna: { label: 'Nocturna', horas: 10, rango: '22:00-08:00' },
-      turno_festivo: { label: 'Festivo', horas: 5, rango: '09:00-14:00' },
+   const TURNOS = {
+      turno_normal: { label: 'Normal', horas: 8, rango: '06:00-14:00' },
+      turno_mixta: { label: 'Mixta', horas: 7, rango: '14:00-22:00' },
+      turno_nocturna: { label: 'Nocturna', horas: 10, rango: '22:00-06:00' },
+      turno_festivo: { label: 'Festivo', horas: 5, rango: 'Variable' },
       turno_extra: { label: 'Extra', horas: 0, rango: 'Variable' }
     };
-
     // ============================================
     // ESTADO GLOBAL
     // ============================================
