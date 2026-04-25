@@ -20,7 +20,6 @@
       --danger: #dc2626;
       --info: #0891b2;
       --purple: #7c3aed;
-      --pink: #db2777;
       
       --bg-body: #f8fafc;
       --bg-card: #ffffff;
@@ -44,6 +43,7 @@
       
       --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       
+      /* Colores de turnos */
       --turno-normal: #dbeafe;
       --turno-normal-border: #2563eb;
       --turno-mixta: #fef3c7;
@@ -51,6 +51,7 @@
       --turno-nocturna: #ede9fe;
       --turno-nocturna-border: #7c3aed;
       
+      /* Colores de estados */
       --estado-laborado: #d1fae5;
       --estado-laborado-border: #059669;
       --estado-no-laborado: #fee2e2;
@@ -123,16 +124,18 @@
       width: 100%;
       max-width: 1200px;
       margin: 0 auto;
-      padding: 1rem;
+      padding: 0.75rem;
     }
     @media (min-width: 768px) { .container { padding: 1.5rem; } }
 
-    /* Header */
+    /* ============================================
+       HEADER
+       ============================================ */
     .app-header {
       background: var(--bg-card);
       border-bottom: 1px solid var(--border);
-      padding: 1rem 0;
-      margin-bottom: 1.5rem;
+      padding: 0.75rem 0;
+      margin-bottom: 1rem;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -146,26 +149,26 @@
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 0.75rem;
     }
 
-    .brand { display: flex; align-items: center; gap: 0.75rem; }
-    .brand-icon { font-size: 2rem; line-height: 1; }
-    .brand-title { font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
-    .brand-subtitle { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+    .brand { display: flex; align-items: center; gap: 0.5rem; }
+    .brand-icon { font-size: 1.5rem; line-height: 1; }
+    .brand-title { font-size: 1.125rem; font-weight: 700; line-height: 1.2; }
+    .brand-subtitle { font-size: 0.6875rem; color: var(--text-muted); font-weight: 500; }
 
     .user-profile {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem 1rem;
+      gap: 0.5rem;
+      padding: 0.375rem 0.75rem;
       background: var(--bg-hover);
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
     }
     .user-avatar {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--primary), var(--purple));
       display: flex;
@@ -173,7 +176,7 @@
       justify-content: center;
       color: white;
       font-weight: 700;
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       flex-shrink: 0;
     }
     .user-info { display: none; }
@@ -185,10 +188,10 @@
     .sync-status {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.25rem 0.75rem;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem;
       border-radius: var(--radius-sm);
-      font-size: 0.75rem;
+      font-size: 0.6875rem;
       font-weight: 600;
       transition: var(--transition);
     }
@@ -210,12 +213,14 @@
       50% { opacity: 0.6; }
     }
 
-    /* Controles */
+    /* ============================================
+       CONTROLES
+       ============================================ */
     .controls-bar {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
     }
     @media (min-width: 768px) {
       .controls-bar { flex-direction: row; align-items: center; justify-content: space-between; }
@@ -226,15 +231,15 @@
       align-items: center;
       gap: 0.5rem;
       background: var(--bg-card);
-      padding: 0.5rem;
+      padding: 0.375rem;
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
       box-shadow: var(--shadow-sm);
     }
 
     .btn-icon {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border: none;
       background: transparent;
       color: var(--text-secondary);
@@ -243,7 +248,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.25rem;
+      font-size: 1.125rem;
       transition: var(--transition);
       touch-action: manipulation;
     }
@@ -256,11 +261,12 @@
     .btn-icon:active { transform: scale(0.95); }
 
     .month-display {
-      min-width: 180px;
+      min-width: 140px;
       text-align: center;
       font-weight: 700;
-      font-size: 1.125rem;
-      padding: 0 0.5rem;
+      font-size: 1rem;
+      color: var(--text-primary);
+      padding: 0 0.25rem;
     }
 
     .view-filters {
@@ -275,7 +281,7 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 0.5rem 2rem 0.5rem 0.75rem;
+      padding: 0.5rem 1.75rem 0.5rem 0.625rem;
       font-size: 0.875rem;
       color: var(--text-primary);
       cursor: pointer;
@@ -291,7 +297,7 @@
     }
 
     .btn-toggle {
-      padding: 0.5rem 1rem;
+      padding: 0.5rem 0.875rem;
       border: 1px solid var(--border);
       background: var(--bg-card);
       color: var(--text-secondary);
@@ -302,7 +308,7 @@
       transition: var(--transition);
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.375rem;
       touch-action: manipulation;
     }
     .btn-toggle:hover, .btn-toggle:focus-visible {
@@ -317,7 +323,9 @@
       border-color: var(--primary);
     }
 
-    /* Calendario */
+    /* ============================================
+       CALENDARIO - GRID CORREGIDO
+       ============================================ */
     .calendar-wrapper {
       background: var(--bg-card);
       border-radius: var(--radius-lg);
@@ -327,6 +335,11 @@
       margin-bottom: 1.5rem;
     }
 
+    /* 
+       SOLUCIÓN CLAVE: Grid de 7 columnas fijas.
+       Cada celda ocupa 1/7 del ancho.
+       No usamos filas intermedias, todo es grid directo.
+    */
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -334,91 +347,142 @@
       background: var(--border);
     }
 
+    /* Headers de días - ocupan toda la fila implícitamente */
     .day-header {
       background: var(--bg-card);
-      padding: 0.75rem 0.25rem;
+      padding: 0.5rem 0.125rem;
       text-align: center;
       font-weight: 600;
-      font-size: 0.75rem;
+      font-size: 0.625rem;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.03em;
+      line-height: 1.2;
     }
     .day-header abbr { text-decoration: none; border-bottom: none; }
+
+    @media (min-width: 640px) {
+      .day-header { padding: 0.75rem 0.25rem; font-size: 0.75rem; }
+    }
     @media (min-width: 768px) {
       .day-header { padding: 1rem; font-size: 0.875rem; }
     }
 
+    /* Celdas de días */
     .day-cell {
       background: var(--bg-card);
-      min-height: 80px;
-      padding: 0.5rem;
+      min-height: 70px;
+      padding: 0.375rem;
       position: relative;
       cursor: pointer;
       transition: var(--transition);
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0.125rem;
       touch-action: manipulation;
+      overflow: hidden;
+    }
+    @media (min-width: 640px) {
+      .day-cell { min-height: 90px; padding: 0.5rem; }
     }
     @media (min-width: 768px) {
       .day-cell { min-height: 110px; padding: 0.75rem; }
     }
+
     .day-cell:hover:not(.empty):not(.disabled) {
       background: var(--bg-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       z-index: 2;
     }
     .day-cell:focus-visible {
-      outline: 3px solid var(--border-focus);
-      outline-offset: -3px;
+      outline: 2px solid var(--border-focus);
+      outline-offset: -2px;
       z-index: 3;
     }
-    .day-cell.empty { background: var(--bg-body); cursor: default; }
-    .day-cell.disabled { opacity: 0.4; cursor: not-allowed; background: var(--bg-body); }
-    .day-cell.today { background: var(--primary-light); }
+    .day-cell.empty {
+      background: var(--bg-body);
+      cursor: default;
+    }
+    .day-cell.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: var(--bg-body);
+    }
+    .day-cell.today {
+      background: var(--primary-light);
+    }
     .day-cell.today .day-number {
       background: var(--primary);
       color: white;
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
       font-weight: 700;
+      font-size: 0.75rem;
     }
-    .day-number { font-size: 0.875rem; font-weight: 600; line-height: 1; }
+    @media (min-width: 768px) {
+      .day-cell.today .day-number { width: 28px; height: 28px; font-size: 0.875rem; }
+    }
+
+    .day-number {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 0.125rem;
+    }
+    @media (min-width: 768px) {
+      .day-number { font-size: 0.875rem; }
+    }
     .day-weekend .day-number { color: var(--danger); }
 
+    /* Indicadores - compactos en móvil */
     .day-indicators {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
       flex: 1;
       justify-content: flex-start;
-      margin-top: 0.25rem;
+      min-width: 0; /* Importante para text-overflow */
     }
 
     .day-badge {
-      font-size: 0.625rem;
-      padding: 2px 4px;
-      border-radius: 4px;
+      font-size: 0.5625rem; /* 9px */
+      padding: 1px 2px;
+      border-radius: 3px;
       font-weight: 600;
       text-align: center;
-      line-height: 1.2;
+      line-height: 1.3;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    @media (min-width: 640px) {
+      .day-badge { font-size: 0.625rem; padding: 2px 4px; }
     }
     @media (min-width: 768px) {
       .day-badge { font-size: 0.6875rem; padding: 3px 6px; }
     }
 
-    .day-badge.turno-normal { background: var(--turno-normal); color: var(--turno-normal-border); border: 1px solid var(--turno-normal-border); }
-    .day-badge.turno-mixta { background: var(--turno-mixta); color: var(--turno-mixta-border); border: 1px solid var(--turno-mixta-border); }
-    .day-badge.turno-nocturna { background: var(--turno-nocturna); color: var(--turno-nocturna-border); border: 1px solid var(--turno-nocturna-border); }
+    .day-badge.turno-normal { 
+      background: var(--turno-normal); 
+      color: var(--turno-normal-border);
+      border: 1px solid var(--turno-normal-border);
+    }
+    .day-badge.turno-mixta { 
+      background: var(--turno-mixta); 
+      color: var(--turno-mixta-border);
+      border: 1px solid var(--turno-mixta-border);
+    }
+    .day-badge.turno-nocturna { 
+      background: var(--turno-nocturna); 
+      color: var(--turno-nocturna-border);
+      border: 1px solid var(--turno-nocturna-border);
+    }
     .day-badge.estado-laborado { background: var(--estado-laborado); color: var(--estado-laborado-border); }
     .day-badge.estado-no-laborado { background: var(--estado-no-laborado); color: var(--estado-no-laborado-border); }
     .day-badge.estado-libre1 { background: var(--estado-libre1); color: var(--estado-libre1-border); }
@@ -430,60 +494,147 @@
 
     .day-comment-icon {
       position: absolute;
-      bottom: 4px;
-      right: 4px;
-      font-size: 0.875rem;
+      bottom: 2px;
+      right: 2px;
+      font-size: 0.75rem;
       opacity: 0.6;
     }
+    @media (min-width: 768px) {
+      .day-comment-icon { bottom: 4px; right: 4px; font-size: 0.875rem; }
+    }
 
-    /* Vista Semanal */
-    .week-view { display: none; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; }
+    /* ============================================
+       VISTA SEMANAL
+       ============================================ */
+    .week-view { 
+      display: none; 
+      background: var(--bg-card); 
+      border-radius: var(--radius-lg); 
+      border: 1px solid var(--border); 
+      box-shadow: var(--shadow); 
+      overflow: hidden; 
+    }
     .week-view.active { display: block; }
-    .week-header { padding: 1rem; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 1.125rem; text-align: center; background: var(--bg-hover); }
-    .week-grid { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--border); }
-    @media (min-width: 768px) { .week-grid { grid-template-columns: repeat(7, 1fr); } }
-    .week-day { background: var(--bg-card); padding: 1rem; min-height: 200px; }
-    .week-day-header { font-weight: 700; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .week-day.today .week-day-header { border-bottom-color: var(--primary); color: var(--primary); }
-    .week-day-content { display: flex; flex-direction: column; gap: 0.5rem; }
-    .week-badge { padding: 0.5rem; border-radius: var(--radius-sm); font-size: 0.875rem; font-weight: 600; text-align: center; }
-    .week-comment { font-size: 0.875rem; color: var(--text-secondary); padding: 0.5rem; background: var(--bg-hover); border-radius: var(--radius-sm); border-left: 3px solid var(--primary); }
+    .week-header { 
+      padding: 1rem; 
+      border-bottom: 1px solid var(--border); 
+      font-weight: 700; 
+      font-size: 1rem; 
+      text-align: center; 
+      background: var(--bg-hover); 
+    }
+    @media (min-width: 768px) {
+      .week-header { font-size: 1.125rem; }
+    }
+    .week-grid { 
+      display: grid; 
+      grid-template-columns: 1fr; 
+      gap: 1px; 
+      background: var(--border); 
+    }
+    @media (min-width: 768px) { 
+      .week-grid { grid-template-columns: repeat(7, 1fr); } 
+    }
+    .week-day { 
+      background: var(--bg-card); 
+      padding: 1rem; 
+      min-height: 150px; 
+    }
+    .week-day-header { 
+      font-weight: 700; 
+      margin-bottom: 0.75rem; 
+      padding-bottom: 0.5rem; 
+      border-bottom: 2px solid var(--border); 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    .week-day.today .week-day-header { 
+      border-bottom-color: var(--primary); 
+      color: var(--primary); 
+    }
+    .week-day-content { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 0.5rem; 
+    }
+    .week-badge { 
+      padding: 0.5rem; 
+      border-radius: var(--radius-sm); 
+      font-size: 0.875rem; 
+      font-weight: 600; 
+      text-align: center; 
+    }
+    .week-comment { 
+      font-size: 0.875rem; 
+      color: var(--text-secondary); 
+      padding: 0.5rem; 
+      background: var(--bg-hover); 
+      border-radius: var(--radius-sm); 
+      border-left: 3px solid var(--primary); 
+    }
 
-    /* Estadísticas */
+    /* ============================================
+       ESTADÍSTICAS - Grid responsive
+       ============================================ */
     .stats-panel {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
     }
-    @media (min-width: 640px) { .stats-panel { grid-template-columns: repeat(3, 1fr); } }
-    @media (min-width: 1024px) { .stats-panel { grid-template-columns: repeat(4, 1fr); } }
+    @media (min-width: 640px) {
+      .stats-panel { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+    }
+    @media (min-width: 1024px) {
+      .stats-panel { grid-template-columns: repeat(4, 1fr); }
+    }
 
     .stat-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1rem;
+      padding: 0.75rem;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.375rem;
       transition: var(--transition);
       position: relative;
       overflow: hidden;
+    }
+    @media (min-width: 768px) {
+      .stat-card { padding: 1rem; gap: 0.5rem; }
     }
     .stat-card::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
-      width: 4px;
+      width: 3px;
       height: 100%;
       background: var(--primary);
     }
     .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-    .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-    .stat-value { font-size: 1.5rem; font-weight: 700; line-height: 1; }
-    .stat-detail { font-size: 0.75rem; color: var(--text-secondary); }
+    .stat-label {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    @media (min-width: 768px) {
+      .stat-value { font-size: 1.5rem; }
+    }
+    .stat-detail {
+      font-size: 0.6875rem;
+      color: var(--text-secondary);
+    }
     .stat-card.laborados::before { background: var(--success); }
     .stat-card.no-laborados::before { background: var(--danger); }
     .stat-card.libres::before { background: var(--warning); }
@@ -491,60 +642,106 @@
     .stat-card.licencias::before { background: var(--text-muted); }
     .stat-card.horas::before { background: var(--purple); }
 
-    /* Leyenda */
+    /* ============================================
+       LEYENDA
+       ============================================ */
     .legend-section {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 1.25rem;
+      padding: 1rem;
       margin-bottom: 1.5rem;
     }
-    .legend-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+    @media (min-width: 768px) {
+      .legend-section { padding: 1.25rem; }
+    }
+    .legend-title { 
+      font-size: 0.9375rem; 
+      font-weight: 700; 
+      margin-bottom: 0.75rem; 
+    }
     .legend-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
-    @media (min-width: 640px) { .legend-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (min-width: 1024px) { .legend-grid { grid-template-columns: repeat(4, 1fr); } }
-    .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary); }
-    .legend-color { width: 16px; height: 16px; border-radius: 4px; border: 2px solid; flex-shrink: 0; }
+    @media (min-width: 640px) {
+      .legend-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .legend-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 2px solid;
+      flex-shrink: 0;
+    }
 
-    /* Modal */
+    /* ============================================
+       MODAL
+       ============================================ */
     .modal-overlay {
       position: fixed;
       inset: 0;
       background: var(--bg-modal);
       display: none;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
       z-index: 1000;
-      padding: 1rem;
+      padding: 0;
       backdrop-filter: blur(4px);
+    }
+    @media (min-width: 640px) {
+      .modal-overlay { align-items: center; padding: 1rem; }
     }
     .modal-overlay.active { display: flex; }
     .modal-content {
       background: var(--bg-card);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
       width: 100%;
       max-width: 500px;
-      max-height: 90vh;
+      max-height: 85vh;
       overflow-y: auto;
       box-shadow: var(--shadow-lg);
       animation: modalIn 0.3s ease-out;
     }
+    @media (min-width: 640px) {
+      .modal-content { border-radius: var(--radius-lg); max-height: 90vh; }
+    }
     @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.95) translateY(20px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
+      from { opacity: 0; transform: translateY(100%); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (min-width: 640px) {
+      @keyframes modalIn {
+        from { opacity: 0; transform: scale(0.95) translateY(20px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+      }
     }
     .modal-header {
-      padding: 1.25rem;
+      padding: 1rem;
       border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: sticky;
+      top: 0;
+      background: var(--bg-card);
+      z-index: 10;
     }
-    .modal-title { font-size: 1.125rem; font-weight: 700; }
+    .modal-title { font-size: 1rem; font-weight: 700; }
+    @media (min-width: 768px) {
+      .modal-title { font-size: 1.125rem; }
+    }
     .modal-close {
       width: 32px;
       height: 32px;
@@ -565,14 +762,22 @@
       outline: 2px solid var(--danger);
       outline-offset: 2px;
     }
-    .modal-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
-    .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .modal-body { 
+      padding: 1rem; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 1rem; 
+    }
+    @media (min-width: 768px) {
+      .modal-body { padding: 1.25rem; gap: 1.25rem; }
+    }
+    .form-group { display: flex; flex-direction: column; gap: 0.375rem; }
     .form-label { font-size: 0.875rem; font-weight: 600; }
     .form-label .required { color: var(--danger); margin-left: 2px; }
     .form-hint { font-size: 0.75rem; color: var(--text-muted); }
     .form-select, .form-textarea {
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.625rem;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       background: var(--bg-card);
@@ -586,21 +791,25 @@
       outline-offset: 2px;
       border-color: var(--primary);
     }
-    .form-textarea { resize: vertical; min-height: 100px; }
-    .char-counter { text-align: right; font-size: 0.75rem; color: var(--text-muted); }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .char-counter {
+      text-align: right;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
     .char-counter.warning { color: var(--warning); font-weight: 600; }
     .char-counter.danger { color: var(--danger); font-weight: 700; }
     .modal-footer {
-      padding: 1.25rem;
+      padding: 1rem;
       border-top: 1px solid var(--border);
       display: flex;
-      gap: 0.75rem;
+      gap: 0.5rem;
       justify-content: flex-end;
       flex-wrap: wrap;
     }
 
     .btn {
-      padding: 0.625rem 1.25rem;
+      padding: 0.5rem 1rem;
       border-radius: var(--radius-sm);
       font-size: 0.9375rem;
       font-weight: 600;
@@ -611,6 +820,11 @@
       align-items: center;
       gap: 0.5rem;
       touch-action: manipulation;
+      flex: 1;
+      justify-content: center;
+    }
+    @media (min-width: 640px) {
+      .btn { flex: 0 0 auto; padding: 0.625rem 1.25rem; }
     }
     .btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
     .btn-primary { background: var(--primary); color: white; }
@@ -620,57 +834,63 @@
     .btn-secondary { background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border); }
     .btn-secondary:hover { background: var(--border); }
 
-    /* Toasts */
+    /* ============================================
+       TOASTS
+       ============================================ */
     .toast-container {
       position: fixed;
-      top: 1rem;
-      right: 1rem;
+      top: 0.75rem;
+      right: 0.75rem;
+      left: 0.75rem;
       z-index: 10000;
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
       pointer-events: none;
     }
+    @media (min-width: 640px) {
+      .toast-container { left: auto; }
+    }
     .toast {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1rem 1.25rem;
+      padding: 0.875rem 1rem;
       box-shadow: var(--shadow-lg);
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      min-width: 300px;
-      max-width: 400px;
       animation: toastIn 0.3s ease-out;
       pointer-events: all;
     }
     @keyframes toastIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
     .toast.success { border-left: 4px solid var(--success); }
     .toast.error { border-left: 4px solid var(--danger); }
     .toast.info { border-left: 4px solid var(--info); }
 
-    /* FABs */
+    /* ============================================
+       FABs
+       ============================================ */
     .fab-container {
       position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
+      bottom: 1rem;
+      right: 1rem;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
       z-index: 50;
     }
     .fab {
-      width: 56px;
-      height: 56px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       border: none;
       background: var(--primary);
       color: white;
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       cursor: pointer;
       box-shadow: var(--shadow-lg);
       display: flex;
@@ -678,6 +898,9 @@
       justify-content: center;
       transition: var(--transition);
       touch-action: manipulation;
+    }
+    @media (min-width: 768px) {
+      .fab { width: 56px; height: 56px; font-size: 1.5rem; }
     }
     .fab:hover, .fab:focus-visible {
       transform: scale(1.1) rotate(5deg);
@@ -688,9 +911,12 @@
       background: var(--bg-card);
       color: var(--text-primary);
       border: 1px solid var(--border);
-      font-size: 1.25rem;
-      width: 48px;
-      height: 48px;
+      font-size: 1.125rem;
+      width: 44px;
+      height: 44px;
+    }
+    @media (min-width: 768px) {
+      .fab-secondary { width: 48px; height: 48px; font-size: 1.25rem; }
     }
 
     .hidden { display: none !important; }
@@ -723,10 +949,10 @@
           <div class="brand-subtitle">Firebase Edition • Sincronización en tiempo real</div>
         </div>
       </div>
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
         <div class="sync-status syncing" id="syncStatus" role="status" aria-live="polite">
           <span id="syncIcon">🔄</span>
-          <span id="syncText">Sincronizando...</span>
+          <span id="syncText">Sync...</span>
         </div>
         <div class="user-profile" role="region" aria-label="Perfil de usuario">
           <div class="user-avatar" id="userAvatar" aria-hidden="true">US</div>
@@ -753,36 +979,36 @@
       
       <div class="view-filters">
         <select class="select-custom" id="selectMes" aria-label="Seleccionar mes">
-          <option value="0">Enero</option>
-          <option value="1">Febrero</option>
-          <option value="2">Marzo</option>
-          <option value="3">Abril</option>
-          <option value="4">Mayo</option>
-          <option value="5">Junio</option>
-          <option value="6">Julio</option>
-          <option value="7">Agosto</option>
-          <option value="8">Septiembre</option>
-          <option value="9">Octubre</option>
-          <option value="10">Noviembre</option>
-          <option value="11">Diciembre</option>
+          <option value="0">Ene</option>
+          <option value="1">Feb</option>
+          <option value="2">Mar</option>
+          <option value="3">Abr</option>
+          <option value="4">May</option>
+          <option value="5">Jun</option>
+          <option value="6">Jul</option>
+          <option value="7">Ago</option>
+          <option value="8">Sep</option>
+          <option value="9">Oct</option>
+          <option value="10">Nov</option>
+          <option value="11">Dic</option>
         </select>
         
         <select class="select-custom" id="selectAnio" aria-label="Seleccionar año"></select>
         
         <button class="btn-toggle active" data-vista="mensual" aria-pressed="true">
-          <span aria-hidden="true">📅</span> Mensual
+          <span aria-hidden="true">📅</span> <span class="sr-only">Vista </span>Mensual
         </button>
         <button class="btn-toggle" data-vista="semanal" aria-pressed="false">
-          <span aria-hidden="true">📆</span> Semanal
+          <span aria-hidden="true">📆</span> <span class="sr-only">Vista </span>Semanal
         </button>
       </div>
     </nav>
 
     <section class="stats-panel" aria-label="Resumen estadístico del mes">
       <article class="stat-card laborados">
-        <span class="stat-label">Días Laborados</span>
+        <span class="stat-label">Laborados</span>
         <span class="stat-value" id="stat-laborados">0</span>
-        <span class="stat-detail" id="detalle-laborados">0 hrs estimadas</span>
+        <span class="stat-detail" id="detalle-laborados">0 hrs</span>
       </article>
       <article class="stat-card no-laborados">
         <span class="stat-label">No Laborados</span>
@@ -790,29 +1016,35 @@
         <span class="stat-detail">Ausencias</span>
       </article>
       <article class="stat-card libres">
-        <span class="stat-label">Días Libres</span>
+        <span class="stat-label">Libres</span>
         <span class="stat-value" id="stat-libres">0</span>
-        <span class="stat-detail" id="detalle-libres">Total acumulado</span>
+        <span class="stat-detail" id="detalle-libres">Total</span>
       </article>
       <article class="stat-card vacaciones">
         <span class="stat-label">Vacaciones</span>
         <span class="stat-value" id="stat-vacaciones">0</span>
-        <span class="stat-detail">Días disfrutados</span>
+        <span class="stat-detail">Días</span>
       </article>
       <article class="stat-card licencias">
         <span class="stat-label">Licencias</span>
         <span class="stat-value" id="stat-licencias">0</span>
-        <span class="stat-detail">Permisos médicos</span>
+        <span class="stat-detail">Permisos</span>
       </article>
       <article class="stat-card horas">
         <span class="stat-label">Horas Mes</span>
         <span class="stat-value" id="stat-horas">0</span>
-        <span class="stat-detail" id="detalle-horas">Total estimado</span>
+        <span class="stat-detail" id="detalle-horas">Total</span>
       </article>
     </section>
 
+    <!-- 
+      VISTA MENSUAL - GRID CORREGIDO
+      Las 7 columnas son fijas. Los headers y las celdas de días
+      fluyen naturalmente en el grid de 7 columnas.
+    -->
     <section id="vistaMensual" class="calendar-wrapper" aria-label="Vista mensual del calendario">
-      <div class="calendar-grid" role="grid" aria-label="Calendario mensual">
+      <div class="calendar-grid" id="calendarioGrid" role="grid" aria-label="Calendario mensual">
+        <!-- Los 7 headers se insertan primero, luego las celdas de días fluyen en las mismas 7 columnas -->
         <div class="day-header" role="columnheader"><abbr title="Domingo">Dom</abbr></div>
         <div class="day-header" role="columnheader"><abbr title="Lunes">Lun</abbr></div>
         <div class="day-header" role="columnheader"><abbr title="Martes">Mar</abbr></div>
@@ -820,7 +1052,7 @@
         <div class="day-header" role="columnheader"><abbr title="Jueves">Jue</abbr></div>
         <div class="day-header" role="columnheader"><abbr title="Viernes">Vie</abbr></div>
         <div class="day-header" role="columnheader"><abbr title="Sábado">Sáb</abbr></div>
-        <div id="cuerpoCalendario" role="rowgroup"></div>
+        <!-- Las celdas de días se insertan aquí vía JS -->
       </div>
     </section>
 
@@ -830,7 +1062,7 @@
     </section>
 
     <section class="legend-section" aria-label="Leyenda de tipos de día">
-      <h2 class="legend-title">Leyenda de Estados y Turnos</h2>
+      <h2 class="legend-title">Leyenda</h2>
       <div class="legend-grid">
         <div class="legend-item">
           <div class="legend-color" style="background: var(--estado-laborado); border-color: var(--estado-laborado-border);"></div>
@@ -842,15 +1074,15 @@
         </div>
         <div class="legend-item">
           <div class="legend-color" style="background: var(--estado-libre1); border-color: var(--estado-libre1-border);"></div>
-          <span>🔴 Libre Compensatorio</span>
+          <span>🔴 Libre Comp.</span>
         </div>
         <div class="legend-item">
           <div class="legend-color" style="background: var(--estado-libre2); border-color: var(--estado-libre2-border);"></div>
-          <span>🟠 Libre por Turno</span>
+          <span>🟠 Libre Turno</span>
         </div>
         <div class="legend-item">
           <div class="legend-color" style="background: var(--estado-libre3); border-color: var(--estado-libre3-border);"></div>
-          <span>🟣 Libre Administrativo</span>
+          <span>🟣 Libre Adm.</span>
         </div>
         <div class="legend-item">
           <div class="legend-color" style="background: var(--estado-vacaciones); border-color: var(--estado-vacaciones-border);"></div>
@@ -858,7 +1090,7 @@
         </div>
         <div class="legend-item">
           <div class="legend-color" style="background: var(--estado-licencia); border-color: var(--estado-licencia-border);"></div>
-          <span>🏥 Licencia Médica</span>
+          <span>🏥 Licencia</span>
         </div>
         <div class="legend-item">
           <div class="legend-color" style="background: var(--estado-feriado); border-color: var(--estado-feriado-border);"></div>
@@ -866,15 +1098,15 @@
         </div>
         <div class="legend-item">
           <div class="legend-color" style="background: var(--turno-normal); border-color: var(--turno-normal-border);"></div>
-          <span>☀️ Turno Normal (8h)</span>
+          <span>☀️ Normal (8h)</span>
         </div>
         <div class="legend-item">
           <div class="legend-color" style="background: var(--turno-mixta); border-color: var(--turno-mixta-border);"></div>
-          <span>🌤️ Jornada Mixta (7h)</span>
+          <span>🌤️ Mixta (7h)</span>
         </div>
         <div class="legend-item">
           <div class="legend-color" style="background: var(--turno-nocturna); border-color: var(--turno-nocturna-border);"></div>
-          <span>🌙 Turno Nocturno (10h)</span>
+          <span>🌙 Nocturna (10h)</span>
         </div>
       </div>
     </section>
@@ -883,7 +1115,7 @@
   <div id="modalEdicion" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="modalTitulo" class="modal-title">Editar Día: <span id="fechaModal"></span></h2>
+        <h2 id="modalTitulo" class="modal-title">Editar: <span id="fechaModal"></span></h2>
         <button class="modal-close" id="btnCerrarModal" aria-label="Cerrar modal">
           <span aria-hidden="true">✕</span>
         </button>
@@ -892,53 +1124,53 @@
       <div class="modal-body">
         <div class="form-group">
           <label class="form-label" for="tipoDia">
-            Estado del Día <span class="required" aria-hidden="true">*</span>
+            Estado <span class="required" aria-hidden="true">*</span>
           </label>
           <select class="form-select" id="tipoDia" aria-required="true">
-            <option value="">-- Seleccione estado --</option>
-            <optgroup label="Estados Laborales">
-              <option value="laborado">✅ Día Laborado</option>
-              <option value="no_laborado">❌ Día No Laborado</option>
+            <option value="">-- Seleccione --</option>
+            <optgroup label="Laborales">
+              <option value="laborado">✅ Laborado</option>
+              <option value="no_laborado">❌ No Laborado</option>
             </optgroup>
-            <optgroup label="Días Libres">
-              <option value="libre1">🔴 Libre Compensatorio</option>
-              <option value="libre2">🟠 Libre por Turno</option>
-              <option value="libre3">🟣 Libre Administrativo</option>
+            <optgroup label="Libres">
+              <option value="libre1">🔴 Compensatorio</option>
+              <option value="libre2">🟠 Por Turno</option>
+              <option value="libre3">🟣 Administrativo</option>
             </optgroup>
-            <optgroup label="Licencias y Permisos">
+            <optgroup label="Licencias">
               <option value="vacaciones">🏖️ Vacaciones</option>
-              <option value="licencia">🏥 Licencia Médica</option>
-              <option value="licencia_paternidad">👶 Licencia Paternidad</option>
-              <option value="permiso_estudio">📚 Permiso Estudio</option>
-              <option value="permiso_personal">👤 Permiso Personal</option>
+              <option value="licencia">🏥 Médica</option>
+              <option value="licencia_paternidad">👶 Paternidad</option>
+              <option value="permiso_estudio">📚 Estudio</option>
+              <option value="permiso_personal">👤 Personal</option>
             </optgroup>
             <optgroup label="Especiales">
-              <option value="feriado">🎉 Feriado Nacional</option>
-              <option value="dia_banco">🏦 Día del Banco</option>
+              <option value="feriado">🎉 Feriado</option>
+              <option value="dia_banco">🏦 Día Banco</option>
             </optgroup>
           </select>
         </div>
 
         <div class="form-group" id="grupoTurno">
-          <label class="form-label" for="tipoTurno">Turno Laboral</label>
+          <label class="form-label" for="tipoTurno">Turno</label>
           <select class="form-select" id="tipoTurno">
-            <option value="">-- Sin turno asignado --</option>
-            <option value="turno_normal">☀️ Turno Normal (08:00 - 17:00)</option>
-            <option value="turno_mixta">🌤️ Jornada Mixta (07:00 - 14:00)</option>
-            <option value="turno_nocturna">🌙 Turno Nocturna (22:00 - 08:00)</option>
-            <option value="turno_festivo">🎄 Turno Festivo (09:00 - 14:00)</option>
-            <option value="turno_extra">⚡ Horas Extraordinarias</option>
+            <option value="">-- Ninguno --</option>
+            <option value="turno_normal">☀️ Normal 08:00-17:00</option>
+            <option value="turno_mixta">🌤️ Mixta 07:00-14:00</option>
+            <option value="turno_nocturna">🌙 Nocturna 22:00-08:00</option>
+            <option value="turno_festivo">🎄 Festivo 09:00-14:00</option>
+            <option value="turno_extra">⚡ Extraordinarias</option>
           </select>
-          <span class="form-hint">Solo aplica para días laborados</span>
+          <span class="form-hint">Solo para días laborados</span>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="comentarioDia">Comentario</label>
           <textarea class="form-textarea" id="comentarioDia" 
-            placeholder="Agregue detalles sobre este día (máx. 500 caracteres)..."
+            placeholder="Detalles del día (máx. 500 caracteres)..."
             aria-describedby="contadorCaracteres hintComentario"></textarea>
           <div id="contadorCaracteres" class="char-counter" aria-live="polite">0 / 500</div>
-          <span id="hintComentario" class="form-hint">Ej: Reunión con equipo, capacitación, etc.</span>
+          <span id="hintComentario" class="form-hint">Ej: Reunión, capacitación, etc.</span>
         </div>
       </div>
       
@@ -948,7 +1180,7 @@
         </button>
         <button class="btn btn-secondary" id="btnCancelarModal">Cancelar</button>
         <button class="btn btn-primary" id="btnGuardarDia">
-          <span aria-hidden="true">💾</span> Guardar Cambios
+          <span aria-hidden="true">💾</span> Guardar
         </button>
       </div>
     </div>
@@ -977,13 +1209,11 @@
       setDoc, 
       getDoc, 
       onSnapshot, 
-      deleteDoc,
-      enableIndexedDbPersistence,
-      CACHE_SIZE_UNLIMITED
+      enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
     // ============================================
-    // CONFIGURACIÓN FIREBASE (tu proyecto original)
+    // CONFIGURACIÓN FIREBASE
     // ============================================
     const firebaseConfig = {
       apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
@@ -997,7 +1227,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Habilitar persistencia offline
     try {
       enableIndexedDbPersistence(db);
     } catch (err) {
@@ -1034,23 +1263,23 @@
     const TIPOS_DIA = {
       laborado: { label: 'Laborado', icon: '✅', horas: true },
       no_laborado: { label: 'No Laborado', icon: '❌', horas: false },
-      libre1: { label: 'Libre Compensatorio', icon: '🔴', horas: false },
-      libre2: { label: 'Libre por Turno', icon: '🟠', horas: false },
-      libre3: { label: 'Libre Administrativo', icon: '🟣', horas: false },
+      libre1: { label: 'Libre Comp.', icon: '🔴', horas: false },
+      libre2: { label: 'Libre Turno', icon: '🟠', horas: false },
+      libre3: { label: 'Libre Adm.', icon: '🟣', horas: false },
       vacaciones: { label: 'Vacaciones', icon: '🏖️', horas: false },
-      licencia: { label: 'Licencia Médica', icon: '🏥', horas: false },
-      licencia_paternidad: { label: 'Licencia Paternidad', icon: '👶', horas: false },
-      permiso_estudio: { label: 'Permiso Estudio', icon: '📚', horas: false },
-      permiso_personal: { label: 'Permiso Personal', icon: '👤', horas: false },
+      licencia: { label: 'Licencia', icon: '🏥', horas: false },
+      licencia_paternidad: { label: 'Paternidad', icon: '👶', horas: false },
+      permiso_estudio: { label: 'Estudio', icon: '📚', horas: false },
+      permiso_personal: { label: 'Personal', icon: '👤', horas: false },
       feriado: { label: 'Feriado', icon: '🎉', horas: false },
-      dia_banco: { label: 'Día del Banco', icon: '🏦', horas: false }
+      dia_banco: { label: 'Día Pago', icon: '🏦', horas: false }
     };
 
     const TURNOS = {
-      turno_normal: { label: 'Normal', horas: 8, rango: '08:00 - 17:00' },
-      turno_mixta: { label: 'Mixta', horas: 7, rango: '07:00 - 14:00' },
-      turno_nocturna: { label: 'Nocturna', horas: 10, rango: '22:00 - 08:00' },
-      turno_festivo: { label: 'Festivo', horas: 5, rango: '09:00 - 14:00' },
+      turno_normal: { label: 'Normal', horas: 8, rango: '06:00-14:00' },
+      turno_mixta: { label: 'Mixta', horas: 7, rango: '14:00-22:00' },
+      turno_nocturna: { label: 'Nocturna', horas: 10, rango: '22:00-06:00' },
+      turno_externo: { label: 'Festivo', horas: 5, rango:'Variable' },
       turno_extra: { label: 'Extra', horas: 0, rango: 'Variable' }
     };
 
@@ -1065,7 +1294,7 @@
     let usuario = null;
 
     // ============================================
-    // AUTENTICACIÓN / SESIÓN
+    // AUTENTICACIÓN
     // ============================================
     function verificarSesion() {
       try {
@@ -1073,7 +1302,6 @@
         if (usuarioGuardado) {
           usuario = JSON.parse(usuarioGuardado);
         } else {
-          // Usuario demo para pruebas sin login
           usuario = {
             cedula: "DEMO123",
             nombre: "Usuario Demo",
@@ -1091,7 +1319,7 @@
     }
 
     // ============================================
-    // SINCRONIZACIÓN FIREBASE
+    // SINCRONIZACIÓN
     // ============================================
     function actualizarEstadoSync(estado) {
       const statusEl = document.getElementById('syncStatus');
@@ -1103,29 +1331,26 @@
       switch(estado) {
         case 'online':
           iconEl.textContent = '☁️';
-          textEl.textContent = 'Sincronizado';
+          textEl.textContent = 'Sync';
           break;
         case 'offline':
           iconEl.textContent = '⚠️';
-          textEl.textContent = 'Sin conexión';
+          textEl.textContent = 'Offline';
           break;
         case 'syncing':
           iconEl.textContent = '🔄';
-          textEl.textContent = 'Sincronizando...';
+          textEl.textContent = 'Sync...';
           break;
         case 'error':
           iconEl.textContent = '❌';
-          textEl.textContent = 'Error de sync';
+          textEl.textContent = 'Error';
           break;
       }
     }
 
     function escucharCambiosMes(mes, anio) {
       if (!usuario) return;
-      
-      if (unsubscribe) {
-        unsubscribe();
-      }
+      if (unsubscribe) unsubscribe();
       
       actualizarEstadoSync('syncing');
       
@@ -1141,7 +1366,6 @@
             const data = docSnap.data();
             Object.keys(data).forEach(fecha => {
               if (data[fecha] && fecha !== 'metadata') {
-                // Verificación de seguridad
                 const datosDia = data[fecha];
                 if (!datosDia.usuario || datosDia.usuario.cedula === usuario.cedula) {
                   datosCalendario.set(fecha, {
@@ -1182,9 +1406,7 @@
         
         const docSnap = await getDoc(docRef);
         let datosMes = {};
-        if (docSnap.exists()) {
-          datosMes = docSnap.data();
-        }
+        if (docSnap.exists()) datosMes = docSnap.data();
         
         if (tipo) {
           datosMes[fechaString] = {
@@ -1202,7 +1424,6 @@
           delete datosMes[fechaString];
         }
         
-        // Metadata del documento
         datosMes.metadata = {
           usuarioCedula: usuario.cedula,
           ultimaModificacion: new Date().toISOString(),
@@ -1235,14 +1456,12 @@
         if (docSnap.exists()) {
           let datosMes = docSnap.data();
           delete datosMes[fechaString];
-          
           datosMes.metadata = {
             usuarioCedula: usuario.cedula,
             ultimaModificacion: new Date().toISOString(),
             mes,
             anio
           };
-          
           await setDoc(docRef, datosMes);
         }
         
@@ -1295,7 +1514,7 @@
       container.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
+        toast.style.transform = 'translateY(-100%)';
         setTimeout(() => toast.remove(), 300);
       }, duracion);
     }
@@ -1330,47 +1549,47 @@
     }
 
     // ============================================
-    // CALENDARIO
+    // CALENDARIO - GRID CORREGIDO
     // ============================================
     function generarCalendario() {
       const mes = fechaActual.getMonth();
       const anio = fechaActual.getFullYear();
       const primerDia = new Date(anio, mes, 1);
       const ultimoDia = new Date(anio, mes + 1, 0);
-      const diaInicio = primerDia.getDay();
+      const diaInicio = primerDia.getDay(); // 0=Dom, 1=Lun, ...
       const totalDias = ultimoDia.getDate();
       
-      const tbody = document.getElementById('cuerpoCalendario');
-      tbody.innerHTML = '';
+      const grid = document.getElementById('calendarioGrid');
       
-      let dia = 1;
-      let semanaActual = [];
+      // Eliminar solo las celdas de días (mantener los 7 headers)
+      // Los headers son los primeros 7 hijos
+      const celdasExistentes = grid.querySelectorAll('.day-cell, .day-cell-empty');
+      celdasExistentes.forEach(celda => celda.remove());
       
+      // Agregar celdas vacías antes del primer día
       for (let i = 0; i < diaInicio; i++) {
-        semanaActual.push(crearCeldaVacia());
+        grid.appendChild(crearCeldaVacia());
       }
       
-      while (dia <= totalDias) {
-        if (semanaActual.length === 7) {
-          agregarSemana(tbody, semanaActual);
-          semanaActual = [];
-        }
+      // Agregar celdas de días
+      for (let dia = 1; dia <= totalDias; dia++) {
         const fechaCompleta = new Date(anio, mes, dia);
-        semanaActual.push(crearCeldaDia(dia, fechaCompleta));
-        dia++;
+        grid.appendChild(crearCeldaDia(dia, fechaCompleta));
       }
       
-      while (semanaActual.length < 7) {
-        semanaActual.push(crearCeldaVacia());
+      // Completar la última semana con celdas vacías si es necesario
+      const totalCeldas = diaInicio + totalDias;
+      const celdasFaltantes = (7 - (totalCeldas % 7)) % 7;
+      for (let i = 0; i < celdasFaltantes; i++) {
+        grid.appendChild(crearCeldaVacia());
       }
-      if (semanaActual.length > 0) agregarSemana(tbody, semanaActual);
       
       actualizarEstadisticas();
     }
 
     function crearCeldaVacia() {
       const celda = document.createElement('div');
-      celda.className = 'day-cell empty';
+      celda.className = 'day-cell day-cell-empty';
       celda.setAttribute('role', 'gridcell');
       celda.setAttribute('aria-label', 'Día vacío');
       return celda;
@@ -1427,11 +1646,11 @@
       
       celda.innerHTML = html;
       
-      let ariaLabel = `${DIAS_SEMANA[fechaCompleta.getDay()]} ${dia} de ${MESES[fechaCompleta.getMonth()]}`;
+      let ariaLabel = `${DIAS_SEMANA[fechaCompleta.getDay()]} ${dia}`;
       if (tipoFinal && TIPOS_DIA[tipoFinal]) ariaLabel += `, ${TIPOS_DIA[tipoFinal].label}`;
       if (turno && TURNOS[turno]) ariaLabel += `, Turno ${TURNOS[turno].label}`;
-      if (feriado && !tipoDia) ariaLabel += ', Feriado Nacional';
-      if (comentario) ariaLabel += `, Comentario: ${comentario}`;
+      if (feriado && !tipoDia) ariaLabel += ', Feriado';
+      if (comentario) ariaLabel += `, ${comentario}`;
       if (!editable) ariaLabel += ', No editable';
       
       celda.setAttribute('aria-label', ariaLabel);
@@ -1449,14 +1668,6 @@
       return celda;
     }
 
-    function agregarSemana(container, celdas) {
-      const fila = document.createElement('div');
-      fila.setAttribute('role', 'row');
-      fila.style.display = 'contents';
-      celdas.forEach(celda => fila.appendChild(celda));
-      container.appendChild(fila);
-    }
-
     // ============================================
     // VISTA SEMANAL
     // ============================================
@@ -1467,11 +1678,11 @@
       const primerDiaSemana = new Date(fechaActual);
       primerDiaSemana.setDate(primerDiaSemana.getDate() - primerDiaSemana.getDay());
       
-      const opcionesFecha = { day: 'numeric', month: 'long', year: 'numeric' };
+      const opcionesFecha = { day: 'numeric', month: 'short' };
       const ultimoDiaSemana = new Date(primerDiaSemana);
       ultimoDiaSemana.setDate(ultimoDiaSemana.getDate() + 6);
       
-      titulo.textContent = `Semana del ${primerDiaSemana.toLocaleDateString('es-ES', opcionesFecha)} al ${ultimoDiaSemana.toLocaleDateString('es-ES', opcionesFecha)}`;
+      titulo.textContent = `${primerDiaSemana.toLocaleDateString('es-ES', opcionesFecha)} - ${ultimoDiaSemana.toLocaleDateString('es-ES', opcionesFecha)}`;
       
       let html = '';
       for (let i = 0; i < 7; i++) {
@@ -1490,10 +1701,10 @@
           estadoHtml += `<div class="week-badge estado-${tipoDia}">${info.icon} ${info.label}</div>`;
         }
         if (turno && TURNOS[turno]) {
-          estadoHtml += `<div class="week-badge ${turno}">⏰ ${TURNOS[turno].label} (${TURNOS[turno].rango})</div>`;
+          estadoHtml += `<div class="week-badge ${turno}">⏰ ${TURNOS[turno].label}</div>`;
         }
         if (!tipoDia && esFeriado(fechaString)) {
-          estadoHtml += `<div class="week-badge estado-feriado">🎉 Feriado Nacional</div>`;
+          estadoHtml += `<div class="week-badge estado-feriado">🎉 Feriado</div>`;
         }
         if (!tipoDia && !esFeriado(fechaString) && !(dia.getDay() === 0 || dia.getDay() === 6)) {
           estadoHtml += `<div class="week-badge" style="background: var(--bg-hover); color: var(--text-muted);">⚪ Sin registrar</div>`;
@@ -1502,7 +1713,7 @@
         html += `
           <div class="week-day ${esHoy ? 'today' : ''}">
             <div class="week-day-header">
-              <span>${DIAS_SEMANA[dia.getDay()]} ${dia.getDate()}</span>
+              <span>${DIAS_SEMANA[dia.getDay()].substring(0, 3)} ${dia.getDate()}</span>
               ${esHoy ? '<span style="color: var(--primary); font-size: 0.75rem;">HOY</span>' : ''}
             </div>
             <div class="week-day-content">
@@ -1569,14 +1780,14 @@
       const licenciasTotal = stats.licencia + stats.licencia_paternidad + stats.permiso_estudio + stats.permiso_personal;
       
       document.getElementById('stat-laborados').textContent = stats.laborado;
-      document.getElementById('detalle-laborados').textContent = `${stats.horasTotal} hrs estimadas`;
+      document.getElementById('detalle-laborados').textContent = `${stats.horasTotal} hrs`;
       document.getElementById('stat-no-laborados').textContent = stats.no_laborado;
       document.getElementById('stat-libres').textContent = libresTotal;
-      document.getElementById('detalle-libres').textContent = `C: ${stats.libre1} | T: ${stats.libre2} | A: ${stats.libre3}`;
+      document.getElementById('detalle-libres').textContent = `${stats.libre1}+${stats.libre2}+${stats.libre3}`;
       document.getElementById('stat-vacaciones').textContent = stats.vacaciones;
       document.getElementById('stat-licencias').textContent = licenciasTotal;
       document.getElementById('stat-horas').textContent = stats.horasTotal;
-      document.getElementById('detalle-horas').textContent = `${stats.laborado} días × promedio`;
+      document.getElementById('detalle-horas').textContent = `${stats.laborado} días`;
     }
 
     // ============================================
@@ -1590,7 +1801,7 @@
       const comentario = document.getElementById('comentarioDia');
       
       const fecha = new Date(fechaString);
-      fechaModal.textContent = `${dia} de ${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`;
+      fechaModal.textContent = `${dia} ${MESES[fecha.getMonth()].substring(0, 3)} ${fecha.getFullYear()}`;
       
       const datosExistentes = datosCalendario.get(fechaString) || {};
       tipoDia.value = datosExistentes.tipo || '';
@@ -1633,19 +1844,19 @@
       const comentario = document.getElementById('comentarioDia').value;
       
       if (!tipo) {
-        mostrarToast('Debe seleccionar un estado para el día', 'error');
+        mostrarToast('Seleccione un estado', 'error');
         return;
       }
       
       if (comentario.length > CONFIG.MAX_COMENTARIO) {
-        mostrarToast(`El comentario excede los ${CONFIG.MAX_COMENTARIO} caracteres`, 'error');
+        mostrarToast(`Máximo ${CONFIG.MAX_COMENTARIO} caracteres`, 'error');
         return;
       }
       
       const resultado = await guardarEnFirebase(fechaString, tipo, turno, comentario);
       if (resultado) {
         cerrarModal();
-        mostrarToast('Día guardado y sincronizado', 'success');
+        mostrarToast('Guardado y sincronizado', 'success');
       }
     }
 
@@ -1653,11 +1864,11 @@
       const modal = document.getElementById('modalEdicion');
       const fechaString = modal.dataset.fecha;
       
-      if (confirm('¿Está seguro de eliminar el registro de este día?')) {
+      if (confirm('¿Eliminar este registro?')) {
         const resultado = await eliminarDeFirebase(fechaString);
         if (resultado) {
           cerrarModal();
-          mostrarToast('Registro eliminado', 'info');
+          mostrarToast('Eliminado', 'info');
         }
       }
     }
@@ -1672,7 +1883,7 @@
       
       const btn = document.getElementById('btnModoOscuro');
       btn.innerHTML = modoOscuro ? '<span aria-hidden="true">☀️</span>' : '<span aria-hidden="true">🌙</span>';
-      btn.setAttribute('aria-label', modoOscuro ? 'Activar modo claro' : 'Activar modo oscuro');
+      btn.setAttribute('aria-label', modoOscuro ? 'Modo claro' : 'Modo oscuro');
     }
 
     function restaurarModoOscuro() {
@@ -1687,8 +1898,6 @@
       verificarSesion();
       restaurarModoOscuro();
       inicializarSelectores();
-      
-      // Iniciar escucha de Firebase para el mes actual
       escucharCambiosMes(fechaActual.getMonth(), fechaActual.getFullYear());
       
       // Navegación
@@ -1744,7 +1953,6 @@
       document.getElementById('btnModoOscuro').addEventListener('click', toggleModoOscuro);
     });
 
-    // Limpiar escucha al salir
     window.addEventListener('beforeunload', () => {
       if (unsubscribe) unsubscribe();
     });
