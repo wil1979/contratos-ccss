@@ -43,7 +43,6 @@
       
       --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       
-      /* Colores de turnos */
       --turno-normal: #dbeafe;
       --turno-normal-border: #2563eb;
       --turno-mixta: #fef3c7;
@@ -51,7 +50,6 @@
       --turno-nocturna: #ede9fe;
       --turno-nocturna-border: #7c3aed;
       
-      /* Colores de estados */
       --estado-laborado: #d1fae5;
       --estado-laborado-border: #059669;
       --estado-no-laborado: #fee2e2;
@@ -128,9 +126,7 @@
     }
     @media (min-width: 768px) { .container { padding: 1.5rem; } }
 
-    /* ============================================
-       HEADER
-       ============================================ */
+    /* Header */
     .app-header {
       background: var(--bg-card);
       border-bottom: 1px solid var(--border);
@@ -184,7 +180,6 @@
     .user-name { font-weight: 600; font-size: 0.875rem; }
     .user-role { font-size: 0.75rem; color: var(--text-muted); }
 
-    /* Indicador de sincronización */
     .sync-status {
       display: flex;
       align-items: center;
@@ -213,9 +208,7 @@
       50% { opacity: 0.6; }
     }
 
-    /* ============================================
-       CONTROLES
-       ============================================ */
+    /* Controles */
     .controls-bar {
       display: flex;
       flex-direction: column;
@@ -323,9 +316,7 @@
       border-color: var(--primary);
     }
 
-    /* ============================================
-       CALENDARIO - GRID CORREGIDO
-       ============================================ */
+    /* Calendario - Grid corregido */
     .calendar-wrapper {
       background: var(--bg-card);
       border-radius: var(--radius-lg);
@@ -335,11 +326,6 @@
       margin-bottom: 1.5rem;
     }
 
-    /* 
-       SOLUCIÓN CLAVE: Grid de 7 columnas fijas.
-       Cada celda ocupa 1/7 del ancho.
-       No usamos filas intermedias, todo es grid directo.
-    */
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -347,7 +333,6 @@
       background: var(--border);
     }
 
-    /* Headers de días - ocupan toda la fila implícitamente */
     .day-header {
       background: var(--bg-card);
       padding: 0.5rem 0.125rem;
@@ -368,7 +353,6 @@
       .day-header { padding: 1rem; font-size: 0.875rem; }
     }
 
-    /* Celdas de días */
     .day-cell {
       background: var(--bg-card);
       min-height: 70px;
@@ -440,18 +424,17 @@
     }
     .day-weekend .day-number { color: var(--danger); }
 
-    /* Indicadores - compactos en móvil */
     .day-indicators {
       display: flex;
       flex-direction: column;
       gap: 1px;
       flex: 1;
       justify-content: flex-start;
-      min-width: 0; /* Importante para text-overflow */
+      min-width: 0;
     }
 
     .day-badge {
-      font-size: 0.5625rem; /* 9px */
+      font-size: 0.5625rem;
       padding: 1px 2px;
       border-radius: 3px;
       font-weight: 600;
@@ -503,9 +486,7 @@
       .day-comment-icon { bottom: 4px; right: 4px; font-size: 0.875rem; }
     }
 
-    /* ============================================
-       VISTA SEMANAL
-       ============================================ */
+    /* Vista Semanal */
     .week-view { 
       display: none; 
       background: var(--bg-card); 
@@ -574,9 +555,7 @@
       border-left: 3px solid var(--primary); 
     }
 
-    /* ============================================
-       ESTADÍSTICAS - Grid responsive
-       ============================================ */
+    /* Estadísticas */
     .stats-panel {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -642,9 +621,7 @@
     .stat-card.licencias::before { background: var(--text-muted); }
     .stat-card.horas::before { background: var(--purple); }
 
-    /* ============================================
-       LEYENDA
-       ============================================ */
+    /* Leyenda */
     .legend-section {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -686,9 +663,7 @@
       flex-shrink: 0;
     }
 
-    /* ============================================
-       MODAL
-       ============================================ */
+    /* Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -834,9 +809,7 @@
     .btn-secondary { background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border); }
     .btn-secondary:hover { background: var(--border); }
 
-    /* ============================================
-       TOASTS
-       ============================================ */
+    /* Toasts */
     .toast-container {
       position: fixed;
       top: 0.75rem;
@@ -871,9 +844,7 @@
     .toast.error { border-left: 4px solid var(--danger); }
     .toast.info { border-left: 4px solid var(--info); }
 
-    /* ============================================
-       FABs
-       ============================================ */
+    /* FABs */
     .fab-container {
       position: fixed;
       bottom: 1rem;
@@ -935,7 +906,6 @@
       .day-cell { min-height: 60px; break-inside: avoid; }
     }
   </style>
-<base target="_blank">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
@@ -1037,14 +1007,8 @@
       </article>
     </section>
 
-    <!-- 
-      VISTA MENSUAL - GRID CORREGIDO
-      Las 7 columnas son fijas. Los headers y las celdas de días
-      fluyen naturalmente en el grid de 7 columnas.
-    -->
     <section id="vistaMensual" class="calendar-wrapper" aria-label="Vista mensual del calendario">
       <div class="calendar-grid" id="calendarioGrid" role="grid" aria-label="Calendario mensual">
-        <!-- Los 7 headers se insertan primero, luego las celdas de días fluyen en las mismas 7 columnas -->
         <div class="day-header" role="columnheader"><abbr title="Domingo">Dom</abbr></div>
         <div class="day-header" role="columnheader"><abbr title="Lunes">Lun</abbr></div>
         <div class="day-header" role="columnheader"><abbr title="Martes">Mar</abbr></div>
@@ -1052,7 +1016,6 @@
         <div class="day-header" role="columnheader"><abbr title="Jueves">Jue</abbr></div>
         <div class="day-header" role="columnheader"><abbr title="Viernes">Vie</abbr></div>
         <div class="day-header" role="columnheader"><abbr title="Sábado">Sáb</abbr></div>
-        <!-- Las celdas de días se insertan aquí vía JS -->
       </div>
     </section>
 
@@ -1199,7 +1162,7 @@
 
   <script type="module">
     // ============================================
-    // FIREBASE IMPORTS (SDK Modular v9+ via CDN)
+    // FIREBASE IMPORTS
     // ============================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
     import { 
@@ -1212,9 +1175,6 @@
       enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
-    // ============================================
-    // CONFIGURACIÓN FIREBASE
-    // ============================================
     const firebaseConfig = {
       apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
       authDomain: "interinos-ccss.firebaseapp.com",
@@ -1234,7 +1194,7 @@
     }
 
     // ============================================
-    // CONFIGURACIÓN Y CONSTANTES
+    // CONFIGURACIÓN
     // ============================================
     const CONFIG = {
       MAX_COMENTARIO: 500,
@@ -1272,14 +1232,14 @@
       permiso_estudio: { label: 'Estudio', icon: '📚', horas: false },
       permiso_personal: { label: 'Personal', icon: '👤', horas: false },
       feriado: { label: 'Feriado', icon: '🎉', horas: false },
-      dia_banco: { label: 'Día Pago', icon: '🏦', horas: false }
+      dia_banco: { label: 'Día Banco', icon: '🏦', horas: false }
     };
 
     const TURNOS = {
-      turno_normal: { label: 'Normal', horas: 8, rango: '06:00-14:00' },
-      turno_mixta: { label: 'Mixta', horas: 7, rango: '14:00-22:00' },
-      turno_nocturna: { label: 'Nocturna', horas: 10, rango: '22:00-06:00' },
-      turno_externo: { label: 'Festivo', horas: 5, rango:'Variable' },
+      turno_normal: { label: 'Normal', horas: 8, rango: '08:00-17:00' },
+      turno_mixta: { label: 'Mixta', horas: 7, rango: '07:00-14:00' },
+      turno_nocturna: { label: 'Nocturna', horas: 10, rango: '22:00-08:00' },
+      turno_festivo: { label: 'Festivo', horas: 5, rango: '09:00-14:00' },
       turno_extra: { label: 'Extra', horas: 0, rango: 'Variable' }
     };
 
@@ -1292,6 +1252,73 @@
     let modoOscuro = false;
     let unsubscribe = null;
     let usuario = null;
+
+    // ============================================
+    // FUNCIONES DE FECHA CORREGIDAS (SIN ZONA HORARIA)
+    // ============================================
+    
+    /**
+     * Construye una fecha YYYY-MM-DD como string SIN usar objetos Date
+     * para evitar problemas de zona horaria.
+     */
+    function construirFechaString(anio, mes, dia) {
+      // mes: 0-11, dia: 1-31
+      const mm = String(mes + 1).padStart(2, '0');
+      const dd = String(dia).padStart(2, '0');
+      return `${anio}-${mm}-${dd}`;
+    }
+
+    /**
+     * Parsea una fecha string YYYY-MM-DD a componentes SIN crear Date
+     */
+    function parsearFechaString(fechaString) {
+      const [anio, mes, dia] = fechaString.split('-').map(Number);
+      return { anio, mes: mes - 1, dia }; // mes 0-based
+    }
+
+    /**
+     * Verifica si una fecha string es hoy
+     */
+    function esHoy(fechaString) {
+      const hoy = new Date();
+      const hoyStr = construirFechaString(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+      return fechaString === hoyStr;
+    }
+
+    /**
+     * Verifica si una fecha string es fin de semana
+     */
+    function esFinDeSemanaString(fechaString) {
+      const { anio, mes, dia } = parsearFechaString(fechaString);
+      const date = new Date(anio, mes, dia);
+      const diaSemana = date.getDay();
+      return diaSemana === 0 || diaSemana === 6;
+    }
+
+    /**
+     * Obtiene el día de la semana (0-6) de una fecha string
+     */
+    function getDiaSemana(fechaString) {
+      const { anio, mes, dia } = parsearFechaString(fechaString);
+      return new Date(anio, mes, dia).getDay();
+    }
+
+    /**
+     * Verifica si una fecha es editable
+     */
+    function esEditableString(fechaString) {
+      const { anio, mes, dia } = parsearFechaString(fechaString);
+      const fecha = new Date(anio, mes, dia);
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      const maxFecha = new Date(hoy.getFullYear(), hoy.getMonth() + CONFIG.MESES_FUTUROS_EDITABLES + 1, 0);
+      const minFecha = new Date(hoy.getFullYear() - 1, hoy.getMonth(), 1);
+      return fecha >= minFecha && fecha <= maxFecha;
+    }
+
+    function esFeriado(fechaString) {
+      return CONFIG.FERIADOS_2026.includes(fechaString);
+    }
 
     // ============================================
     // AUTENTICACIÓN
@@ -1319,7 +1346,7 @@
     }
 
     // ============================================
-    // SINCRONIZACIÓN
+    // SINCRONIZACIÓN FIREBASE
     // ============================================
     function actualizarEstadoSync(estado) {
       const statusEl = document.getElementById('syncStatus');
@@ -1365,7 +1392,7 @@
           if (docSnap.exists()) {
             const data = docSnap.data();
             Object.keys(data).forEach(fecha => {
-              if (data[fecha] && fecha !== 'metadata') {
+              if (data[fecha] && fecha !== 'metadata' && fecha.match(/^\d{4}-\d{2}-\d{2}$/)) {
                 const datosDia = data[fecha];
                 if (!datosDia.usuario || datosDia.usuario.cedula === usuario.cedula) {
                   datosCalendario.set(fecha, {
@@ -1396,9 +1423,12 @@
 
     async function guardarEnFirebase(fechaString, tipo, turno, comentario) {
       try {
-        const fecha = new Date(fechaString);
-        const mes = fecha.getMonth();
-        const anio = fecha.getFullYear();
+        // Validar formato de fecha
+        if (!fechaString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          throw new Error('Formato de fecha inválido: ' + fechaString);
+        }
+        
+        const { anio, mes } = parsearFechaString(fechaString);
         const docId = `${usuario.cedula}_${anio}_${mes}`;
         const docRef = doc(db, "calendar", docId);
         
@@ -1444,9 +1474,11 @@
 
     async function eliminarDeFirebase(fechaString) {
       try {
-        const fecha = new Date(fechaString);
-        const mes = fecha.getMonth();
-        const anio = fecha.getFullYear();
+        if (!fechaString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          throw new Error('Formato de fecha inválido: ' + fechaString);
+        }
+        
+        const { anio, mes } = parsearFechaString(fechaString);
         const docId = `${usuario.cedula}_${anio}_${mes}`;
         const docRef = doc(db, "calendar", docId);
         
@@ -1473,30 +1505,6 @@
         mostrarToast('Error al eliminar: ' + error.message, 'error');
         return false;
       }
-    }
-
-    // ============================================
-    // UTILIDADES
-    // ============================================
-    function formatearFecha(fecha) {
-      return fecha.toISOString().split('T')[0];
-    }
-
-    function esFeriado(fechaString) {
-      return CONFIG.FERIADOS_2026.includes(fechaString);
-    }
-
-    function esFinDeSemana(fecha) {
-      const dia = fecha.getDay();
-      return dia === 0 || dia === 6;
-    }
-
-    function esEditable(fecha) {
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0);
-      const maxFecha = new Date(hoy.getFullYear(), hoy.getMonth() + CONFIG.MESES_FUTUROS_EDITABLES + 1, 0);
-      const minFecha = new Date(hoy.getFullYear() - 1, hoy.getMonth(), 1);
-      return fecha >= minFecha && fecha <= maxFecha;
     }
 
     // ============================================
@@ -1549,35 +1557,38 @@
     }
 
     // ============================================
-    // CALENDARIO - GRID CORREGIDO
+    // CALENDARIO - GENERACIÓN CORREGIDA
     // ============================================
     function generarCalendario() {
       const mes = fechaActual.getMonth();
       const anio = fechaActual.getFullYear();
-      const primerDia = new Date(anio, mes, 1);
-      const ultimoDia = new Date(anio, mes + 1, 0);
-      const diaInicio = primerDia.getDay(); // 0=Dom, 1=Lun, ...
-      const totalDias = ultimoDia.getDate();
+      
+      // Primer día del mes: usamos UTC para evitar desfases
+      const primerDiaDate = new Date(Date.UTC(anio, mes, 1));
+      const diaInicio = primerDiaDate.getUTCDay(); // 0=Dom, 1=Lun, ...
+      
+      // Último día del mes
+      const ultimoDiaDate = new Date(Date.UTC(anio, mes + 1, 0));
+      const totalDias = ultimoDiaDate.getUTCDate();
       
       const grid = document.getElementById('calendarioGrid');
       
-      // Eliminar solo las celdas de días (mantener los 7 headers)
-      // Los headers son los primeros 7 hijos
+      // Eliminar celdas de días anteriores (mantener los 7 headers)
       const celdasExistentes = grid.querySelectorAll('.day-cell, .day-cell-empty');
       celdasExistentes.forEach(celda => celda.remove());
       
-      // Agregar celdas vacías antes del primer día
+      // Celdas vacías antes del primer día
       for (let i = 0; i < diaInicio; i++) {
         grid.appendChild(crearCeldaVacia());
       }
       
-      // Agregar celdas de días
+      // Celdas de días del mes
       for (let dia = 1; dia <= totalDias; dia++) {
-        const fechaCompleta = new Date(anio, mes, dia);
-        grid.appendChild(crearCeldaDia(dia, fechaCompleta));
+        const fechaString = construirFechaString(anio, mes, dia);
+        grid.appendChild(crearCeldaDia(dia, fechaString));
       }
       
-      // Completar la última semana con celdas vacías si es necesario
+      // Completar última semana
       const totalCeldas = diaInicio + totalDias;
       const celdasFaltantes = (7 - (totalCeldas % 7)) % 7;
       for (let i = 0; i < celdasFaltantes; i++) {
@@ -1595,13 +1606,12 @@
       return celda;
     }
 
-    function crearCeldaDia(dia, fechaCompleta) {
-      const fechaString = formatearFecha(fechaCompleta);
-      const hoy = new Date();
-      const esHoy = fechaCompleta.toDateString() === hoy.toDateString();
-      const editable = esEditable(fechaCompleta);
-      const finDeSemana = esFinDeSemana(fechaCompleta);
+    function crearCeldaDia(diaNumero, fechaString) {
+      const esHoyFlag = esHoy(fechaString);
+      const editable = esEditableString(fechaString);
+      const finDeSemana = esFinDeSemanaString(fechaString);
       const feriado = esFeriado(fechaString);
+      const diaSemana = getDiaSemana(fechaString);
       
       const datosDia = datosCalendario.get(fechaString) || {};
       const tipoDia = datosDia.tipo || '';
@@ -1617,11 +1627,11 @@
       celda.setAttribute('tabindex', editable ? '0' : '-1');
       celda.dataset.fecha = fechaString;
       
-      if (esHoy) celda.classList.add('today');
+      if (esHoyFlag) celda.classList.add('today');
       if (finDeSemana) celda.classList.add('day-weekend');
       if (!editable) celda.classList.add('disabled');
       
-      let html = `<div class="day-number">${dia}</div>`;
+      let html = `<div class="day-number">${diaNumero}</div>`;
       html += '<div class="day-indicators" aria-hidden="true">';
       
       if (tipoFinal && TIPOS_DIA[tipoFinal]) {
@@ -1646,7 +1656,8 @@
       
       celda.innerHTML = html;
       
-      let ariaLabel = `${DIAS_SEMANA[fechaCompleta.getDay()]} ${dia}`;
+      // ARIA label
+      let ariaLabel = `${DIAS_SEMANA[diaSemana]} ${diaNumero}`;
       if (tipoFinal && TIPOS_DIA[tipoFinal]) ariaLabel += `, ${TIPOS_DIA[tipoFinal].label}`;
       if (turno && TURNOS[turno]) ariaLabel += `, Turno ${TURNOS[turno].label}`;
       if (feriado && !tipoDia) ariaLabel += ', Feriado';
@@ -1656,11 +1667,11 @@
       celda.setAttribute('aria-label', ariaLabel);
       
       if (editable) {
-        celda.addEventListener('click', () => abrirModal(fechaString, dia));
+        celda.addEventListener('click', () => abrirModal(fechaString, diaNumero));
         celda.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            abrirModal(fechaString, dia);
+            abrirModal(fechaString, diaNumero);
           }
         });
       }
@@ -1675,25 +1686,29 @@
       const contenido = document.getElementById('contenidoSemanal');
       const titulo = document.getElementById('tituloSemana');
       
-      const primerDiaSemana = new Date(fechaActual);
-      primerDiaSemana.setDate(primerDiaSemana.getDate() - primerDiaSemana.getDay());
+      // Calcular inicio de semana (domingo) de fechaActual
+      const curr = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), fechaActual.getDate());
+      const diaSemana = curr.getDay();
+      const primerDiaSemana = new Date(curr);
+      primerDiaSemana.setDate(curr.getDate() - diaSemana);
       
       const opcionesFecha = { day: 'numeric', month: 'short' };
       const ultimoDiaSemana = new Date(primerDiaSemana);
-      ultimoDiaSemana.setDate(ultimoDiaSemana.getDate() + 6);
+      ultimoDiaSemana.setDate(primerDiaSemana.getDate() + 6);
       
       titulo.textContent = `${primerDiaSemana.toLocaleDateString('es-ES', opcionesFecha)} - ${ultimoDiaSemana.toLocaleDateString('es-ES', opcionesFecha)}`;
       
       let html = '';
       for (let i = 0; i < 7; i++) {
-        const dia = new Date(primerDiaSemana);
-        dia.setDate(dia.getDate() + i);
-        const fechaString = formatearFecha(dia);
+        const diaDate = new Date(primerDiaSemana);
+        diaDate.setDate(primerDiaSemana.getDate() + i);
+        
+        const fechaString = construirFechaString(diaDate.getFullYear(), diaDate.getMonth(), diaDate.getDate());
         const datosDia = datosCalendario.get(fechaString) || {};
         const tipoDia = datosDia.tipo || '';
         const turno = datosDia.turno || '';
         const comentario = datosDia.comentario || '';
-        const esHoy = dia.toDateString() === new Date().toDateString();
+        const esHoyFlag = esHoy(fechaString);
         
         let estadoHtml = '';
         if (tipoDia && TIPOS_DIA[tipoDia]) {
@@ -1706,15 +1721,15 @@
         if (!tipoDia && esFeriado(fechaString)) {
           estadoHtml += `<div class="week-badge estado-feriado">🎉 Feriado</div>`;
         }
-        if (!tipoDia && !esFeriado(fechaString) && !(dia.getDay() === 0 || dia.getDay() === 6)) {
+        if (!tipoDia && !esFeriado(fechaString) && !(diaDate.getDay() === 0 || diaDate.getDay() === 6)) {
           estadoHtml += `<div class="week-badge" style="background: var(--bg-hover); color: var(--text-muted);">⚪ Sin registrar</div>`;
         }
         
         html += `
-          <div class="week-day ${esHoy ? 'today' : ''}">
+          <div class="week-day ${esHoyFlag ? 'today' : ''}">
             <div class="week-day-header">
-              <span>${DIAS_SEMANA[dia.getDay()].substring(0, 3)} ${dia.getDate()}</span>
-              ${esHoy ? '<span style="color: var(--primary); font-size: 0.75rem;">HOY</span>' : ''}
+              <span>${DIAS_SEMANA[diaDate.getDay()].substring(0, 3)} ${diaDate.getDate()}</span>
+              ${esHoyFlag ? '<span style="color: var(--primary); font-size: 0.75rem;">HOY</span>' : ''}
             </div>
             <div class="week-day-content">
               ${estadoHtml}
@@ -1770,8 +1785,8 @@
       const mes = fechaActual.getMonth();
       const anio = fechaActual.getFullYear();
       CONFIG.FERIADOS_2026.forEach(fechaStr => {
-        const f = new Date(fechaStr);
-        if (f.getMonth() === mes && f.getFullYear() === anio && !datosCalendario.has(fechaStr)) {
+        const { anio: fa, mes: fm } = parsearFechaString(fechaStr);
+        if (fm === mes && fa === anio && !datosCalendario.has(fechaStr)) {
           stats.feriado++;
         }
       });
@@ -1793,15 +1808,15 @@
     // ============================================
     // MODAL
     // ============================================
-    function abrirModal(fechaString, dia) {
+    function abrirModal(fechaString, diaNumero) {
       const modal = document.getElementById('modalEdicion');
       const fechaModal = document.getElementById('fechaModal');
       const tipoDia = document.getElementById('tipoDia');
       const tipoTurno = document.getElementById('tipoTurno');
       const comentario = document.getElementById('comentarioDia');
       
-      const fecha = new Date(fechaString);
-      fechaModal.textContent = `${dia} ${MESES[fecha.getMonth()].substring(0, 3)} ${fecha.getFullYear()}`;
+      const { anio, mes } = parsearFechaString(fechaString);
+      fechaModal.textContent = `${diaNumero} ${MESES[mes].substring(0, 3)} ${anio}`;
       
       const datosExistentes = datosCalendario.get(fechaString) || {};
       tipoDia.value = datosExistentes.tipo || '';
