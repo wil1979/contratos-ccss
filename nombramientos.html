@@ -3,174 +3,380 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro de Nombramientos</title>
-  <link rel="stylesheet" href="styleextra.css">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-</head>
-<body>
-  <div class="container">
-    <h2>Registro de Nombramientos</h2>
+  <title>Nombramientos | CCSS Interino</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ccss: {
+              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
+              400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
+              800: '#1e40af', 900: '#1e3a8a', 950: '#172554',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
-    <!-- Información del usuario activo -->
-    <div class="info-usuario" id="infoUsuario">
-      <h3>Usuario Activo: <span id="nombreUsuario">Cargando...</span></h3>
-      <p>Rol: <span id="rolUsuario">Usuario</span></p>
-    </div>
+    * { font-family: 'Inter', sans-serif; }
+    
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+    
+    .input-ccss {
+      @apply w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900 transition-all;
+    }
+    
+    .input-ccss:hover { border-color: #93c5fd; }
+    
+    .modal-enter { animation: modalEnter 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    @keyframes modalEnter {
+      from { opacity: 0; transform: scale(0.95) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .area-card {
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+    
+    .area-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-ccss-50 via-white to-ccss-100 min-h-screen">
 
-    <form id="formNombramiento">
-      <div class="form-group">
-        <label for="inicio">Inicio:</label>
-        <input type="date" id="inicio" required>
-      </div>
-
-      <div class="form-group">
-        <label for="final">Final:</label>
-        <input type="date" id="final" required>
-      </div>
-
-      <div class="form-group">
-        <label for="dias">Días:</label>
-        <input type="number" id="dias" readonly>
-      </div>
-
-      <div class="form-group">
-        <label for="selectAreaSalud">Área de Salud:</label>
-        <select id="selectAreaSalud" required>
-          <option value="">-- Elegir Área --</option>
-        </select>
-        <button type="button" id="btnAgregarArea" class="btn-secondary">+ Agregar Área</button>
-      </div>
-
-      <div class="form-group">
-        <label>Horario:</label>
-        <div class="horario-container">
-          <input type="time" id="horaEntrada" required>
-          <input type="time" id="horaSalida" required>
+  <!-- Header -->
+  <nav class="bg-white/80 backdrop-blur-md border-b border-ccss-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-3">
+          <button onclick="location.href='dashboard.html'" class="p-2 hover:bg-ccss-100 rounded-lg transition-colors text-ccss-600">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+          <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <i data-lucide="file-badge" class="text-white w-6 h-6"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-ccss-900 leading-tight">Nombramientos</h1>
+            <p class="text-xs text-ccss-500 font-medium">Gestión de periodos laborales</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <div class="text-right hidden sm:block">
+            <p class="text-sm font-semibold text-ccss-900" id="nombreUsuario">Usuario</p>
+            <p class="text-xs text-ccss-500" id="rolUsuario">Rol</p>
+          </div>
+          <div class="w-10 h-10 bg-gradient-to-br from-ccss-500 to-ccss-700 rounded-full flex items-center justify-center text-white font-bold shadow-md" id="userAvatar">
+            US
+          </div>
         </div>
       </div>
+    </div>
+  </nav>
 
-      <div class="form-group">
-        <label for="salario">Salario:</label>
-        <input type="number" id="salario" step="0.01" readonly>
-      </div>
-
-      <div class="form-group">
-        <label for="comentario">Comentario:</label>
-        <textarea id="comentario" rows="3"></textarea>
-      </div>
-
-      <!-- Persona a Sustituir -->
-      <div class="form-group">
-        <label>Persona a Sustituir (Cédula):</label>
-        <input type="text" id="cedulaSustituir" placeholder="Ej: 108290753" >
-        <button type="button" id="btnBuscarPersonal" class="btn-secondary">🔍 Buscar Personal</button>
-      </div>
-
-      <div class="form-group">
-        <label>Nombre Persona a Sustituir:</label>
-        <input type="text" id="nombreSustituir" >
-      </div>
-
-      <div class="form-group">
-        <label>
-          <input type="checkbox" id="estado"> Pago Validado
-        </label>
-      </div>
-
-      <div class="btn-container">
-        <button type="submit" class="btn-primary">Guardar Nombramiento</button>
-        <button type="button" class="btn-secondary" onclick="cerrarSesion()">Cerrar Sesión</button>
-      </div>
-    </form>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in">
     
-    <!-- Reporte de días por área -->
-    <div class="reporte-container">
-      <div class="reporte-header">
-        <h3 class="reporte-titulo">📊 Reporte de Días Laborados por Área</h3>
-        <button id="btnActualizarReporte" class="reporte-refresh">🔄 Actualizar</button>
+    <!-- Formulario Principal -->
+    <div class="glass-panel rounded-2xl border border-ccss-200 shadow-lg p-6 mb-8">
+      <h2 class="text-lg font-bold text-ccss-900 mb-6 flex items-center gap-2">
+        <i data-lucide="file-plus" class="w-5 h-5 text-ccss-600"></i>
+        Nuevo Nombramiento
+      </h2>
+      
+      <form id="formNombramiento" class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          
+          <!-- Fecha Inicio -->
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Fecha Inicio <span class="text-red-500">*</span></label>
+            <input type="date" id="inicio" required 
+              class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900 transition-all hover:border-ccss-400">
+          </div>
+          
+          <!-- Fecha Final -->
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Fecha Final <span class="text-red-500">*</span></label>
+            <input type="date" id="final" required 
+              class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900 transition-all hover:border-ccss-400">
+          </div>
+          
+          <!-- Días Calculados -->
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Días Laborados</label>
+            <input type="number" id="dias" readonly 
+              class="w-full px-4 py-2.5 border border-ccss-200 rounded-xl bg-ccss-50 text-ccss-900 font-bold text-center">
+          </div>
+          
+          <!-- Área de Salud -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Área de Salud <span class="text-red-500">*</span></label>
+            <div class="flex gap-2">
+              <select id="selectAreaSalud" required 
+                class="flex-1 px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900">
+                <option value="">-- Seleccione Área --</option>
+              </select>
+              <button type="button" id="btnAgregarArea" 
+                class="px-4 py-2.5 bg-ccss-100 hover:bg-ccss-200 text-ccss-700 rounded-xl font-medium transition-colors flex items-center gap-1 whitespace-nowrap">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                Nueva
+              </button>
+            </div>
+          </div>
+          
+          <!-- Horario -->
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Horario</label>
+            <div class="flex gap-2">
+              <input type="time" id="horaEntrada" required 
+                class="flex-1 px-3 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900 text-center">
+              <span class="self-center text-ccss-400 font-bold">→</span>
+              <input type="time" id="horaSalida" required 
+                class="flex-1 px-3 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900 text-center">
+            </div>
+          </div>
+          
+          <!-- Salario Calculado -->
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Salario Estimado (₡)</label>
+            <input type="text" id="salario" readonly 
+              class="w-full px-4 py-2.5 border border-ccss-200 rounded-xl bg-ccss-50 text-ccss-900 font-bold text-center">
+          </div>
+          
+          <!-- Persona a Sustituir -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Persona a Sustituir</label>
+            <div class="flex gap-2">
+              <input type="text" id="cedulaSustituir" placeholder="Cédula (ej: 108290753)" 
+                class="flex-1 px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900">
+              <button type="button" id="btnBuscarPersonal" 
+                class="px-4 py-2.5 bg-ccss-600 hover:bg-ccss-700 text-white rounded-xl font-medium transition-colors shadow-sm shadow-ccss-500/20 flex items-center gap-1">
+                <i data-lucide="search" class="w-4 h-4"></i>
+                Buscar
+              </button>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Nombre</label>
+            <input type="text" id="nombreSustituir" placeholder="Nombre del funcionario" readonly 
+              class="w-full px-4 py-2.5 border border-ccss-200 rounded-xl bg-gray-50 text-ccss-900">
+          </div>
+          
+          <!-- Comentario -->
+          <div class="md:col-span-3">
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Comentario</label>
+            <textarea id="comentario" rows="2" placeholder="Observaciones adicionales..." 
+              class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900 resize-none"></textarea>
+          </div>
+          
+          <!-- Estado Pago -->
+          <div class="flex items-center gap-3">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="estadoPago" class="w-5 h-5 rounded border-ccss-300 text-ccss-600 focus:ring-ccss-500">
+              <span class="text-sm font-medium text-ccss-700">Pago Validado</span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Botones -->
+        <div class="flex gap-3 pt-4 border-t border-ccss-100">
+          <button type="submit" 
+            class="px-6 py-3 bg-ccss-600 hover:bg-ccss-700 text-white rounded-xl font-semibold transition-colors shadow-lg shadow-ccss-500/20 flex items-center gap-2">
+            <i data-lucide="save" class="w-5 h-5"></i>
+            Guardar Nombramiento
+          </button>
+          <button type="button" onclick="limpiarFormulario()" 
+            class="px-6 py-3 bg-white border border-ccss-300 text-ccss-700 rounded-xl font-semibold hover:bg-ccss-50 transition-colors">
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Reporte de Días por Área -->
+    <div class="glass-panel rounded-2xl border border-ccss-200 shadow-lg p-6 mb-8">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-lg font-bold text-ccss-900 flex items-center gap-2">
+          <i data-lucide="bar-chart-3" class="w-5 h-5 text-ccss-600"></i>
+          Reporte de Días por Área
+        </h2>
+        <button id="btnActualizarReporte" 
+          class="px-4 py-2 bg-ccss-100 hover:bg-ccss-200 text-ccss-700 rounded-lg font-medium transition-colors flex items-center gap-1">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          Actualizar
+        </button>
       </div>
-      <div id="reporteContenido" class="reporte-grid">
-        <p>Cargando reporte...</p>
+      
+      <div id="reporteContenido" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="text-center py-8 text-ccss-400">
+          <i data-lucide="loader-2" class="w-8 h-8 mx-auto mb-2 animate-spin"></i>
+          Cargando reporte...
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial de Nombramientos -->
+    <div class="glass-panel rounded-2xl border border-ccss-200 shadow-lg p-6">
+      <h2 class="text-lg font-bold text-ccss-900 mb-6 flex items-center gap-2">
+        <i data-lucide="history" class="w-5 h-5 text-ccss-600"></i>
+        Historial de Nombramientos
+      </h2>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b-2 border-ccss-200">
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-500 uppercase tracking-wider">Periodo</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-500 uppercase tracking-wider">Área</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-500 uppercase tracking-wider">Días</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-500 uppercase tracking-wider">Salario</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-500 uppercase tracking-wider">Sustituye a</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-500 uppercase tracking-wider">Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tablaHistorial" class="divide-y divide-ccss-100">
+            <tr>
+              <td colspan="6" class="py-8 text-center text-ccss-400">
+                <i data-lucide="loader-2" class="w-6 h-6 mx-auto mb-2 animate-spin"></i>
+                Cargando historial...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Nueva Área -->
+  <div id="modalArea" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md modal-enter shadow-2xl overflow-hidden">
+      <div class="bg-gradient-to-r from-ccss-600 to-ccss-700 px-6 py-4">
+        <h3 class="text-white font-bold text-lg flex items-center gap-2">
+          <i data-lucide="building-2" class="w-5 h-5"></i>
+          Nueva Área de Salud
+        </h3>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-ccss-700 mb-1">Código</label>
+          <input type="text" id="nuevaCodArea" placeholder="Ej: 101-AS" 
+            class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-ccss-700 mb-1">Nombre del Área</label>
+          <input type="text" id="nuevaNombreArea" placeholder="Ej: Hospital San Juan de Dios" 
+            class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900">
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-2 justify-end">
+        <button id="cerrarModalArea" class="px-4 py-2 bg-white border border-ccss-300 text-ccss-700 rounded-lg font-medium hover:bg-ccss-50 transition-colors">
+          Cancelar
+        </button>
+        <button id="guardarAreaBtn" class="px-4 py-2 bg-ccss-600 text-white rounded-lg font-medium hover:bg-ccss-700 transition-colors shadow-sm shadow-ccss-500/20">
+          Guardar Área
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Modal para áreas -->
-  <div id="modalArea">
-    <div class="modal-content">
-      <h3>Nueva Área</h3>
-      <div class="form-group">
-        <label>Código:</label>
-        <input type="text" id="nuevaCodArea">
+  <!-- Modal Selección Personal -->
+  <div id="modalPersonal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-3xl modal-enter shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <div class="bg-gradient-to-r from-ccss-600 to-ccss-700 px-6 py-4 flex justify-between items-center">
+        <h3 class="text-white font-bold text-lg flex items-center gap-2">
+          <i data-lucide="users" class="w-5 h-5"></i>
+          Seleccionar Personal
+        </h3>
+        <button id="cerrarModalPersonal" class="text-white/80 hover:text-white transition-colors">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
       </div>
-      <div class="form-group">
-        <label>Nombre Área:</label>
-        <input type="text" id="nuevaNombreArea">
-      </div>
-      <div class="btn-container">
-        <button id="guardarAreaBtn" class="btn-primary">Guardar Área</button>
-        <button id="cerrarModalBtn" class="btn-secondary">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Selección de Personal -->
-  <div id="modalPersonal" class="modal">
-    <div class="modal-content">
-      <h3>Seleccionar Personal</h3>
-
-      <!-- Filtros -->
-      <div class="form-group">
-        <input type="text" id="filtroNombre" placeholder="Buscar por nombre...">
-      </div>
-      <div class="form-group">
-        <input type="text" id="filtroCedula" placeholder="Buscar por cédula...">
-      </div>
-      <div class="form-group">
-        <label for="filtroPuesto">Puesto:</label>
-        <select id="filtroPuesto">
-          <option value="">Todos</option>
-          <option value="TRAB.SERV.GENERALES">TRAB.SERV.GENERALES</option>
-          <option value="TEC.SAL.EN FARM. I">TEC.SAL.EN FARM. I</option>
-          <!-- Agrega más puestos según tu Personal.json -->
-        </select>
-      </div>
-
-      <!-- Botones de acción -->
-      <div class="btn-container" style="justify-content: center; gap: 10px;">
-        <button id="btnBuscarEnModal" class="btn-primary">🔍 Buscar</button>
-        <button id="btnLimpiarFiltros" class="btn-secondary">🧹 Limpiar</button>
-      </div>
-
-      <!-- Tabla resultados -->
-      <table id="tablaPersonal">
-        <thead>
-          <tr>
-            <th>Cédula</th>
-            <th>Nombre</th>
-            <th>Puesto</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Se llena con JS -->
-        </tbody>
-      </table>
-
-      <div class="btn-container">
-        <button id="cerrarPersonalBtn" class="btn-secondary">Cerrar</button>
+      
+      <div class="p-6 space-y-4 overflow-y-auto">
+        <!-- Filtros -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <input type="text" id="filtroNombre" placeholder="Buscar por nombre..." 
+            class="px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900">
+          <input type="text" id="filtroCedula" placeholder="Buscar por cédula..." 
+            class="px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900">
+          <select id="filtroPuesto" 
+            class="px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900">
+            <option value="">Todos los puestos</option>
+          </select>
+        </div>
+        
+        <div class="flex gap-2">
+          <button id="btnBuscarEnModal" class="px-4 py-2 bg-ccss-600 hover:bg-ccss-700 text-white rounded-lg font-medium transition-colors flex items-center gap-1">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            Buscar
+          </button>
+          <button id="btnLimpiarFiltros" class="px-4 py-2 bg-white border border-ccss-300 text-ccss-700 rounded-lg font-medium hover:bg-ccss-50 transition-colors">
+            Limpiar
+          </button>
+        </div>
+        
+        <!-- Tabla -->
+        <div class="overflow-x-auto border border-ccss-200 rounded-xl">
+          <table class="w-full">
+            <thead class="bg-ccss-50">
+              <tr>
+                <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase">Cédula</th>
+                <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase">Nombre</th>
+                <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase">Puesto</th>
+                <th class="text-center py-3 px-4 text-xs font-bold text-ccss-600 uppercase">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tablaPersonalBody" class="divide-y divide-ccss-100">
+              <tr>
+                <td colspan="4" class="py-8 text-center text-ccss-400">Ingrese criterios y haga clic en Buscar</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- 🎯 Botón flotante "Inicio" -->
-  <a href="dashboard.html" class="btn-flotante-inicio" title="Ir al Dashboard">
-    🏠 Inicio
-  </a>
+  <!-- Toast -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[100] space-y-2 pointer-events-none"></div>
 
   <script type="module">
+    // ============================================
+    // FIREBASE
+    // ============================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      getDocs, 
+      query, 
+      where,
+      orderBy,
+      doc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
@@ -184,421 +390,534 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Verificar sesión
+    // ============================================
+    // 🔧 UTILIDADES DE FECHA CORREGIDAS
+    // ============================================
+    
+    function fechaAString(anio, mes, dia) {
+      return `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+    }
+
+    function parseFechaString(fechaStr) {
+      const [a, m, d] = fechaStr.split('-').map(Number);
+      return { anio: a, mes: m - 1, dia: d };
+    }
+
+    /**
+     * Calcula diferencia en días entre dos fechas YYYY-MM-DD
+     * SIN usar new Date(string) para evitar desfase de zona horaria
+     */
+    function calcularDiasEntre(inicioStr, finalStr) {
+      const fi = parseFechaString(inicioStr);
+      const ff = parseFechaString(finalStr);
+      
+      // Crear fechas con componentes individuales (hora local 00:00:00)
+      const d1 = new Date(fi.anio, fi.mes, fi.dia);
+      const d2 = new Date(ff.anio, ff.mes, ff.dia);
+      
+      const diff = d2 - d1;
+      const dias = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+      return dias >= 0 ? dias : 0;
+    }
+
+    // ============================================
+    // ESTADO
+    // ============================================
     const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
     if (!usuario) {
       window.location.href = "login.html";
-    } else {
-      document.getElementById("nombreUsuario").textContent = usuario.nombre || "Usuario no disponible";
-      document.getElementById("rolUsuario").textContent = usuario.rol || "Usuario";
     }
 
+    // Mostrar info usuario
+    document.getElementById("nombreUsuario").textContent = usuario.nombre || "Usuario";
+    document.getElementById("rolUsuario").textContent = usuario.rol || "Usuario";
+    document.getElementById("userAvatar").textContent = (usuario.nombre || 'U').substring(0, 2).toUpperCase();
+
+    // Elementos
     const inicio = document.getElementById("inicio");
     const final = document.getElementById("final");
     const dias = document.getElementById("dias");
     const salarioInput = document.getElementById("salario");
+    const cedulaSustituir = document.getElementById("cedulaSustituir");
+    const nombreSustituir = document.getElementById("nombreSustituir");
 
+    const SALARIO_POR_DIA = 14523;
+
+    // ============================================
+    // CÁLCULOS
+    // ============================================
     function calcularSalario() {
-      const diasValor = parseFloat(dias.value) || 0;
-      const salario = diasValor * 14523;
-      salarioInput.value = salario.toFixed(2);
+      const diasValor = parseInt(dias.value) || 0;
+      const salario = diasValor * SALARIO_POR_DIA;
+      salarioInput.value = `₡${salario.toLocaleString('es-CR')}`;
     }
 
     function calcularDias() {
       if (!inicio.value || !final.value) return;
-      const fi = new Date(inicio.value);
-      const ff = new Date(final.value);
-      const diff = ff - fi;
-      const total = Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1;
-      dias.value = total >= 0 ? total : 0;
+      const total = calcularDiasEntre(inicio.value, final.value);
+      dias.value = total;
       calcularSalario();
     }
 
     inicio.addEventListener("change", calcularDias);
     final.addEventListener("change", calcularDias);
 
-    // Áreas de Salud
+    // ============================================
+    // ÁREAS DE SALUD
+    // ============================================
     const selectArea = document.getElementById("selectAreaSalud");
-    const btnAgregarArea = document.getElementById("btnAgregarArea");
     const modalArea = document.getElementById("modalArea");
-    const guardarAreaBtn = document.getElementById("guardarAreaBtn");
-    const cerrarModalBtn = document.getElementById("cerrarModalBtn");
 
     async function cargarAreas() {
-      selectArea.innerHTML = `<option value="">-- Elegir Área --</option>`;
-      const snapshot = await getDocs(collection(db, "areasSalud"));
-      snapshot.forEach(doc => {
-        const a = doc.data();
-        const opt = document.createElement("option");
-        opt.value = JSON.stringify({ codArea: a.codArea, nombreArea: a.nombreArea });
-        opt.textContent = `${a.codArea} - ${a.nombreArea}`;
-        selectArea.appendChild(opt);
-      });
+      selectArea.innerHTML = '<option value="">-- Seleccione Área --</option>';
+      try {
+        const snapshot = await getDocs(collection(db, "areasSalud"));
+        const areas = [];
+        snapshot.forEach(doc => {
+          const a = doc.data();
+          areas.push(a);
+        });
+        areas.sort((a, b) => a.nombreArea.localeCompare(b.nombreArea));
+        areas.forEach(a => {
+          const opt = document.createElement("option");
+          opt.value = JSON.stringify({ codArea: a.codArea, nombreArea: a.nombreArea });
+          opt.textContent = `${a.codArea} - ${a.nombreArea}`;
+          selectArea.appendChild(opt);
+        });
+      } catch (error) {
+        console.error("Error cargando áreas:", error);
+      }
     }
-    cargarAreas();
 
-    btnAgregarArea.addEventListener("click", () => modalArea.style.display = "flex");
-    cerrarModalBtn.addEventListener("click", () => modalArea.style.display = "none");
+    document.getElementById("btnAgregarArea").addEventListener("click", () => {
+      modalArea.classList.remove("hidden");
+      modalArea.classList.add("flex");
+      document.getElementById("nuevaCodArea").focus();
+    });
 
-    guardarAreaBtn.addEventListener("click", async () => {
+    document.getElementById("cerrarModalArea").addEventListener("click", () => {
+      modalArea.classList.add("hidden");
+      modalArea.classList.remove("flex");
+    });
+
+    document.getElementById("guardarAreaBtn").addEventListener("click", async () => {
       const cod = document.getElementById("nuevaCodArea").value.trim();
       const nombre = document.getElementById("nuevaNombreArea").value.trim();
       if (!cod || !nombre) {
-        alert("Debe llenar los campos");
+        mostrarToast("Complete todos los campos", "error");
         return;
       }
-      await addDoc(collection(db, "areasSalud"), { codArea: cod, nombreArea: nombre });
-      modalArea.style.display = "none";
-      document.getElementById("nuevaCodArea").value = "";
-      document.getElementById("nuevaNombreArea").value = "";
-      cargarAreas();
+      try {
+        await addDoc(collection(db, "areasSalud"), { codArea: cod, nombreArea: nombre });
+        modalArea.classList.add("hidden");
+        modalArea.classList.remove("flex");
+        document.getElementById("nuevaCodArea").value = "";
+        document.getElementById("nuevaNombreArea").value = "";
+        cargarAreas();
+        mostrarToast("Área guardada correctamente", "success");
+      } catch (error) {
+        mostrarToast("Error al guardar área: " + error.message, "error");
+      }
     });
 
-    const cedulaSustituir = document.getElementById("cedulaSustituir");
-    const nombreSustituir = document.getElementById("nombreSustituir");
-
-    // 🔹 Función para buscar persona por cédula usando API de Hacienda
+    // ============================================
+    // BÚSQUEDA DE PERSONAL
+    // ============================================
     async function buscarPersonaPorCedula(cedula) {
-      try {
-        // Validar cédula
-        if (!cedula || cedula.trim() === '') {
-          return null;
-        }
-        
-        const cedulaLimpia = cedula.trim().replace(/\D/g, '');
-        if (cedulaLimpia.length < 9) {
-          console.warn("Cédula demasiado corta:", cedulaLimpia);
-          return null;
-        }
+      if (!cedula || cedula.trim() === '') return null;
+      const cedulaLimpia = cedula.trim().replace(/\D/g, '');
+      if (cedulaLimpia.length < 9) return null;
 
-        // 1. Intentar con API de Hacienda (API pública de Costa Rica)
-        console.log("🔍 Buscando en API de Hacienda:", cedulaLimpia);
-        const apiUrl = `https://api.hacienda.go.cr/fe/ae?identificacion=${cedulaLimpia}`;
-        
-        const resp = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-        
+      try {
+        const resp = await fetch(`https://api.hacienda.go.cr/fe/ae?identificacion=${cedulaLimpia}`);
         if (resp.ok) {
           const data = await resp.json();
-          if (data && data.nombre) {
-            console.log("✅ Nombre encontrado en API de Hacienda:", data.nombre);
-            return data.nombre;
-          }
-        } else {
-          console.warn("API de Hacienda no devolvió datos válidos para:", cedulaLimpia);
+          if (data && data.nombre) return data.nombre;
         }
       } catch (error) {
-        console.error("❌ Error al consultar API de Hacienda:", error);
-        // No retornamos aquí porque queremos intentar con Firestore
+        console.warn("API Hacienda no disponible:", error);
       }
 
-      // 2. Intentar en Firestore tabla personal (como respaldo)
+      // Respaldo Firestore
       try {
-        console.log("🔍 Buscando en Firestore personal:", cedula);
         const q = query(collection(db, "personal"), where("id", "==", cedula.trim()));
         const snap = await getDocs(q);
-        if (!snap.empty) {
-          const nombre = snap.docs[0].data().nombre;
-          console.log("✅ Nombre encontrado en Firestore:", nombre);
-          return nombre;
-        }
+        if (!snap.empty) return snap.docs[0].data().nombre;
       } catch (error) {
-        console.error("❌ Error al buscar en Firestore:", error);
+        console.error("Error Firestore:", error);
       }
 
       return null;
     }
 
-    // 🔹 Evento para buscar automáticamente al salir del campo de cédula
     cedulaSustituir.addEventListener("blur", async () => {
       const cedula = cedulaSustituir.value.trim();
-      if (!cedula) {
-        nombreSustituir.value = "";
-        return;
-      }
-
-      // Mostrar estado de carga
+      if (!cedula) { nombreSustituir.value = ""; return; }
+      
       nombreSustituir.value = "Buscando...";
       nombreSustituir.disabled = true;
-
+      
       try {
         const nombre = await buscarPersonaPorCedula(cedula);
-        if (nombre) {
-          nombreSustituir.value = nombre;
-        } else {
-          nombreSustituir.value = "No encontrado";
-        }
+        nombreSustituir.value = nombre || "No encontrado";
       } catch (error) {
-        console.error("Error en búsqueda automática:", error);
         nombreSustituir.value = "Error en búsqueda";
       } finally {
         nombreSustituir.disabled = false;
       }
     });
 
-    // Guardar nombramiento
-    document.getElementById("formNombramiento").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!selectArea.value) {
-        alert("Seleccione un área de salud");
-        return;
-      }
-      const area = JSON.parse(selectArea.value);
-      const docRef = await addDoc(collection(db, "nombramientos"), {
-        inicio: inicio.value,
-        final: final.value,
-        dias: parseInt(dias.value),
-        codArea: area.codArea,
-        area: area.nombreArea,
-        horarioEntrada: document.getElementById("horaEntrada").value,
-        horarioSalida: document.getElementById("horaSalida").value,
-        salario: parseFloat(salarioInput.value),
-        comentario: document.getElementById("comentario").value,
-        estado: document.getElementById("estado").checked,
-        personaSustituirCedula: cedulaSustituir.value.trim(),
-        personaSustituirNombre: nombreSustituir.value,
-        usuarioCedula: usuario.cedula,
-        usuarioNombre: usuario.nombre,
-        creadoEn: new Date()
-      });
-      alert("Nombramiento guardado con ID: " + docRef.id);
-      e.target.reset();
-      generarReporteDiasPorArea();
+    // ============================================
+    // MODAL PERSONAL
+    // ============================================
+    const modalPersonal = document.getElementById("modalPersonal");
+    let listaPersonal = [];
+    const puestosUnicos = new Set();
+
+    document.getElementById("btnBuscarPersonal").addEventListener("click", async () => {
+      modalPersonal.classList.remove("hidden");
+      modalPersonal.classList.add("flex");
+      if (listaPersonal.length === 0) await cargarPersonal();
     });
 
-    function cerrarSesion() {
-      localStorage.removeItem("usuarioActivo");
-      window.location.href = "login.html";
+    document.getElementById("cerrarModalPersonal").addEventListener("click", () => {
+      modalPersonal.classList.add("hidden");
+      modalPersonal.classList.remove("flex");
+    });
+
+    async function cargarPersonal() {
+      try {
+        const respuesta = await fetch("personal.json");
+        if (!respuesta.ok) throw new Error(`Código: ${respuesta.status}`);
+        
+        const datos = await respuesta.json();
+        if (!Array.isArray(datos)) throw new Error("Debe ser un arreglo");
+        
+        listaPersonal = datos.filter(p => p && typeof p === 'object');
+        
+        puestosUnicos.clear();
+        listaPersonal.forEach(p => {
+          if (p.puesto && typeof p.puesto === 'string') puestosUnicos.add(p.puesto);
+        });
+        
+        const selectPuesto = document.getElementById("filtroPuesto");
+        selectPuesto.innerHTML = '<option value="">Todos los puestos</option>';
+        Array.from(puestosUnicos).sort().forEach(puesto => {
+          const option = document.createElement("option");
+          option.value = puesto;
+          option.textContent = puesto;
+          selectPuesto.appendChild(option);
+        });
+        
+        document.getElementById("tablaPersonalBody").innerHTML = 
+          '<tr><td colspan="4" class="py-8 text-center text-ccss-400">Ingrese criterios y haga clic en Buscar</td></tr>';
+      } catch (error) {
+        document.getElementById("tablaPersonalBody").innerHTML = 
+          `<tr><td colspan="4" class="py-8 text-center text-red-500">Error: ${error.message}</td></tr>`;
+      }
     }
-    window.cerrarSesion = cerrarSesion;
-    
-    async function generarReporteDiasPorArea() {
-      const reporteContenido = document.getElementById("reporteContenido");
-      reporteContenido.innerHTML = "<p>Cargando datos...</p>";
+
+    function buscarPersonal() {
+      const nombreFiltro = document.getElementById("filtroNombre").value.trim().toLowerCase();
+      const cedulaFiltro = document.getElementById("filtroCedula").value.trim().replace(/\D/g, '');
+      const puestoFiltro = document.getElementById("filtroPuesto").value;
+      
+      const tbody = document.getElementById("tablaPersonalBody");
+      tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-ccss-400"><i data-lucide="loader-2" class="w-6 h-6 mx-auto mb-2 animate-spin"></i>Buscando...</td></tr>';
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        const resultados = listaPersonal.filter(p => {
+          if (puestoFiltro && p.puesto !== puestoFiltro) return false;
+          if (nombreFiltro && !(p.nombre || '').toLowerCase().includes(nombreFiltro)) return false;
+          if (cedulaFiltro) {
+            const cedulaStr = (p.cedula != null) ? p.cedula.toString() : '';
+            if (!cedulaStr.includes(cedulaFiltro)) return false;
+          }
+          return true;
+        });
+        
+        if (resultados.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-ccss-400">No se encontraron coincidencias</td></tr>';
+        } else {
+          const aMostrar = resultados.slice(0, 100);
+          tbody.innerHTML = aMostrar.map(p => `
+            <tr class="hover:bg-ccss-50 transition-colors">
+              <td class="py-3 px-4 text-sm text-ccss-900">${p.cedula != null ? p.cedula : '—'}</td>
+              <td class="py-3 px-4 text-sm text-ccss-900 font-medium">${p.nombre || '—'}</td>
+              <td class="py-3 px-4 text-sm text-ccss-600">${p.puesto || '—'}</td>
+              <td class="py-3 px-4 text-center">
+                <button onclick="seleccionarPersona('${(p.cedula || '').toString().replace(/'/g, "\\'")}', '${(p.nombre || '').replace(/'/g, "\\'")}')" 
+                  class="px-3 py-1.5 bg-ccss-600 hover:bg-ccss-700 text-white text-sm rounded-lg transition-colors">
+                  Seleccionar
+                </button>
+              </td>
+            </tr>
+          `).join('');
+          
+          if (resultados.length > 100) {
+            tbody.innerHTML += `<tr><td colspan="4" class="py-3 px-4 text-center text-xs text-ccss-400">... y ${resultados.length - 100} resultados más</td></tr>`;
+          }
+        }
+        lucide.createIcons();
+      }, 150);
+    }
+
+    document.getElementById("btnBuscarEnModal").addEventListener("click", buscarPersonal);
+    document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
+      document.getElementById("filtroNombre").value = "";
+      document.getElementById("filtroCedula").value = "";
+      document.getElementById("filtroPuesto").value = "";
+      document.getElementById("tablaPersonalBody").innerHTML = 
+        '<tr><td colspan="4" class="py-8 text-center text-ccss-400">Filtros limpiados</td></tr>';
+    });
+
+    window.seleccionarPersona = function(cedula, nombre) {
+      document.getElementById("cedulaSustituir").value = cedula;
+      document.getElementById("nombreSustituir").value = nombre;
+      modalPersonal.classList.add("hidden");
+      modalPersonal.classList.remove("flex");
+    };
+
+    // ============================================
+    // GUARDAR NOMBRAMIENTO
+    // ============================================
+    document.getElementById("formNombramiento").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      if (!selectArea.value) {
+        mostrarToast("Seleccione un área de salud", "error");
+        return;
+      }
+      
+      const area = JSON.parse(selectArea.value);
       
       try {
-        const q = query(collection(db, "nombramientos"), where("usuarioCedula", "==", usuario.cedula));
-        const querySnapshot = await getDocs(q);
+        const docRef = await addDoc(collection(db, "nombramientos"), {
+          inicio: inicio.value,
+          final: final.value,
+          dias: parseInt(dias.value) || 0,
+          codArea: area.codArea,
+          area: area.nombreArea,
+          horarioEntrada: document.getElementById("horaEntrada").value,
+          horarioSalida: document.getElementById("horaSalida").value,
+          salario: parseFloat(dias.value) * SALARIO_POR_DIA,
+          comentario: document.getElementById("comentario").value,
+          estado: document.getElementById("estadoPago").checked,
+          personaSustituirCedula: cedulaSustituir.value.trim(),
+          personaSustituirNombre: nombreSustituir.value,
+          usuarioCedula: usuario.cedula,
+          usuarioNombre: usuario.nombre,
+          creadoEn: new Date().toISOString()
+        });
+        
+        mostrarToast("Nombramiento guardado correctamente", "success");
+        limpiarFormulario();
+        generarReporteDiasPorArea();
+        cargarHistorial();
+      } catch (error) {
+        mostrarToast("Error al guardar: " + error.message, "error");
+      }
+    });
+
+    function limpiarFormulario() {
+      document.getElementById("formNombramiento").reset();
+      dias.value = "";
+      salarioInput.value = "";
+      nombreSustituir.value = "";
+    }
+    window.limpiarFormulario = limpiarFormulario;
+
+    // ============================================
+    // REPORTE DÍAS POR ÁREA
+    // ============================================
+    async function generarReporteDiasPorArea() {
+      const contenedor = document.getElementById("reporteContenido");
+      contenedor.innerHTML = '<div class="col-span-full text-center py-8 text-ccss-400"><i data-lucide="loader-2" class="w-8 h-8 mx-auto mb-2 animate-spin"></i>Cargando...</div>';
+      lucide.createIcons();
+      
+      try {
+        const q = query(
+          collection(db, "nombramientos"), 
+          where("usuarioCedula", "==", usuario.cedula)
+        );
+        const snapshot = await getDocs(q);
         
         const areasMap = new Map();
         
-        querySnapshot.forEach(doc => {
+        snapshot.forEach(doc => {
           const data = doc.data();
           const areaKey = `${data.codArea} - ${data.area}`;
           if (!areasMap.has(areaKey)) {
-            areasMap.set(areaKey, { codArea: data.codArea, nombreArea: data.area, totalDias: 0 });
+            areasMap.set(areaKey, { 
+              codArea: data.codArea, 
+              nombreArea: data.area, 
+              totalDias: 0,
+              totalSalario: 0,
+              count: 0
+            });
           }
           const areaData = areasMap.get(areaKey);
           areaData.totalDias += data.dias || 0;
+          areaData.totalSalario += data.salario || 0;
+          areaData.count++;
         });
         
         const areasOrdenadas = Array.from(areasMap.values()).sort((a, b) => b.totalDias - a.totalDias);
         
         if (areasOrdenadas.length === 0) {
-          reporteContenido.innerHTML = "<p>📊 No hay datos de nombramientos para generar el reporte.</p>";
+          contenedor.innerHTML = '<div class="col-span-full text-center py-8 text-ccss-400">No hay nombramientos registrados</div>';
           return;
         }
         
-        let htmlReporte = "";
+        let html = "";
         areasOrdenadas.forEach(area => {
-          htmlReporte += `
-            <div class="area-card">
-              <div class="area-nombre">${area.nombreArea}</div>
-              <div class="area-codigo">Código: ${area.codArea}</div>
-              <div class="area-dias">${area.totalDias} días</div>
+          html += `
+            <div class="area-card rounded-xl border border-ccss-200 p-5 shadow-sm">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-ccss-500 to-ccss-700 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                  ${area.codArea.substring(0, 2)}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-bold text-ccss-900 truncate">${area.nombreArea}</h4>
+                  <p class="text-xs text-ccss-500">Código: ${area.codArea}</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="bg-ccss-50 rounded-lg p-3 text-center">
+                  <p class="text-2xl font-bold text-ccss-700">${area.totalDias}</p>
+                  <p class="text-xs text-ccss-500">días</p>
+                </div>
+                <div class="bg-emerald-50 rounded-lg p-3 text-center">
+                  <p class="text-lg font-bold text-emerald-700">₡${area.totalSalario.toLocaleString('es-CR')}</p>
+                  <p class="text-xs text-emerald-600">${area.count} nombram.</p>
+                </div>
+              </div>
             </div>
           `;
         });
-        reporteContenido.innerHTML = htmlReporte;
         
-        const totalGeneral = areasOrdenadas.reduce((sum, area) => sum + area.totalDias, 0);
-        const totalElement = document.createElement("div");
-        totalElement.style.fontWeight = "bold";
-        totalElement.style.marginTop = "1rem";
-        totalElement.textContent = `TOTAL GENERAL: ${totalGeneral} días laborados`;
-        reporteContenido.appendChild(totalElement);
+        const totalGeneral = areasOrdenadas.reduce((sum, a) => sum + a.totalDias, 0);
+        const totalSalario = areasOrdenadas.reduce((sum, a) => sum + a.totalSalario, 0);
         
+        html += `
+          <div class="col-span-full bg-gradient-to-r from-ccss-600 to-ccss-700 rounded-xl p-5 text-white shadow-lg">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-sm opacity-80">Total General</p>
+                <p class="text-3xl font-bold">${totalGeneral} días</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm opacity-80">Salario Total</p>
+                <p class="text-2xl font-bold">₡${totalSalario.toLocaleString('es-CR')}</p>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        contenedor.innerHTML = html;
       } catch (error) {
-        console.error("Error al generar reporte:", error);
-        reporteContenido.innerHTML = `<p style="color: red;">❌ Error al cargar el reporte: ${error.message}</p>`;
+        contenedor.innerHTML = `<div class="col-span-full text-center py-8 text-red-500">Error: ${error.message}</div>`;
       }
     }
-    
-    document.getElementById("btnActualizarReporte").addEventListener("click", function() {
-      this.textContent = "Actualizando...";
-      this.disabled = true;
-      generarReporteDiasPorArea().then(() => {
-        this.textContent = "🔄 Actualizar";
-        this.disabled = false;
+
+    // ============================================
+    // HISTORIAL
+    // ============================================
+    async function cargarHistorial() {
+      const tbody = document.getElementById("tablaHistorial");
+      
+      try {
+        const q = query(
+          collection(db, "nombramientos"),
+          where("usuarioCedula", "==", usuario.cedula),
+          orderBy("creadoEn", "desc")
+        );
+        const snapshot = await getDocs(q);
+        
+        if (snapshot.empty) {
+          tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-ccss-400">No hay nombramientos registrados</td></tr>';
+          return;
+        }
+        
+        let html = "";
+        snapshot.forEach(doc => {
+          const r = doc.data();
+          const estadoClass = r.estado 
+            ? 'bg-emerald-100 text-emerald-700 border-emerald-200' 
+            : 'bg-amber-100 text-amber-700 border-amber-200';
+          const estadoText = r.estado ? 'Pagado' : 'Pendiente';
+          
+          html += `
+            <tr class="hover:bg-ccss-50 transition-colors">
+              <td class="py-3 px-4 text-sm text-ccss-900">
+                <div class="font-medium">${r.inicio}</div>
+                <div class="text-xs text-ccss-500">al ${r.final}</div>
+              </td>
+              <td class="py-3 px-4 text-sm text-ccss-900">${r.area}</td>
+              <td class="py-3 px-4 text-sm font-bold text-ccss-700">${r.dias}</td>
+              <td class="py-3 px-4 text-sm text-ccss-900">₡${(r.salario || 0).toLocaleString('es-CR')}</td>
+              <td class="py-3 px-4 text-sm text-ccss-900">
+                <div class="font-medium">${r.personaSustituirNombre || '—'}</div>
+                <div class="text-xs text-ccss-500">${r.personaSustituirCedula || ''}</div>
+              </td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full border ${estadoClass}">
+                  ${estadoText}
+                </span>
+              </td>
+            </tr>
+          `;
+        });
+        
+        tbody.innerHTML = html;
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-red-500">Error: ${error.message}</td></tr>`;
+      }
+    }
+
+    // ============================================
+    // TOASTS
+    // ============================================
+    function mostrarToast(mensaje, tipo = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const colores = {
+        success: 'bg-emerald-50 border-emerald-400 text-emerald-800',
+        error: 'bg-red-50 border-red-400 text-red-800',
+        info: 'bg-ccss-50 border-ccss-400 text-ccss-800'
+      };
+      const iconos = { success: '✅', error: '❌', info: 'ℹ️' };
+      
+      toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-xl border shadow-lg ${colores[tipo]} animate-[fadeIn_0.3s_ease-out]`;
+      toast.innerHTML = `<span>${iconos[tipo]}</span><span class="font-medium text-sm">${mensaje}</span>`;
+      
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // ============================================
+    // INICIALIZACIÓN
+    // ============================================
+    document.addEventListener("DOMContentLoaded", () => {
+      cargarAreas();
+      generarReporteDiasPorArea();
+      cargarHistorial();
+      lucide.createIcons();
+      
+      document.getElementById("btnActualizarReporte").addEventListener("click", function() {
+        this.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Actualizando...';
+        lucide.createIcons();
+        generarReporteDiasPorArea().then(() => {
+          this.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i> Actualizar';
+          lucide.createIcons();
+        });
       });
     });
-    
-    document.addEventListener("DOMContentLoaded", function() {
-      setTimeout(() => {
-        generarReporteDiasPorArea();
-      }, 1000);
-    });
-
-   // =============================
-// Modal Selección de Personal (CORREGIDO)
-// =============================
-const modalPersonal = document.getElementById("modalPersonal");
-const btnBuscarPersonal = document.getElementById("btnBuscarPersonal");
-const cerrarPersonalBtn = document.getElementById("cerrarPersonalBtn");
-const tablaPersonal = document.querySelector("#tablaPersonal tbody");
-const filtroNombre = document.getElementById("filtroNombre");
-const filtroCedula = document.getElementById("filtroCedula");
-const filtroPuesto = document.getElementById("filtroPuesto");
-const btnBuscarEnModal = document.getElementById("btnBuscarEnModal");
-const btnLimpiarFiltros = document.getElementById("btnLimpiarFiltros");
-
-let listaPersonal = [];
-const puestosUnicos = new Set(); // 👈 ¡Importante: estaba faltando!
-
-// Función para seleccionar una persona y cerrar el modal
-function seleccionarPersona(cedula, nombre) {
-  document.getElementById("cedulaSustituir").value = cedula;
-  document.getElementById("nombreSustituir").value = nombre;
-  modalPersonal.style.display = "none";
-}
-window.seleccionarPersona = seleccionarPersona; // Necesario para onclick en strings
-
-// Cargar Personal.json con validación robusta
-async function cargarPersonal() {
-  try {
-    const respuesta = await fetch("personal.json");
-    if (!respuesta.ok) {
-      throw new Error(`Archivo no encontrado. Código: ${respuesta.status}`);
-    }
-
-    const datos = await respuesta.json();
-
-    if (!Array.isArray(datos)) {
-      throw new Error("personal.json debe ser un arreglo de objetos");
-    }
-
-    listaPersonal = datos.filter(p => {
-      if (!p || typeof p !== 'object') return false;
-      return (p.nombre != null) || (p.cedula != null) || (p.puesto != null);
-    });
-
-    // Limpiar y llenar puestos únicos
-    puestosUnicos.clear();
-    listaPersonal.forEach(p => {
-      if (p.puesto && typeof p.puesto === 'string') {
-        puestosUnicos.add(p.puesto);
-      }
-    });
-
-    // Llenar el select de puestos en el modal
-    const opcionesPuesto = Array.from(puestosUnicos).sort();
-    filtroPuesto.innerHTML = '<option value="">Todos los puestos</option>';
-    opcionesPuesto.forEach(puesto => {
-      const option = document.createElement("option");
-      option.value = puesto;
-      option.textContent = puesto;
-      filtroPuesto.appendChild(option);
-    });
-
-    console.log(`✅ Cargados ${listaPersonal.length} registros válidos`);
-    tablaPersonal.innerHTML = '<tr><td colspan="4" class="message">Ingrese criterios y haga clic en "Buscar"</td></tr>';
-  } catch (error) {
-    console.error("❌ Error al cargar personal.json:", error);
-    tablaPersonal.innerHTML = `<tr><td colspan="4" class="message error">
-      ❌ Error: ${error.message}<br>
-      Verifique que el archivo "personal.json" exista y sea un JSON válido.
-    </td></tr>`;
-  }
-}
-
-// Función de búsqueda segura (adaptada al modal)
-function buscarPersonal() {
-  const nombreFiltro = filtroNombre.value.trim().toLowerCase();
-  const cedulaFiltro = filtroCedula.value.trim().replace(/\D/g, ''); // Solo dígitos
-  const puestoFiltro = filtroPuesto.value;
-
-  tablaPersonal.innerHTML = '<tr><td colspan="4" class="message loading">Buscando...</td></tr>';
-
-  setTimeout(() => {
-    const resultados = listaPersonal.filter(p => {
-      // Filtro por puesto
-      if (puestoFiltro && p.puesto !== puestoFiltro) return false;
-
-      // Filtro por nombre
-      if (nombreFiltro) {
-        const nombreNormalizado = (p.nombre || '').toLowerCase();
-        if (!nombreNormalizado.includes(nombreFiltro)) return false;
-      }
-
-      // Filtro por cédula
-      if (cedulaFiltro) {
-        const cedulaStr = (p.cedula != null) ? p.cedula.toString() : '';
-        if (!cedulaStr.includes(cedulaFiltro)) return false;
-      }
-
-      return true;
-    });
-
-    if (resultados.length === 0) {
-      tablaPersonal.innerHTML = '<tr><td colspan="4" class="message error">❌ No se encontraron coincidencias</td></tr>';
-    } else {
-      const resultadosAMostrar = resultados.slice(0, 100);
-      tablaPersonal.innerHTML = resultadosAMostrar.map(p => `
-        <tr>
-          <td>${p.cedula != null ? p.cedula : '—'}</td>
-          <td>${p.nombre || '—'}</td>
-          <td>${p.puesto || '—'}</td>
-          <td>
-            <button class="btn-primary" onclick="seleccionarPersona('${(p.cedula != null ? p.cedula : '').replace(/'/g, "\\'")}', '${(p.nombre || '').replace(/'/g, "\\'")}')">
-              Seleccionar
-            </button>
-          </td>
-        </tr>
-      `).join('');
-
-      if (resultados.length > 100) {
-        const filaAdvertencia = document.createElement("tr");
-        filaAdvertencia.innerHTML = `<td colspan="4" class="message">... y ${resultados.length - 100} más (mostrando solo 100)</td>`;
-        tablaPersonal.appendChild(filaAdvertencia);
-      }
-    }
-  }, 150);
-}
-
-// Eventos del modal
-btnBuscarPersonal.addEventListener("click", async () => {
-  modalPersonal.style.display = "flex";
-  if (listaPersonal.length === 0) {
-    await cargarPersonal();
-  }
-  tablaPersonal.innerHTML = '<tr><td colspan="4">Ingrese criterios y haga clic en "Buscar"</td></tr>';
-});
-
-cerrarPersonalBtn.addEventListener("click", () => {
-  modalPersonal.style.display = "none";
-});
-
-btnBuscarEnModal.addEventListener("click", buscarPersonal);
-
-btnLimpiarFiltros.addEventListener("click", () => {
-  filtroNombre.value = "";
-  filtroCedula.value = "";
-  filtroPuesto.value = "";
-  tablaPersonal.innerHTML = '<tr><td colspan="4">Filtros limpiados. Haga clic en "Buscar".</td></tr>';
-});
-
-// Permitir búsqueda con Enter dentro del modal
-modalPersonal.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    buscarPersonal();
-  }
-});
   </script>
 </body>
 </html>

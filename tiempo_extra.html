@@ -2,132 +2,283 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Tiempo Extra</title>
-  <link rel="stylesheet" href="styleextra.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tiempo Extra | CCSS Interino</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ccss: {
+              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
+              400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
+              800: '#1e40af', 900: '#1e3a8a', 950: '#172554',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * { font-family: 'Inter', sans-serif; }
+    
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+    
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .modal-enter { animation: modalEnter 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    @keyframes modalEnter {
+      from { opacity: 0; transform: scale(0.95) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    
+    .input-ccss {
+      @apply w-full px-3 py-2 border border-ccss-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900 text-sm transition-all;
+    }
+    
+    .input-ccss:hover { border-color: #93c5fd; }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
+    
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+    }
+  </style>
 </head>
-<body>
-  <div class="container">
-    <h2>Registro de Tiempo Extra</h2>
-    
-    <!-- Información del usuario activo -->
-    <div class="info-usuario" id="infoUsuario">
-      <h3>Usuario Activo: <span id="nombreUsuario">Cargando...</span></h3>
-      <p>Rol: <span id="rolUsuario">Usuario</span></p>
-    </div>
-    
-    <div class="form-extra">
-      <h3 class="form-title">Nuevo Registro de Tiempo Extra</h3>
-      <form id="formExtra">
-        <div class="form-group">
-          <div class="form-field">
-            <label>Fecha:</label>
-            <input type="date" id="fechaExtra" required>
-          </div>
-          
-          <div class="form-field">
-            <label>Hora Entrada Extra:</label>
-            <input type="time" id="entradaExtra" required>
-          </div>
-          
-          <div class="form-field">
-            <label>Hora Salida Extra:</label>
-            <input type="time" id="salidaExtra" required>
-          </div>
+<body class="bg-gradient-to-br from-ccss-50 via-white to-ccss-100 min-h-screen">
 
-          <div class="form-field">
-            <label>Total Horas:</label>
-            <input type="text" id="horasExtra" readonly>
+  <!-- Header -->
+  <nav class="bg-white/80 backdrop-blur-md border-b border-ccss-200 sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-3">
+          <button onclick="location.href='dashboard.html'" class="p-2 hover:bg-ccss-100 rounded-lg transition-colors text-ccss-600">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+          <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+            <i data-lucide="zap" class="text-white w-6 h-6"></i>
           </div>
-
-          <div class="form-field">
-            <label>Área:</label>
-            <input type="text" id="areaExtra" required>
+          <div>
+            <h1 class="text-xl font-bold text-ccss-900 leading-tight">Tiempo Extra</h1>
+            <p class="text-xs text-ccss-500 font-medium">Registro de horas extraordinarias</p>
           </div>
         </div>
         
-        <div class="form-field">
-          <label>Observaciones:</label>
-          <textarea id="observacionesExtra" rows="3" placeholder="Ingrese observaciones adicionales..."></textarea>
+        <div class="flex items-center gap-3">
+          <div class="text-right hidden sm:block">
+            <p class="text-sm font-semibold text-ccss-900" id="nombreUsuario">Usuario</p>
+            <p class="text-xs text-ccss-500" id="rolUsuario">Rol</p>
+          </div>
+          <div class="w-10 h-10 bg-gradient-to-br from-ccss-500 to-ccss-700 rounded-full flex items-center justify-center text-white font-bold shadow-md" id="userAvatar">
+            US
+          </div>
         </div>
+      </div>
+    </div>
+  </nav>
 
-        <button type="submit" class="guardar">Guardar Tiempo Extra</button>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in">
+    
+    <!-- Formulario -->
+    <div class="glass-panel rounded-2xl border border-ccss-200 shadow-lg p-6 mb-8 no-print">
+      <h2 class="text-lg font-bold text-ccss-900 mb-6 flex items-center gap-2">
+        <i data-lucide="plus-circle" class="w-5 h-5 text-ccss-600"></i>
+        Nuevo Registro de Tiempo Extra
+      </h2>
+      
+      <form id="formExtra" class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          
+          <!-- Fecha -->
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Fecha <span class="text-red-500">*</span></label>
+            <input type="date" id="fechaExtra" required 
+              class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900 transition-all hover:border-ccss-400">
+          </div>
+          
+          <!-- Hora Entrada -->
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Hora Entrada <span class="text-red-500">*</span></label>
+            <input type="time" id="entradaExtra" required 
+              class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900 text-center transition-all hover:border-ccss-400">
+          </div>
+          
+          <!-- Hora Salida -->
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Hora Salida <span class="text-red-500">*</span></label>
+            <input type="time" id="salidaExtra" required 
+              class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900 text-center transition-all hover:border-ccss-400">
+          </div>
+          
+          <!-- Total Horas (calculado) -->
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Total Horas</label>
+            <input type="text" id="horasExtra" readonly 
+              class="w-full px-4 py-2.5 border border-ccss-200 rounded-xl bg-ccss-50 text-ccss-900 font-bold text-center">
+          </div>
+          
+          <!-- Área -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Área <span class="text-red-500">*</span></label>
+            <input type="text" id="areaExtra" required placeholder="Ej: Hospital San Juan de Dios" 
+              class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900 transition-all hover:border-ccss-400">
+          </div>
+          
+          <!-- Observaciones -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-ccss-700 mb-1.5">Observaciones</label>
+            <input type="text" id="observacionesExtra" placeholder="Motivo del tiempo extra..." 
+              class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900 transition-all hover:border-ccss-400">
+          </div>
+        </div>
+        
+        <div class="flex gap-3 pt-4 border-t border-ccss-100">
+          <button type="submit" 
+            class="px-6 py-3 bg-ccss-600 hover:bg-ccss-700 text-white rounded-xl font-semibold transition-colors shadow-lg shadow-ccss-500/20 flex items-center gap-2">
+            <i data-lucide="save" class="w-5 h-5"></i>
+            Guardar Registro
+          </button>
+          <button type="button" onclick="limpiarFormularioExtra()" 
+            class="px-6 py-3 bg-white border border-ccss-300 text-ccss-700 rounded-xl font-semibold hover:bg-ccss-50 transition-colors">
+            Limpiar
+          </button>
+        </div>
       </form>
     </div>
 
-    <div class="filtros-container">
-      <label>Mes:</label>
-      <select id="mesFiltroExtra">
-        <option value="">Todos los meses</option>
-        <option value="0">Enero</option>
-        <option value="1">Febrero</option>
-        <option value="2">Marzo</option>
-        <option value="3">Abril</option>
-        <option value="4">Mayo</option>
-        <option value="5">Junio</option>
-        <option value="6">Julio</option>
-        <option value="7">Agosto</option>
-        <option value="8">Septiembre</option>
-        <option value="9">Octubre</option>
-        <option value="10">Noviembre</option>
-        <option value="11">Diciembre</option>
-      </select>
-      
-      <label>Año:</label>
-      <select id="anioFiltroExtra"></select>
-      
-      <button class="btn-filtrar" id="btnFiltrar">Filtrar Registros</button>
-      <button class="pdf" id="btnExportarPDF">Exportar PDF</button>
-      <button class="pdf" id="btnImprimir">Imprimir Reporte</button>
-    </div>
-
-    <div id="reporteParaImprimir" class="no-print">
-      <table id="tablaExtras">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Entrada</th>
-            <th>Salida</th>
-            <th>Horas</th>
-            <th>Área</th>
-            <th>Observaciones</th>
-            <th>Estado Pago</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    
-    <div class="totales-container" id="totalesContainer">
-      <div class="total-item">
-        Total Registros
-        <div class="total-valor" id="totalRegistros">0</div>
-      </div>
-      <div class="total-item">
-        Horas Totales
-        <div class="total-valor" id="totalHoras">0h 0m</div>
-      </div>
-      <div class="total-item">
-        Pagados
-        <div class="total-valor" id="totalPagados">0</div>
-      </div>
-      <div class="total-item">
-        Pendientes
-        <div class="total-valor" id="totalPendientes">0</div>
+    <!-- Filtros y Acciones -->
+    <div class="glass-panel rounded-2xl border border-ccss-200 shadow-lg p-6 mb-6 no-print">
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="filter" class="w-5 h-5 text-ccss-600"></i>
+          <h3 class="font-bold text-ccss-900">Filtros</h3>
+        </div>
+        
+        <div class="flex flex-wrap items-center gap-3">
+          <select id="mesFiltroExtra" 
+            class="px-3 py-2 border border-ccss-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900 text-sm">
+            <option value="">Todos los meses</option>
+            <option value="0">Enero</option>
+            <option value="1">Febrero</option>
+            <option value="2">Marzo</option>
+            <option value="3">Abril</option>
+            <option value="4">Mayo</option>
+            <option value="5">Junio</option>
+            <option value="6">Julio</option>
+            <option value="7">Agosto</option>
+            <option value="8">Septiembre</option>
+            <option value="9">Octubre</option>
+            <option value="10">Noviembre</option>
+            <option value="11">Diciembre</option>
+          </select>
+          
+          <select id="anioFiltroExtra" 
+            class="px-3 py-2 border border-ccss-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900 text-sm">
+          </select>
+          
+          <button id="btnFiltrar" 
+            class="px-4 py-2 bg-ccss-600 hover:bg-ccss-700 text-white rounded-lg font-medium transition-colors shadow-sm shadow-ccss-500/20 flex items-center gap-1">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            Filtrar
+          </button>
+          
+          <div class="flex gap-2 border-l border-ccss-200 pl-3">
+            <button id="btnExportarPDF" 
+              class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg font-medium transition-colors flex items-center gap-1">
+              <i data-lucide="file-text" class="w-4 h-4"></i>
+              PDF
+            </button>
+            <button id="btnImprimir" 
+              class="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 rounded-lg font-medium transition-colors flex items-center gap-1">
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              Imprimir
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- 🎯 Botón flotante "Inicio" -->
-  <a href="dashboard.html" class="btn-flotante-inicio" title="Ir al Dashboard">
-    🏠 Inicio
-  </a>
+    <!-- Totales -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 no-print">
+      <div class="bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-ccss-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Total Registros</p>
+        <p class="text-2xl font-bold text-ccss-900" id="totalRegistros">0</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-violet-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Horas Totales</p>
+        <p class="text-2xl font-bold text-ccss-900" id="totalHoras">0h 0m</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-emerald-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Pagados</p>
+        <p class="text-2xl font-bold text-ccss-900" id="totalPagados">0</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-amber-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Pendientes</p>
+        <p class="text-2xl font-bold text-ccss-900" id="totalPendientes">0</p>
+      </div>
+    </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Tabla -->
+    <div class="glass-panel rounded-2xl border border-ccss-200 shadow-lg overflow-hidden mb-8">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-ccss-50">
+            <tr class="border-b-2 border-ccss-200">
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Fecha</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Entrada</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Salida</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Horas</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Área</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Observaciones</th>
+              <th class="text-center py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Estado</th>
+              <th class="text-center py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider no-print">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaExtrasBody" class="divide-y divide-ccss-100">
+            <tr>
+              <td colspan="8" class="py-8 text-center text-ccss-400">
+                <i data-lucide="loader-2" class="w-6 h-6 mx-auto mb-2 animate-spin"></i>
+                Cargando registros...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[100] space-y-2 pointer-events-none"></div>
 
   <script type="module">
+    // ============================================
+    // FIREBASE
+    // ============================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      getDocs, 
+      doc, 
+      updateDoc,
+      query,
+      where
+    } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
@@ -141,175 +292,307 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Verificar y obtener usuario activo
-    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
-    if(!usuario) window.location.href = "login.html";
+    // ============================================
+    // 🔧 UTILIDADES DE FECHA CORREGIDAS
+    // ============================================
     
-    // Variables globales
-    let tablaBody;
-    let entrada, salida, horasInput;
-
-    // Función para inicializar elementos del DOM
-    function inicializarElementos() {
-      // Mostrar información del usuario
-      const nombreUsuarioEl = document.getElementById("nombreUsuario");
-      const rolUsuarioEl = document.getElementById("rolUsuario");
-      
-      if (nombreUsuarioEl && rolUsuarioEl) {
-        nombreUsuarioEl.textContent = usuario.nombre || "Usuario no disponible";
-        rolUsuarioEl.textContent = usuario.rol || "Usuario";
-      }
-      
-      // Obtener elementos del DOM
-      tablaBody = document.querySelector("#tablaExtras tbody");
-      entrada = document.getElementById("entradaExtra");
-      salida = document.getElementById("salidaExtra");
-      horasInput = document.getElementById("horasExtra");
-      
-      // Asignar eventos a los botones
-      document.getElementById("btnFiltrar").addEventListener("click", cargarExtras);
-      document.getElementById("btnExportarPDF").addEventListener("click", generarPDFExtra);
-      document.getElementById("btnImprimir").addEventListener("click", prepararParaImprimir);
-      
-      // Asignar eventos a los campos de hora
-      entrada.addEventListener("change", calcularHorasExtra);
-      salida.addEventListener("change", calcularHorasExtra);
-      
-      // Asignar evento al formulario
-      document.getElementById("formExtra").addEventListener("submit", guardarTiempoExtra);
+    function fechaAString(anio, mes, dia) {
+      return `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
     }
 
-    // Generar años
-    function generarAnios() {
-      const selectAnio = document.getElementById("anioFiltroExtra");
-      const yearActual = new Date().getFullYear();
-      for(let y = yearActual; y >= yearActual-10; y--){
-        const opt = document.createElement("option"); 
-        opt.value = y; 
-        opt.textContent = y;
-        selectAnio.appendChild(opt);
-      }
-      // Establecer año actual por defecto
-      selectAnio.value = yearActual;
+    function parseFechaString(fechaStr) {
+      const [a, m, d] = fechaStr.split('-').map(Number);
+      return { anio: a, mes: m - 1, dia: d };
     }
 
+    /**
+     * Obtiene componentes de fecha de un input type="date" (YYYY-MM-DD)
+     * SIN crear Date object para evitar desfase
+     */
+    function getFechaInput(inputValue) {
+      if (!inputValue) return null;
+      return parseFechaString(inputValue);
+    }
+
+    /**
+     * Verifica si fecha string pertenece a mes/año específicos
+     */
+    function fechaEnMesAnio(fechaStr, mes, anio) {
+      const f = parseFechaString(fechaStr);
+      return f.mes === mes && f.anio === anio;
+    }
+
+    // ============================================
+    // ESTADO
+    // ============================================
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!usuario) {
+      window.location.href = "login.html";
+    }
+
+    document.getElementById("nombreUsuario").textContent = usuario.nombre || "Usuario";
+    document.getElementById("rolUsuario").textContent = usuario.rol || "Usuario";
+    document.getElementById("userAvatar").textContent = (usuario.nombre || 'U').substring(0, 2).toUpperCase();
+
+    // ============================================
+    // ELEMENTOS
+    // ============================================
+    const entrada = document.getElementById("entradaExtra");
+    const salida = document.getElementById("salidaExtra");
+    const horasInput = document.getElementById("horasExtra");
+    const fechaExtra = document.getElementById("fechaExtra");
+
+    // ============================================
+    // CÁLCULO DE HORAS
+    // ============================================
     function calcularHorasExtra() {
-      if(!entrada.value || !salida.value) return;
-      const [h1,m1] = entrada.value.split(":").map(Number);
-      const [h2,m2] = salida.value.split(":").map(Number);
-      let diff = (h2*60 + m2) - (h1*60 + m1);
-      if(diff < 0) diff = 0;
-      const horas = Math.floor(diff/60);
-      const minutos = diff % 60;
+      if (!entrada.value || !salida.value) {
+        horasInput.value = "";
+        return;
+      }
+      
+      const [h1, m1] = entrada.value.split(":").map(Number);
+      const [h2, m2] = salida.value.split(":").map(Number);
+      
+      let diffMinutos = (h2 * 60 + m2) - (h1 * 60 + m1);
+      
+      // Si la salida es antes de la entrada, asumimos turno nocturno (24h +)
+      if (diffMinutos < 0) {
+        diffMinutos += 24 * 60;
+      }
+      
+      const horas = Math.floor(diffMinutos / 60);
+      const minutos = diffMinutos % 60;
+      
       horasInput.value = `${horas}h ${minutos}m`;
     }
 
-    // Guardar tiempo extra
-    async function guardarTiempoExtra(e) {
+    entrada.addEventListener("change", calcularHorasExtra);
+    salida.addEventListener("change", calcularHorasExtra);
+
+    // ============================================
+    // GENERAR AÑOS
+    // ============================================
+    function generarAnios() {
+      const select = document.getElementById("anioFiltroExtra");
+      const yearActual = new Date().getFullYear();
+      select.innerHTML = "";
+      for (let y = yearActual + 1; y >= yearActual - 5; y--) {
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        select.appendChild(opt);
+      }
+      select.value = yearActual;
+    }
+
+    // ============================================
+    // GUARDAR TIEMPO EXTRA
+    // ============================================
+    document.getElementById("formExtra").addEventListener("submit", async (e) => {
       e.preventDefault();
+      
+      if (!fechaExtra.value) {
+        mostrarToast("Seleccione una fecha", "error");
+        return;
+      }
+      
+      if (!horasInput.value) {
+        mostrarToast("Calcule las horas primero", "error");
+        return;
+      }
+
       try {
-        await addDoc(collection(db,"tiempoExtra"),{
-          fecha: document.getElementById("fechaExtra").value,
+        await addDoc(collection(db, "tiempoExtra"), {
+          fecha: fechaExtra.value, // Guardamos como YYYY-MM-DD directamente
           entrada: entrada.value,
           salida: salida.value,
           horas: horasInput.value,
           estado: false,
-          area: document.getElementById("areaExtra").value,
-          observaciones: document.getElementById("observacionesExtra").value,
+          area: document.getElementById("areaExtra").value.trim(),
+          observaciones: document.getElementById("observacionesExtra").value.trim(),
           usuarioCedula: usuario.cedula,
           usuarioNombre: usuario.nombre,
-          createdAt: new Date()
+          createdAt: new Date().toISOString()
         });
 
-        alert("✅ Tiempo extra guardado exitosamente");
-        e.target.reset();
-        horasInput.value = "";
+        mostrarToast("Tiempo extra guardado correctamente", "success");
+        limpiarFormularioExtra();
         cargarExtras();
       } catch (error) {
-        console.error("Error al guardar:", error);
-        alert("❌ Error al guardar el tiempo extra: " + error.message);
+        mostrarToast("Error al guardar: " + error.message, "error");
+      }
+    });
+
+    function limpiarFormularioExtra() {
+      document.getElementById("formExtra").reset();
+      horasInput.value = "";
+    }
+    window.limpiarFormularioExtra = limpiarFormularioExtra;
+
+    // ============================================
+    // CARGAR REGISTROS (CON FILTRO CORREGIDO)
+    // ============================================
+    async function cargarExtras() {
+      const tbody = document.getElementById("tablaExtrasBody");
+      tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-ccss-400"><i data-lucide="loader-2" class="w-6 h-6 mx-auto mb-2 animate-spin"></i>Cargando...</td></tr>';
+      lucide.createIcons();
+
+      const mesSel = document.getElementById("mesFiltroExtra").value;
+      const anioSel = parseInt(document.getElementById("anioFiltroExtra").value);
+
+      try {
+        const snapshot = await getDocs(collection(db, "tiempoExtra"));
+        const registros = [];
+
+        snapshot.forEach(docSnap => {
+          const r = docSnap.data();
+          if (r.usuarioCedula !== usuario.cedula) return;
+
+          // 🔧 CORRECCIÓN CRÍTICA: Parsear fecha string sin new Date(string)
+          const fechaComp = getFechaInput(r.fecha);
+          if (!fechaComp) return;
+
+          // Filtro por mes (si se seleccionó)
+          if (mesSel !== "" && fechaComp.mes !== parseInt(mesSel)) return;
+          
+          // Filtro por año
+          if (!isNaN(anioSel) && fechaComp.anio !== anioSel) return;
+
+          registros.push({ ...r, id: docSnap.id });
+        });
+
+        // Ordenar por fecha (comparando strings YYYY-MM-DD funciona correctamente)
+        registros.sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+        if (registros.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-ccss-400">No se encontraron registros para los filtros seleccionados</td></tr>';
+          actualizarTotales(0, "0h 0m", 0, 0);
+          return;
+        }
+
+        renderizarTabla(registros);
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-red-500">Error: ${error.message}</td></tr>`;
       }
     }
 
-    async function cargarExtras() {
-      if (!tablaBody) {
-        console.error("tablaBody no está definido");
-        return;
-      }
+    function renderizarTabla(registros) {
+      const tbody = document.getElementById("tablaExtrasBody");
+      tbody.innerHTML = "";
       
-      tablaBody.innerHTML = "<tr><td colspan='8' style='text-align:center;padding:20px;'>Cargando registros...</td></tr>";
-      
-      const mes = document.getElementById("mesFiltroExtra").value === "" ? null : parseInt(document.getElementById("mesFiltroExtra").value);
-      const anio = parseInt(document.getElementById("anioFiltroExtra").value);
+      let totalMinutos = 0;
+      let totalPagados = 0;
+      let totalPendientes = 0;
 
-      try {
-        const snapshot = await getDocs(collection(db,"tiempoExtra"));
-        const registrosFiltrados = [];
-        
-        snapshot.forEach(docSnap=>{
-          const r = docSnap.data();
-          const fechaDate = new Date(r.fecha);
-          if(r.usuarioCedula !== usuario.cedula) return;
-          if(mes !== null && fechaDate.getMonth() !== mes) return;
-          if(!isNaN(anio) && fechaDate.getFullYear() !== anio) return;
-          
-          registrosFiltrados.push({...r, id: docSnap.id});
-        });
-        
-        if(registrosFiltrados.length === 0) {
-          tablaBody.innerHTML = "<tr><td colspan='8' style='text-align:center;padding:20px;color:#666;'>No se encontraron registros para los filtros seleccionados.</td></tr>";
-          actualizarTotales([], 0, 0, 0);
-          return;
-        }
-        
-        tablaBody.innerHTML = "";
-        let totalHoras = 0;
-        let totalPagados = 0;
-        let totalPendientes = 0;
-        
-        registrosFiltrados.forEach(registro => {
-          const tr = document.createElement("tr");
-          
-          // Calcular horas en minutos para el total
-          if(registro.horas) {
-            const match = registro.horas.match(/(\d+)h\s*(\d+)m/);
-            if(match) {
-              totalHoras += parseInt(match[1]) * 60 + parseInt(match[2]);
-            }
+      registros.forEach(registro => {
+        // Parsear horas para totales
+        if (registro.horas) {
+          const match = registro.horas.match(/(\d+)h\s*(\d+)m/);
+          if (match) {
+            totalMinutos += parseInt(match[1]) * 60 + parseInt(match[2]);
           }
-          
-          if(registro.estado) {
-            totalPagados++;
-          } else {
-            totalPendientes++;
-          }
-          
-          tr.innerHTML = `
-            <td>${registro.fecha}</td>
-            <td><input type="time" value="${registro.entrada || ''}" data-id="${registro.id}" class="entrada" style="width:100px;"></td>
-            <td><input type="time" value="${registro.salida || ''}" data-id="${registro.id}" class="salida" style="width:100px;"></td>
-            <td><input type="text" value="${registro.horas || ''}" readonly style="width:80px;"></td>
-            <td><input type="text" value="${registro.area || ''}" data-id="${registro.id}" class="area" style="width:120px;"></td>
-            <td><textarea data-id="${registro.id}" class="observaciones" style="width:150px;height:60px;">${registro.observaciones || ''}</textarea></td>
-            <td><input type="checkbox" ${registro.estado ? "checked" : ""} data-id="${registro.id}" class="estado"></td>
-            <td><button class="edit" data-id="${registro.id}">Guardar</button></td>
-          `;
-          tablaBody.appendChild(tr);
-        });
-        
-        // Convertir total de minutos a horas y minutos
-        const totalHorasFormateadas = `${Math.floor(totalHoras/60)}h ${totalHoras%60}m`;
-        
-        // Actualizar totales
-        actualizarTotales(registrosFiltrados.length, totalHorasFormateadas, totalPagados, totalPendientes);
-        
-        activarBotonesExtra();
-      } catch (error) {
-        console.error("Error al cargar registros:", error);
-        if (tablaBody) {
-          tablaBody.innerHTML = `<tr><td colspan='8' style='text-align:center;padding:20px;color:red;'>Error al cargar los registros: ${error.message}</td></tr>`;
         }
-      }
+
+        if (registro.estado) totalPagados++;
+        else totalPendientes++;
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-ccss-50 transition-colors group";
+        
+        const estadoBadge = registro.estado
+          ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full border border-emerald-200">Pagado</span>'
+          : '<span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full border border-amber-200">Pendiente</span>';
+
+        tr.innerHTML = `
+          <td class="py-3 px-4 text-sm text-ccss-900 font-medium">${registro.fecha}</td>
+          <td class="py-3 px-4">
+            <input type="time" value="${registro.entrada || ''}" data-id="${registro.id}" class="entrada-edit w-24 px-2 py-1 border border-ccss-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900 text-center">
+          </td>
+          <td class="py-3 px-4">
+            <input type="time" value="${registro.salida || ''}" data-id="${registro.id}" class="salida-edit w-24 px-2 py-1 border border-ccss-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900 text-center">
+          </td>
+          <td class="py-3 px-4 text-sm font-bold text-ccss-700">
+            <input type="text" value="${registro.horas || ''}" readonly data-id="${registro.id}" class="horas-edit w-20 px-2 py-1 border border-ccss-200 rounded-lg text-sm bg-ccss-50 text-center font-bold">
+          </td>
+          <td class="py-3 px-4">
+            <input type="text" value="${registro.area || ''}" data-id="${registro.id}" class="area-edit px-2 py-1 border border-ccss-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900 w-full">
+          </td>
+          <td class="py-3 px-4">
+            <input type="text" value="${registro.observaciones || ''}" data-id="${registro.id}" class="obs-edit px-2 py-1 border border-ccss-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900 w-full">
+          </td>
+          <td class="py-3 px-4 text-center">
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="checkbox" ${registro.estado ? "checked" : ""} data-id="${registro.id}" class="estado-edit w-5 h-5 rounded border-ccss-300 text-ccss-600 focus:ring-ccss-500">
+            </label>
+          </td>
+          <td class="py-3 px-4 text-center no-print">
+            <button class="guardar-edit px-3 py-1.5 bg-ccss-600 hover:bg-ccss-700 text-white text-sm rounded-lg transition-colors shadow-sm" data-id="${registro.id}">
+              <i data-lucide="save" class="w-4 h-4 inline"></i>
+            </button>
+          </td>
+        `;
+        
+        tbody.appendChild(tr);
+      });
+
+      // Activar eventos de edición
+      activarEdicionInline();
+
+      // Actualizar totales
+      const totalHorasFormateadas = `${Math.floor(totalMinutos / 60)}h ${totalMinutos % 60}m`;
+      actualizarTotales(registros.length, totalHorasFormateadas, totalPagados, totalPendientes);
+    }
+
+    function activarEdicionInline() {
+      // Recalcular horas al cambiar entrada/salida
+      document.querySelectorAll(".entrada-edit, .salida-edit").forEach(input => {
+        input.addEventListener("change", function() {
+          const id = this.dataset.id;
+          const entradaVal = document.querySelector(`.entrada-edit[data-id="${id}"]`).value;
+          const salidaVal = document.querySelector(`.salida-edit[data-id="${id}"]`).value;
+          
+          if (entradaVal && salidaVal) {
+            const [h1, m1] = entradaVal.split(":").map(Number);
+            const [h2, m2] = salidaVal.split(":").map(Number);
+            let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+            if (diff < 0) diff += 24 * 60;
+            const horas = Math.floor(diff / 60);
+            const minutos = diff % 60;
+            document.querySelector(`.horas-edit[data-id="${id}"]`).value = `${horas}h ${minutos}m`;
+          }
+        });
+      });
+
+      // Guardar cambios
+      document.querySelectorAll(".guardar-edit").forEach(btn => {
+        btn.addEventListener("click", async function() {
+          const id = this.dataset.id;
+          const entradaVal = document.querySelector(`.entrada-edit[data-id="${id}"]`).value;
+          const salidaVal = document.querySelector(`.salida-edit[data-id="${id}"]`).value;
+          const horasVal = document.querySelector(`.horas-edit[data-id="${id}"]`).value;
+          const areaVal = document.querySelector(`.area-edit[data-id="${id}"]`).value;
+          const obsVal = document.querySelector(`.obs-edit[data-id="${id}"]`).value;
+          const estadoVal = document.querySelector(`.estado-edit[data-id="${id}"]`).checked;
+
+          try {
+            await updateDoc(doc(db, "tiempoExtra", id), {
+              entrada: entradaVal,
+              salida: salidaVal,
+              horas: horasVal,
+              area: areaVal,
+              observaciones: obsVal,
+              estado: estadoVal,
+              updatedAt: new Date().toISOString()
+            });
+            
+            mostrarToast("Registro actualizado", "success");
+            cargarExtras();
+          } catch (error) {
+            mostrarToast("Error al actualizar: " + error.message, "error");
+          }
+        });
+      });
     }
 
     function actualizarTotales(totalRegistros, totalHoras, totalPagados, totalPendientes) {
@@ -319,218 +602,167 @@
       document.getElementById("totalPendientes").textContent = totalPendientes;
     }
 
-    function activarBotonesExtra(){
-      document.querySelectorAll("button.edit").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.dataset.id;
-          const entradaVal = document.querySelector(`.entrada[data-id="${id}"]`).value;
-          const salidaVal = document.querySelector(`.salida[data-id="${id}"]`).value;
-          const estadoVal = document.querySelector(`.estado[data-id="${id}"]`).checked;
-          const areaVal = document.querySelector(`.area[data-id="${id}"]`).value;
-          const observacionesVal = document.querySelector(`.observaciones[data-id="${id}"]`).value;
+    // ============================================
+    // EXPORTAR PDF
+    // ============================================
+    document.getElementById("btnExportarPDF").addEventListener("click", generarPDF);
 
-          // Recalcular horas
-          let diff = 0;
-          if(entradaVal && salidaVal){
-            const [h1,m1] = entradaVal.split(":").map(Number);
-            const [h2,m2] = salidaVal.split(":").map(Number);
-            diff = (h2*60 + m2) - (h1*60 + m1);
-            if(diff<0) diff=0;
-          }
-          const horas = `${Math.floor(diff/60)}h ${diff%60}m`;
+    function generarPDF() {
+      const filas = document.querySelectorAll("#tablaExtrasBody tr");
+      if (filas.length === 0 || filas[0].querySelector("td").textContent.includes("Cargando")) {
+        mostrarToast("Espere a que carguen los datos", "error");
+        return;
+      }
 
-          try {
-            await updateDoc(doc(db,"tiempoExtra",id),{
-              entrada: entradaVal,
-              salida: salidaVal,
-              horas: horas,
-              estado: estadoVal,
-              area: areaVal,
-              observaciones: observacionesVal,
-              updatedAt: new Date()
-            });
-            
-            alert("✅ Registro actualizado correctamente");
-            cargarExtras();
-          } catch (error) {
-            console.error("Error al actualizar:", error);
-            alert("❌ Error al actualizar el registro: " + error.message);
-          }
-        });
-      });
-    }
+      const mesTexto = document.getElementById("mesFiltroExtra").options[document.getElementById("mesFiltroExtra").selectedIndex].text;
+      const anioTexto = document.getElementById("anioFiltroExtra").value;
 
-    function generarPDFExtra(){
-      // Crear elemento para el PDF
+      // Construir contenido para PDF
       const element = document.createElement("div");
       element.style.padding = "20px";
-      
-      // Agregar encabezado
-      const header = document.createElement("div");
-      header.innerHTML = `
-        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #004080; padding-bottom: 20px;">
-          <h1 style="color: #004080; margin: 0 0 10px 0; font-size: 28px;">Reporte de Tiempo Extra</h1>
-          <p style="font-size: 16px; color: #333; margin: 0;">
+      element.style.fontFamily = "Arial, sans-serif";
+
+      element.innerHTML = `
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2563eb; padding-bottom: 20px;">
+          <h1 style="color: #1e3a8a; margin: 0 0 10px 0; font-size: 28px;">Reporte de Tiempo Extra</h1>
+          <p style="font-size: 14px; color: #475569; margin: 5px 0;">
             <strong>Funcionario:</strong> ${usuario.nombre} (${usuario.cedula})<br>
-            <strong>Período:</strong> ${document.getElementById("mesFiltroExtra").options[document.getElementById("mesFiltroExtra").selectedIndex].text} ${document.getElementById("anioFiltroExtra").value}<br>
-            <strong>Fecha de generación:</strong> ${new Date().toLocaleDateString('es-ES')}
+            <strong>Período:</strong> ${mesTexto} ${anioTexto}<br>
+            <strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CR')}
           </p>
         </div>
       `;
-      element.appendChild(header);
-      
-      // Crear tabla para el PDF (sin la columna de acciones)
-      const tablaPDF = document.createElement("table");
-      tablaPDF.style.width = "100%";
-      tablaPDF.style.borderCollapse = "collapse";
-      tablaPDF.style.margin = "20px 0";
-      
-      // Encabezados
-      const thead = document.createElement("thead");
-      thead.innerHTML = `
-        <tr>
-          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Fecha</th>
-          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Entrada</th>
-          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Salida</th>
-          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Horas</th>
-          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Área</th>
-          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Observaciones</th>
-          <th style="border: 1px solid #004080; padding: 12px; background: #004080; color: white; text-align: center;">Estado Pago</th>
-        </tr>
+
+      const tabla = document.createElement("table");
+      tabla.style.width = "100%";
+      tabla.style.borderCollapse = "collapse";
+      tabla.style.marginTop = "20px";
+      tabla.innerHTML = `
+        <thead>
+          <tr style="background: #2563eb; color: white;">
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: center;">Fecha</th>
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: center;">Entrada</th>
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: center;">Salida</th>
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: center;">Horas</th>
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: center;">Área</th>
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: center;">Observaciones</th>
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: center;">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
       `;
-      tablaPDF.appendChild(thead);
-      
-      // Cuerpo de la tabla
-      const tbody = document.createElement("tbody");
-      
-      // Obtener datos actuales
-      const filas = document.querySelectorAll("#tablaExtras tbody tr");
-      if (filas.length > 0 && filas[0].querySelector("td")?.textContent?.includes("Cargando")) {
-        alert("Por favor, espere a que se carguen los datos antes de generar el PDF.");
-        return;
-      }
-      
+
+      const tbody = tabla.querySelector("tbody");
       filas.forEach(fila => {
         const celdas = fila.querySelectorAll("td");
         if (celdas.length >= 7) {
+          const estado = celdas[6].querySelector("input")?.checked ? "PAGADO" : "PENDIENTE";
+          const estadoColor = estado === 'PAGADO' ? '#059669' : '#d97706';
+          
           const tr = document.createElement("tr");
-          
-          // Formatear el estado de pago
-          const estadoPago = celdas[6].querySelector("input")?.checked ? "PAGADO" : "PENDIENTE";
-          
           tr.innerHTML = `
-            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[0].textContent}</td>
-            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[1].querySelector("input")?.value || celdas[1].textContent}</td>
-            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[2].querySelector("input")?.value || celdas[2].textContent}</td>
-            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[3].querySelector("input")?.value || celdas[3].textContent}</td>
-            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[4].querySelector("input")?.value || celdas[4].textContent}</td>
-            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9;">${celdas[5].querySelector("textarea")?.value || celdas[5].textContent}</td>
-            <td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: #f9f9f9; font-weight: bold; color: ${estadoPago === 'PAGADO' ? '#28a745' : '#dc3545'};">${estadoPago}</td>
+            <td style="border: 1px solid #e2e8f0; padding: 8px; text-align: center;">${celdas[0].textContent}</td>
+            <td style="border: 1px solid #e2e8f0; padding: 8px; text-align: center;">${celdas[1].querySelector("input")?.value || ''}</td>
+            <td style="border: 1px solid #e2e8f0; padding: 8px; text-align: center;">${celdas[2].querySelector("input")?.value || ''}</td>
+            <td style="border: 1px solid #e2e8f0; padding: 8px; text-align: center; font-weight: bold;">${celdas[3].querySelector("input")?.value || ''}</td>
+            <td style="border: 1px solid #e2e8f0; padding: 8px; text-align: center;">${celdas[4].querySelector("input")?.value || ''}</td>
+            <td style="border: 1px solid #e2e8f0; padding: 8px; text-align: center;">${celdas[5].querySelector("input")?.value || ''}</td>
+            <td style="border: 1px solid #e2e8f0; padding: 8px; text-align: center; font-weight: bold; color: ${estadoColor};">${estado}</td>
           `;
           tbody.appendChild(tr);
         }
       });
-      
-      tablaPDF.appendChild(tbody);
-      element.appendChild(tablaPDF);
-      
-      // Agregar totales
+
+      element.appendChild(tabla);
+
+      // Totales
       const totalesDiv = document.createElement("div");
+      totalesDiv.style.marginTop = "30px";
+      totalesDiv.style.padding = "20px";
+      totalesDiv.style.background = "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
+      totalesDiv.style.color = "white";
+      totalesDiv.style.borderRadius = "12px";
+      totalesDiv.style.display = "flex";
+      totalesDiv.style.justifyContent = "space-around";
+      totalesDiv.style.flexWrap = "wrap";
+      totalesDiv.style.gap = "20px";
+      
       totalesDiv.innerHTML = `
-        <div style="margin-top: 30px; padding: 20px; background: #004080; color: white; border-radius: 10px; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
-          <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; min-width: 150px;">
-            <div>Total Registros</div>
-            <div style="font-size: 24px; font-weight: bold; margin-top: 5px;">${document.getElementById("totalRegistros").textContent}</div>
-          </div>
-          <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; min-width: 150px;">
-            <div>Horas Totales</div>
-            <div style="font-size: 24px; font-weight: bold; margin-top: 5px;">${document.getElementById("totalHoras").textContent}</div>
-          </div>
-          <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; min-width: 150px;">
-            <div>Pagados</div>
-            <div style="font-size: 24px; font-weight: bold; margin-top: 5px;">${document.getElementById("totalPagados").textContent}</div>
-          </div>
-          <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; min-width: 150px;">
-            <div>Pendientes</div>
-            <div style="font-size: 24px; font-weight: bold; margin-top: 5px;">${document.getElementById("totalPendientes").textContent}</div>
-          </div>
+        <div style="text-align: center;">
+          <div style="font-size: 12px; opacity: 0.8;">Total Registros</div>
+          <div style="font-size: 24px; font-weight: bold;">${document.getElementById("totalRegistros").textContent}</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 12px; opacity: 0.8;">Horas Totales</div>
+          <div style="font-size: 24px; font-weight: bold;">${document.getElementById("totalHoras").textContent}</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 12px; opacity: 0.8;">Pagados</div>
+          <div style="font-size: 24px; font-weight: bold;">${document.getElementById("totalPagados").textContent}</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 12px; opacity: 0.8;">Pendientes</div>
+          <div style="font-size: 24px; font-weight: bold;">${document.getElementById("totalPendientes").textContent}</div>
         </div>
       `;
+      
       element.appendChild(totalesDiv);
-      
-      // Pie de página
-      const footer = document.createElement("div");
-      footer.innerHTML = `
-        <div style="margin-top: 40px; text-align: center; font-style: italic; color: #666; font-size: 14px;">
-          Reporte generado por el Sistema de Gestión de Tiempo Extra - CCSS<br>
-          Fecha: ${new Date().toLocaleDateString('es-ES')} ${new Date().toLocaleTimeString('es-ES')}
-        </div>
-      `;
-      element.appendChild(footer);
-      
-      // Configurar opciones del PDF
+
+      // Generar PDF
       const opt = {
-        margin: [15, 10, 15, 10],
-        filename: `Reporte_TiempoExtra_${usuario.nombre}_${new Date().toISOString().slice(0,10)}.pdf`,
+        margin: [10, 10, 10, 10],
+        filename: `TiempoExtra_${usuario.cedula}_${anioTexto}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2, 
-          useCORS: true,
-          scrollY: -window.scrollY
-        },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'landscape',
-          putOnlyUsedFonts: true
-        }
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
       };
-      
-      // Generar el PDF
+
       html2pdf().set(opt).from(element).save();
     }
 
+    // ============================================
+    // IMPRIMIR
+    // ============================================
+    document.getElementById("btnImprimir").addEventListener("click", prepararParaImprimir);
+
     function prepararParaImprimir() {
-      // Crear una ventana de impresión
+      const filas = document.querySelectorAll("#tablaExtrasBody tr");
+      if (filas.length === 0 || filas[0].querySelector("td").textContent.includes("Cargando")) {
+        mostrarToast("Espere a que carguen los datos", "error");
+        return;
+      }
+
+      const mesTexto = document.getElementById("mesFiltroExtra").options[document.getElementById("mesFiltroExtra").selectedIndex].text;
+      const anioTexto = document.getElementById("anioFiltroExtra").value;
+
       const printWindow = window.open('', '_blank');
-      
-      // Obtener los valores actuales
-      const mesSeleccionado = document.getElementById("mesFiltroExtra").options[document.getElementById("mesFiltroExtra").selectedIndex].text;
-      const anioSeleccionado = document.getElementById("anioFiltroExtra").value;
-      const totalRegistros = document.getElementById("totalRegistros").textContent;
-      const totalHoras = document.getElementById("totalHoras").textContent;
-      const totalPagados = document.getElementById("totalPagados").textContent;
-      const totalPendientes = document.getElementById("totalPendientes").textContent;
-      
-      // Construir el contenido para impresión
-      let printContent = `
+      printWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Reporte de Tiempo Extra para Impresión</title>
+          <title>Tiempo Extra - ${usuario.nombre}</title>
           <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #004080; padding-bottom: 20px; }
-            .header h1 { color: #004080; margin: 0 0 10px 0; font-size: 24px; }
-            .header p { font-size: 16px; color: #333; margin: 5px 0; }
+            body { font-family: Arial, sans-serif; margin: 20px; color: #1e3a8a; }
+            .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2563eb; padding-bottom: 20px; }
+            .header h1 { color: #1e3a8a; margin: 0 0 10px 0; }
             table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-            th, td { border: 1px solid #004080; padding: 10px; text-align: center; }
-            th { background-color: #004080; color: white; font-weight: bold; }
-            tr:nth-child(even) { background-color: #f2f2f2; }
-            .totales { margin-top: 30px; padding: 20px; background: #004080; color: white; border-radius: 10px; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; }
-            .total-item { text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px; min-width: 150px; }
-            .total-valor { font-size: 20px; font-weight: bold; margin-top: 5px; }
-            .footer { margin-top: 40px; text-align: center; font-style: italic; color: #666; font-size: 14px; }
+            th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: center; }
+            th { background: #2563eb; color: white; font-weight: bold; }
+            tr:nth-child(even) { background: #f8fafc; }
+            .totales { margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border-radius: 12px; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; }
+            .total-item { text-align: center; }
+            .total-valor { font-size: 24px; font-weight: bold; margin-top: 5px; }
+            .footer { margin-top: 40px; text-align: center; font-style: italic; color: #64748b; font-size: 12px; }
           </style>
         </head>
         <body>
           <div class="header">
             <h1>Reporte de Tiempo Extra</h1>
             <p><strong>Funcionario:</strong> ${usuario.nombre} (${usuario.cedula})</p>
-            <p><strong>Período:</strong> ${mesSeleccionado} ${anioSeleccionado}</p>
-            <p><strong>Fecha de generación:</strong> ${new Date().toLocaleDateString('es-ES')} ${new Date().toLocaleTimeString('es-ES')}</p>
+            <p><strong>Período:</strong> ${mesTexto} ${anioTexto}</p>
+            <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CR')}</p>
           </div>
-          
           <table>
             <thead>
               <tr>
@@ -540,81 +772,102 @@
                 <th>Horas</th>
                 <th>Área</th>
                 <th>Observaciones</th>
-                <th>Estado Pago</th>
+                <th>Estado</th>
               </tr>
             </thead>
             <tbody>
-      `;
-      
-      // Agregar filas de datos
-      const filas = document.querySelectorAll("#tablaExtras tbody tr");
-      filas.forEach(fila => {
-        const celdas = fila.querySelectorAll("td");
-        if (celdas.length >= 7) {
-          const estadoPago = celdas[6].querySelector("input")?.checked ? "PAGADO" : "PENDIENTE";
-          const estadoColor = estadoPago === 'PAGADO' ? 'color: green; font-weight: bold;' : 'color: red; font-weight: bold;';
-          
-          printContent += `
-            <tr>
-              <td>${celdas[0].textContent}</td>
-              <td>${celdas[1].querySelector("input")?.value || celdas[1].textContent}</td>
-              <td>${celdas[2].querySelector("input")?.value || celdas[2].textContent}</td>
-              <td>${celdas[3].querySelector("input")?.value || celdas[3].textContent}</td>
-              <td>${celdas[4].querySelector("input")?.value || celdas[4].textContent}</td>
-              <td>${celdas[5].querySelector("textarea")?.value || celdas[5].textContent}</td>
-              <td style="${estadoColor}">${estadoPago}</td>
-            </tr>
-          `;
-        }
-      });
-      
-      // Agregar totales y pie de página
-      printContent += `
             </tbody>
           </table>
-          
           <div class="totales">
             <div class="total-item">
-              Total Registros
-              <div class="total-valor">${totalRegistros}</div>
+              <div>Total Registros</div>
+              <div class="total-valor">${document.getElementById("totalRegistros").textContent}</div>
             </div>
             <div class="total-item">
-              Horas Totales
-              <div class="total-valor">${totalHoras}</div>
+              <div>Horas Totales</div>
+              <div class="total-valor">${document.getElementById("totalHoras").textContent}</div>
             </div>
             <div class="total-item">
-              Pagados
-              <div class="total-valor">${totalPagados}</div>
+              <div>Pagados</div>
+              <div class="total-valor">${document.getElementById("totalPagados").textContent}</div>
             </div>
             <div class="total-item">
-              Pendientes
-              <div class="total-valor">${totalPendientes}</div>
+              <div>Pendientes</div>
+              <div class="total-valor">${document.getElementById("totalPendientes").textContent}</div>
             </div>
           </div>
-          
           <div class="footer">
-            Reporte generado por el Sistema de Gestión de Tiempo Extra - CCSS<br>
-            Fecha: ${new Date().toLocaleDateString('es-ES')} ${new Date().toLocaleTimeString('es-ES')}
+            Sistema CCSS Interino - Reporte generado ${new Date().toLocaleString('es-CR')}
           </div>
         </body>
         </html>
-      `;
-      
-      // Escribir el contenido en la ventana de impresión
-      printWindow.document.write(printContent);
+      `);
+
+      // Llenar tabla
+      const tbody = printWindow.document.querySelector("tbody");
+      filas.forEach(fila => {
+        const celdas = fila.querySelectorAll("td");
+        if (celdas.length >= 7) {
+          const estado = celdas[6].querySelector("input")?.checked ? "PAGADO" : "PENDIENTE";
+          const estadoColor = estado === 'PAGADO' ? '#059669' : '#d97706';
+          
+          const tr = printWindow.document.createElement("tr");
+          tr.innerHTML = `
+            <td>${celdas[0].textContent}</td>
+            <td>${celdas[1].querySelector("input")?.value || ''}</td>
+            <td>${celdas[2].querySelector("input")?.value || ''}</td>
+            <td style="font-weight: bold;">${celdas[3].querySelector("input")?.value || ''}</td>
+            <td>${celdas[4].querySelector("input")?.value || ''}</td>
+            <td>${celdas[5].querySelector("input")?.value || ''}</td>
+            <td style="font-weight: bold; color: ${estadoColor};">${estado}</td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+
       printWindow.document.close();
-      
-      // Esperar a que se cargue el contenido y luego mostrar el diálogo de impresión
-      printWindow.onload = function() {
+      printWindow.focus();
+      setTimeout(() => {
         printWindow.print();
-      };
+        printWindow.close();
+      }, 250);
     }
 
-    // Inicializar cuando el DOM esté cargado
-    document.addEventListener("DOMContentLoaded", function() {
-      inicializarElementos();
+    // ============================================
+    // TOASTS
+    // ============================================
+    function mostrarToast(mensaje, tipo = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const colores = {
+        success: 'bg-emerald-50 border-emerald-400 text-emerald-800',
+        error: 'bg-red-50 border-red-400 text-red-800',
+        info: 'bg-ccss-50 border-ccss-400 text-ccss-800'
+      };
+      const iconos = { success: '✅', error: '❌', info: 'ℹ️' };
+      
+      toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-xl border shadow-lg ${colores[tipo]} animate-[fadeIn_0.3s_ease-out]`;
+      toast.innerHTML = `<span>${iconos[tipo]}</span><span class="font-medium text-sm">${mensaje}</span>`;
+      
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // ============================================
+    // INICIALIZACIÓN
+    // ============================================
+    document.addEventListener("DOMContentLoaded", () => {
       generarAnios();
       cargarExtras();
+      lucide.createIcons();
+      
+      document.getElementById("btnFiltrar").addEventListener("click", cargarExtras);
+      document.getElementById("mesFiltroExtra").addEventListener("change", cargarExtras);
+      document.getElementById("anioFiltroExtra").addEventListener("change", cargarExtras);
     });
   </script>
 </body>

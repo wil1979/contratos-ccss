@@ -3,175 +3,234 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🔍 Consulta de Días Registrados</title>
+  <title>Consulta de Días | CCSS Interino</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ccss: {
+              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
+              400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
+              800: '#1e40af', 900: '#1e3a8a', 950: '#172554',
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * { font-family: 'Inter', sans-serif; }
+    
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
     }
-    body {
-      background-color: #f8f9fa;
-      padding: 20px;
-    }
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #2c3e50;
-    }
-    .usuario-info {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #34495e;
-    }
-    .filtros {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 25px;
-      flex-wrap: wrap;
-      align-items: end;
-    }
-    .filtros > div {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .filtros label {
-      font-weight: 600;
-      color: #34495e;
-    }
-    .filtros select, .filtros button {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    .filtros button {
-      background-color: #27ae60;
-      color: white;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .filtros button:hover {
-      background-color: #219653;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-    th {
-      background-color: #f8f9fa;
-      color: #2c3e50;
-      font-weight: 600;
-    }
-    tr:hover {
-      background-color: #f8f9fa;
-    }
-    .btn-eliminar {
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .btn-eliminar:hover {
-      background-color: #c0392b;
-    }
-    .sin-datos {
-      text-align: center;
-      padding: 30px;
-      color: #7f8c8d;
-      font-style: italic;
-    }
-    .cargando {
-      text-align: center;
-      padding: 30px;
-      color: #27ae60;
-    }
-    .tipo-icono {
-      font-size: 18px;
-      margin-right: 8px;
-    }
-    .btn-volver {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #9b59b6;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: 600;
-    }
-    .btn-volver:hover {
-      background-color: #8e44ad;
+    
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
+    
+    @media print {
+      .no-print { display: none !important; }
     }
   </style>
 </head>
-<body>
-  <div class="container">
-    <h1>🔍 Consulta y Eliminación de Días Registrados</h1>
+<body class="bg-gradient-to-br from-ccss-50 via-white to-ccss-100 min-h-screen">
 
-    <div class="usuario-info">
-      <p>Usuario: <strong id="nombreUsuario">Cargando...</strong></p>
+  <!-- Header -->
+  <nav class="bg-white/80 backdrop-blur-md border-b border-ccss-200 sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-3">
+          <button onclick="location.href='dashboard.html'" class="p-2 hover:bg-ccss-100 rounded-lg transition-colors text-ccss-600">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+          <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-violet-700 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/30">
+            <i data-lucide="search" class="text-white w-6 h-6"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-ccss-900 leading-tight">Consulta de Días</h1>
+            <p class="text-xs text-ccss-500 font-medium">Búsqueda y gestión de registros</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <div class="text-right hidden sm:block">
+            <p class="text-sm font-semibold text-ccss-900" id="nombreUsuario">Usuario</p>
+            <p class="text-xs text-ccss-500" id="rolUsuario">Rol</p>
+          </div>
+          <div class="w-10 h-10 bg-gradient-to-br from-ccss-500 to-ccss-700 rounded-full flex items-center justify-center text-white font-bold shadow-md" id="userAvatar">
+            US
+          </div>
+        </div>
+      </div>
     </div>
+  </nav>
 
-    <div class="filtros">
-      <div>
-        <label for="mes">Mes:</label>
-        <select id="mes">
-          <option value="">Todos los meses</option>
-          <option value="0">Enero</option>
-          <option value="1">Febrero</option>
-          <option value="2">Marzo</option>
-          <option value="3">Abril</option>
-          <option value="4">Mayo</option>
-          <option value="5">Junio</option>
-          <option value="6">Julio</option>
-          <option value="7">Agosto</option>
-          <option value="8">Septiembre</option>
-          <option value="9">Octubre</option>
-          <option value="10">Noviembre</option>
-          <option value="11">Diciembre</option>
-        </select>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in">
+    
+    <!-- Info Usuario -->
+    <div class="glass-panel rounded-2xl border border-ccss-200 shadow-sm p-4 mb-6 flex items-center gap-3">
+      <div class="w-12 h-12 bg-gradient-to-br from-ccss-500 to-ccss-700 rounded-xl flex items-center justify-center text-white">
+        <i data-lucide="user" class="w-6 h-6"></i>
       </div>
       <div>
-        <label for="anio">Año:</label>
-        <select id="anio">
-          <!-- Se llenará con JS -->
-        </select>
+        <p class="text-sm text-ccss-500">Usuario activo</p>
+        <p class="text-lg font-bold text-ccss-900" id="nombreUsuarioBanner">Cargando...</p>
       </div>
-      <button id="btnFiltrar">Filtrar</button>
-      <button id="btnImprimir">🖨️ Imprimir</button>
-      <button id="btnExportarPDF">📄 Exportar a PDF</button>
     </div>
 
-    <div id="tablaContenedor">
-      <p class="cargando">Cargando días registrados...</p>
+    <!-- Filtros -->
+    <div class="glass-panel rounded-2xl border border-ccss-200 shadow-lg p-6 mb-6 no-print">
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="filter" class="w-5 h-5 text-ccss-600"></i>
+          <h3 class="font-bold text-ccss-900">Filtros de Búsqueda</h3>
+        </div>
+        
+        <div class="flex flex-wrap items-center gap-3">
+          <select id="mes" 
+            class="px-3 py-2 border border-ccss-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900 text-sm">
+            <option value="">Todos los meses</option>
+            <option value="0">Enero</option>
+            <option value="1">Febrero</option>
+            <option value="2">Marzo</option>
+            <option value="3">Abril</option>
+            <option value="4">Mayo</option>
+            <option value="5">Junio</option>
+            <option value="6">Julio</option>
+            <option value="7">Agosto</option>
+            <option value="8">Septiembre</option>
+            <option value="9">Octubre</option>
+            <option value="10">Noviembre</option>
+            <option value="11">Diciembre</option>
+          </select>
+          
+          <select id="anio" 
+            class="px-3 py-2 border border-ccss-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900 text-sm">
+          </select>
+          
+          <button id="btnFiltrar" 
+            class="px-4 py-2 bg-ccss-600 hover:bg-ccss-700 text-white rounded-lg font-medium transition-colors shadow-sm shadow-ccss-500/20 flex items-center gap-1">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            Filtrar
+          </button>
+          
+          <div class="flex gap-2 border-l border-ccss-200 pl-3">
+            <button id="btnImprimir" 
+              class="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 rounded-lg font-medium transition-colors flex items-center gap-1">
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              Imprimir
+            </button>
+            <button id="btnExportarPDF" 
+              class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg font-medium transition-colors flex items-center gap-1">
+              <i data-lucide="file-text" class="w-4 h-4"></i>
+              PDF
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <a href="javascript:history.back()" class="btn-volver">⬅️ Volver</a>
+    <!-- Resumen -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 no-print">
+      <div class="bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-ccss-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Total Registros</p>
+        <p class="text-2xl font-bold text-ccss-900" id="resumenTotal">0</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-emerald-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Laborados</p>
+        <p class="text-2xl font-bold text-ccss-900" id="resumenLaborados">0</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-amber-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Libres/Licencias</p>
+        <p class="text-2xl font-bold text-ccss-900" id="resumenOtros">0</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-violet-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Horas Totales</p>
+        <p class="text-2xl font-bold text-ccss-900" id="resumenHoras">0</p>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="glass-panel rounded-2xl border border-ccss-200 shadow-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-ccss-50">
+            <tr class="border-b-2 border-ccss-200">
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Fecha</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Día Semana</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Tipo de Día</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Turno</th>
+              <th class="text-left py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider">Comentario</th>
+              <th class="text-center py-3 px-4 text-xs font-bold text-ccss-600 uppercase tracking-wider no-print">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaCuerpo" class="divide-y divide-ccss-100">
+            <tr>
+              <td colspan="6" class="py-8 text-center text-ccss-400">
+                <i data-lucide="loader-2" class="w-6 h-6 mx-auto mb-2 animate-spin"></i>
+                Cargando días registrados...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Confirmación Eliminación -->
+  <div id="modalEliminar" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md modal-enter shadow-2xl overflow-hidden">
+      <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4">
+        <h3 class="text-white font-bold text-lg flex items-center gap-2">
+          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+          Confirmar Eliminación
+        </h3>
+      </div>
+      <div class="p-6">
+        <p class="text-ccss-700 mb-2">¿Está seguro de eliminar el registro del día:</p>
+        <p class="text-xl font-bold text-ccss-900 mb-4" id="fechaEliminar"></p>
+        <p class="text-sm text-ccss-500">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-2 justify-end">
+        <button id="btnCancelarEliminar" class="px-4 py-2 bg-white border border-ccss-300 text-ccss-700 rounded-lg font-medium hover:bg-ccss-50 transition-colors">
+          Cancelar
+        </button>
+        <button id="btnConfirmarEliminar" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors shadow-sm">
+          Eliminar
+        </button>
+      </div>
+    </div>
   </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Toast -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[100] space-y-2 pointer-events-none"></div>
+
   <script type="module">
+    // ============================================
+    // FIREBASE
+    // ============================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-    import { getFirestore, collection, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    import { 
+      getFirestore, 
+      collection, 
+      doc, 
+      getDoc, 
+      setDoc,
+      deleteDoc
+    } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDigm9JWEqr5h0YV3H6a-H3ub4N__2Y2q4",
@@ -185,26 +244,83 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
-    if (!usuario) {
-      alert("⚠️ Sesión no válida. Redirigiendo al login...");
-      window.location.href = "login.html";
-    } else {
-      document.getElementById("nombreUsuario").textContent = usuario.nombre || "Usuario";
+    // ============================================
+    // 🔧 UTILIDADES DE FECHA CORREGIDAS
+    // ============================================
+    
+    function parseFechaString(fechaStr) {
+      const [a, m, d] = fechaStr.split('-').map(Number);
+      return { anio: a, mes: m - 1, dia: d };
     }
 
-    // Mapeo de tipos a iconos y texto
-    const tipoTexto = {
-      'laborado': '✅ Laborado',
-      'no_laborado': '❌ No Laborado',
-      'libre1': '🔴 Libre 1',
-      'libre2': '🟠 Libre 2',
-      'libre3': '🟣 Libre 3',
-      'vacaciones': '🏖️ Vacaciones',
-      'licencia': '🏥 Licencia'
+    /**
+     * Obtiene nombre del día de la semana de una fecha YYYY-MM-DD
+     */
+    function getDiaSemanaNombre(fechaStr) {
+      const { anio, mes, dia } = parseFechaString(fechaStr);
+      const fecha = new Date(anio, mes, dia);
+      const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      return dias[fecha.getDay()];
+    }
+
+    /**
+     * Verifica si fecha string pertenece a mes/año específicos
+     */
+    function fechaEnMesAnio(fechaStr, mes, anio) {
+      const f = parseFechaString(fechaStr);
+      return f.mes === mes && f.anio === anio;
+    }
+
+    // ============================================
+    // ESTADO
+    // ============================================
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!usuario) {
+      window.location.href = "login.html";
+    }
+
+    document.getElementById("nombreUsuario").textContent = usuario.nombre || "Usuario";
+    document.getElementById("rolUsuario").textContent = usuario.rol || "Usuario";
+    document.getElementById("userAvatar").textContent = (usuario.nombre || 'U').substring(0, 2).toUpperCase();
+    document.getElementById("nombreUsuarioBanner").textContent = usuario.nombre || "Usuario";
+
+    // ============================================
+    // MAPA DE TIPOS
+    // ============================================
+    const tipoInfo = {
+      'laborado': { texto: '✅ Laborado', clase: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+      'no_laborado': { texto: '❌ No Laborado', clase: 'bg-red-100 text-red-700 border-red-200' },
+      'libre1': { texto: '🔴 Libre Comp.', clase: 'bg-orange-100 text-orange-700 border-orange-200' },
+      'libre2': { texto: '🟠 Libre Turno', clase: 'bg-pink-100 text-pink-700 border-pink-200' },
+      'libre3': { texto: '🟣 Libre Adm.', clase: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+      'vacaciones': { texto: '🏖️ Vacaciones', clase: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
+      'licencia': { texto: '🏥 Licencia', clase: 'bg-gray-100 text-gray-700 border-gray-200' },
+      'licencia_paternidad': { texto: '👶 Paternidad', clase: 'bg-pink-100 text-pink-700 border-pink-200' },
+      'permiso_estudio': { texto: '📚 Estudio', clase: 'bg-amber-100 text-amber-700 border-amber-200' },
+      'permiso_personal': { texto: '👤 Personal', clase: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+      'feriado': { texto: '🎉 Feriado', clase: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
+      'dia_banco': { texto: '🏦 Día Banco', clase: 'bg-slate-100 text-slate-700 border-slate-200' }
     };
 
-    // Cargar años
+    const turnoHoras = {
+      'turno_normal': 8,
+      'turno_mixta': 7,
+      'turno_nocturna': 10,
+      'turno_festivo': 5,
+      'turno_extra': 0
+    };
+
+    const turnoInfo = {
+      'turno_normal': '☀️ Normal',
+      'turno_mixta': '🌤️ Mixta',
+      'turno_nocturna': '🌙 Nocturna',
+      'turno_festivo': '🎄 Festivo',
+      'turno_extra': '⚡ Extra'
+    };
+
+    // ============================================
+    // CARGAR AÑOS
+    // ============================================
     function llenarAnios() {
       const anioSelect = document.getElementById("anio");
       const hoy = new Date();
@@ -218,199 +334,399 @@
       anioSelect.value = hoy.getFullYear();
     }
 
-    // Extraer mes y año de fecha
-    function extraerMesAnio(fechaStr) {
-      const [anio, mes] = fechaStr.split('-').map(Number);
-      return { anio, mes: mes - 1 }; // Mes en JS es 0-11
-    }
-
-    // Eliminar un día
-    async function eliminarDia(fecha, docId) {
-      if (!confirm(`¿Eliminar el registro del día ${fecha}? Esta acción no se puede deshacer.`)) return;
-
-      try {
-        const docRef = doc(collection(db, "calendar"), docId);
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          const data = snap.data();
-          if (data[fecha]) {
-            delete data[fecha];
-            await deleteDoc(doc(db, "calendar", docId)); // Opcional: podrías hacer setDoc con data actualizado
-            // Pero si data queda vacío, mejor eliminar el doc
-            if (Object.keys(data).length > 0) {
-              await setDoc(docRef, data);
-            }
-          }
-        }
-        // Recargar
-        cargarDias();
-      } catch (error) {
-        console.error("Error al eliminar:", error);
-        alert("❌ Error al eliminar el día: " + error.message);
-      }
-    }
-
-    // Cargar días desde calendar
+    // ============================================
+    // CARGAR DÍAS (CON FILTRO CORREGIDO)
+    // ============================================
     async function cargarDias() {
       const mesSel = document.getElementById("mes").value;
       const anioSel = parseInt(document.getElementById("anio").value);
-      const contenedor = document.getElementById("tablaContenedor");
+      const contenedor = document.getElementById("tablaCuerpo");
 
       if (isNaN(anioSel)) {
-        contenedor.innerHTML = '<p style="color:red; text-align:center;">⚠️ Año inválido.</p>';
+        contenedor.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-red-500">⚠️ Año inválido</td></tr>';
         return;
       }
 
-      contenedor.innerHTML = '<p class="cargando">Buscando registros...</p>';
+      contenedor.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-ccss-400"><i data-lucide="loader-2" class="w-6 h-6 mx-auto mb-2 animate-spin"></i>Buscando registros...</td></tr>';
+      lucide.createIcons();
 
       try {
         const registros = [];
-        // Consultar documentos del rango de años posibles
+        
+        // Consultar documentos mensuales del año seleccionado
         for (let mes = 0; mes <= 11; mes++) {
+          // Si hay filtro de mes, saltar los que no coinciden
+          if (mesSel !== "" && mes !== parseInt(mesSel)) continue;
+          
           const docId = `${usuario.cedula}_${anioSel}_${mes}`;
           const docRef = doc(collection(db, "calendar"), docId);
           const snap = await getDoc(docRef);
+          
           if (snap.exists()) {
             const data = snap.data();
             Object.keys(data).forEach(fecha => {
+              // Solo procesar fechas válidas YYYY-MM-DD
+              if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return;
+              
               const reg = data[fecha];
-              if (reg.usuario?.cedula === usuario.cedula) {
-                const info = extraerMesAnio(fecha);
-                if (info.anio !== anioSel) return;
-                if (mesSel !== "" && info.mes !== parseInt(mesSel)) return;
-                registros.push({ fecha, ...reg, docId });
-              }
+              if (!reg || !reg.usuario || reg.usuario.cedula !== usuario.cedula) return;
+              
+              // 🔧 CORRECCIÓN: Verificar que la fecha pertenezca al mes/año del documento
+              // (evita duplicados si hay datos de otros meses en el mismo doc)
+              const fechaComp = parseFechaString(fecha);
+              if (fechaComp.anio !== anioSel || fechaComp.mes !== mes) return;
+              
+              registros.push({
+                fecha,
+                tipo: reg.tipo,
+                turno: reg.turno,
+                comentario: reg.comentario,
+                docId
+              });
             });
           }
         }
 
-        // Ordenar por fecha
-        registros.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+        // Ordenar por fecha (string comparison YYYY-MM-DD es cronológico)
+        registros.sort((a, b) => a.fecha.localeCompare(b.fecha));
 
         if (registros.length === 0) {
-          contenedor.innerHTML = '<p class="sin-datos">📭 No hay días registrados para este filtro.</p>';
-        } else {
-          let html = `
-            <table>
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Tipo de Día</th>
-                  <th>Comentario</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-          `;
-          registros.forEach(reg => {
-            const tipo = tipoTexto[reg.tipo] || reg.tipo;
-            const comentario = reg.comentario || "—";
-            html += `
-              <tr>
-                <td>${reg.fecha}</td>
-                <td>${tipo}</td>
-                <td>${comentario}</td>
-                <td>
-                  <button class="btn-eliminar" onclick="eliminar('${reg.fecha}', '${reg.docId}')">🗑️ Eliminar</button>
-                </td>
-              </tr>
-            `;
-          });
-          html += `</tbody></table>`;
-          contenedor.innerHTML = html;
+          contenedor.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-ccss-400">📭 No hay días registrados para este filtro</td></tr>';
+          actualizarResumen(0, 0, 0, 0);
+          return;
         }
 
+        renderizarTabla(registros);
       } catch (error) {
         console.error("Error al cargar días:", error);
-        contenedor.innerHTML = `<p style="color:red; text-align:center;">❌ Error: ${error.message}</p>`;
+        contenedor.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-red-500">❌ Error: ${error.message}</td></tr>`;
       }
     }
 
-    // 🔹 IMPRIMIR
-function imprimirTabla() {
-  const printContent = document.getElementById("tablaContenedor").innerHTML;
-  const originalContent = document.body.innerHTML;
+    function renderizarTabla(registros) {
+      const tbody = document.getElementById("tablaCuerpo");
+      let html = "";
+      
+      let totalLaborados = 0;
+      let totalOtros = 0;
+      let totalHoras = 0;
 
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Impresión - Días Registrados</title>
-      <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .sin-datos, .cargando { text-align: center; padding: 20px; }
-      </style>
-    </head>
-    <body>
-      <h2>📅 Días Registrados - ${usuario.nombre || 'Usuario'}</h2>
-      <p><strong>Filtro:</strong> 
-        ${document.getElementById("mes").options[document.getElementById("mes").selectedIndex]?.text || 'Todos los meses'} 
-        ${document.getElementById("anio").value}
-      </p>
-      ${printContent}
-    </body>
-    </html>
-  `);
-  printWindow.document.close();
-  printWindow.focus();
-  printWindow.print();
-  printWindow.close();
-}
+      registros.forEach(reg => {
+        const infoTipo = tipoInfo[reg.tipo] || { texto: reg.tipo, clase: 'bg-gray-100 text-gray-700 border-gray-200' };
+        const diaSemana = getDiaSemanaNombre(reg.fecha);
+        
+        // Calcular horas si es laborado
+        if (reg.tipo === 'laborado' && reg.turno && turnoHoras[reg.turno]) {
+          totalLaborados++;
+          totalHoras += turnoHoras[reg.turno];
+        } else if (reg.tipo && reg.tipo !== 'laborado') {
+          totalOtros++;
+        }
 
-// 🔹 EXPORTAR A PDF
-function exportarPDF() {
-  const element = document.getElementById("tablaContenedor");
-  const mes = document.getElementById("mes").options[document.getElementById("mes").selectedIndex]?.text || 'Todos los meses';
-  const anio = document.getElementById("anio").value;
+        const turnoTexto = reg.turno && turnoInfo[reg.turno] ? turnoInfo[reg.turno] : '—';
+        const comentarioTexto = reg.comentario || "—";
 
-  const filas = element.querySelectorAll("tr");
-  if (filas.length === 0 || element.querySelector(".sin-datos") || element.querySelector(".cargando")) {
-    alert("No hay datos para exportar.");
-    return;
-  }
+        html += `
+          <tr class="hover:bg-ccss-50 transition-colors group">
+            <td class="py-3 px-4 text-sm font-bold text-ccss-900">${reg.fecha}</td>
+            <td class="py-3 px-4 text-sm text-ccss-600">${diaSemana}</td>
+            <td class="py-3 px-4">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full border ${infoTipo.clase}">
+                ${infoTipo.texto}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-sm text-ccss-700">${turnoTexto}</td>
+            <td class="py-3 px-4 text-sm text-ccss-600 max-w-xs truncate" title="${comentarioTexto.replace(/"/g, '&quot;')}">${comentarioTexto}</td>
+            <td class="py-3 px-4 text-center no-print">
+              <button onclick="confirmarEliminar('${reg.fecha}', '${reg.docId}')" 
+                class="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors" title="Eliminar">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
 
-  const pdfContainer = document.createElement('div');
-  pdfContainer.innerHTML = `
-    <div style="text-align: center; margin-bottom: 20px;">
-      <h2 style="color: #2c3e50;">📅 Días Registrados</h2>
-      <p><strong>Usuario:</strong> ${usuario.nombre || 'Usuario'}</p>
-      <p><strong>Filtro:</strong> ${mes} ${anio}</p>
-      <p><em>Fecha de generación: ${new Date().toLocaleDateString('es-CR')}</em></p>
-    </div>
-  `;
-  pdfContainer.appendChild(element.cloneNode(true));
+      tbody.innerHTML = html;
+      lucide.createIcons();
+      
+      actualizarResumen(registros.length, totalLaborados, totalOtros, totalHoras);
+    }
 
-  const opt = {
-    margin: 10,
-    filename: `dias_registrados_${usuario.cedula}_${mes}_${anio}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-  };
+    function actualizarResumen(total, laborados, otros, horas) {
+      document.getElementById("resumenTotal").textContent = total;
+      document.getElementById("resumenLaborados").textContent = laborados;
+      document.getElementById("resumenOtros").textContent = otros;
+      document.getElementById("resumenHoras").textContent = `${horas}h`;
+    }
 
-  html2pdf().set(opt).from(pdfContainer).save();
-}
+    // ============================================
+    // ELIMINAR DÍA (CORREGIDO)
+    // ============================================
+    let fechaAEliminar = null;
+    let docIdAEliminar = null;
 
-    // Función global para eliminar (accesible desde onclick)
-    window.eliminar = eliminarDia;
+    window.confirmarEliminar = function(fecha, docId) {
+      fechaAEliminar = fecha;
+      docIdAEliminar = docId;
+      
+      document.getElementById("fechaEliminar").textContent = fecha;
+      const modal = document.getElementById("modalEliminar");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
 
-    // Inicializar
+    document.getElementById("btnCancelarEliminar").addEventListener("click", () => {
+      document.getElementById("modalEliminar").classList.add("hidden");
+      document.getElementById("modalEliminar").classList.remove("flex");
+      fechaAEliminar = null;
+      docIdAEliminar = null;
+    });
+
+    document.getElementById("btnConfirmarEliminar").addEventListener("click", async () => {
+      if (!fechaAEliminar || !docIdAEliminar) return;
+      
+      try {
+        const docRef = doc(db, "calendar", docIdAEliminar);
+        const snap = await getDoc(docRef);
+        
+        if (!snap.exists()) {
+          mostrarToast("Documento no encontrado", "error");
+          return;
+        }
+        
+        const data = snap.data();
+        
+        // Verificar que el registro existe
+        if (!data[fechaAEliminar]) {
+          mostrarToast("Registro no encontrado", "error");
+          return;
+        }
+        
+        // Eliminar el registro específico
+        delete data[fechaAEliminar];
+        
+        // Actualizar metadata
+        data.metadata = {
+          ...data.metadata,
+          ultimaModificacion: new Date().toISOString()
+        };
+        
+        // Si quedan solo metadata, eliminar documento completo
+        const keysRestantes = Object.keys(data).filter(k => k !== 'metadata');
+        if (keysRestantes.length === 0) {
+          await deleteDoc(docRef);
+        } else {
+          await setDoc(docRef, data);
+        }
+        
+        mostrarToast("Registro eliminado correctamente", "success");
+        document.getElementById("modalEliminar").classList.add("hidden");
+        document.getElementById("modalEliminar").classList.remove("flex");
+        cargarDias();
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+        mostrarToast("Error al eliminar: " + error.message, "error");
+      }
+      
+      fechaAEliminar = null;
+      docIdAEliminar = null;
+    });
+
+    // ============================================
+    // IMPRIMIR
+    // ============================================
+    function imprimirTabla() {
+      const filas = document.querySelectorAll("#tablaCuerpo tr");
+      if (filas.length === 0 || filas[0].querySelector("td").textContent.includes("Cargando") || filas[0].querySelector("td").textContent.includes("No hay")) {
+        mostrarToast("No hay datos para imprimir", "error");
+        return;
+      }
+
+      const mesTexto = document.getElementById("mes").options[document.getElementById("mes").selectedIndex].text;
+      const anioTexto = document.getElementById("anio").value;
+
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Días Registrados - ${usuario.nombre}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; color: #1e3a8a; }
+            .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2563eb; padding-bottom: 20px; }
+            .header h1 { color: #1e3a8a; margin: 0 0 10px 0; font-size: 24px; }
+            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; }
+            th { background: #2563eb; color: white; font-weight: bold; }
+            tr:nth-child(even) { background: #f8fafc; }
+            .footer { margin-top: 40px; text-align: center; font-style: italic; color: #64748b; font-size: 12px; }
+            .badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>📅 Días Registrados</h1>
+            <p><strong>Usuario:</strong> ${usuario.nombre} (${usuario.cedula})</p>
+            <p><strong>Filtro:</strong> ${mesTexto} ${anioTexto}</p>
+            <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CR')}</p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Día</th>
+                <th>Tipo</th>
+                <th>Turno</th>
+                <th>Comentario</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <div class="footer">
+            Sistema CCSS Interino - ${new Date().toLocaleString('es-CR')}
+          </div>
+        </body>
+        </html>
+      `);
+
+      const tbody = printWindow.document.querySelector("tbody");
+      filas.forEach(fila => {
+        const celdas = fila.querySelectorAll("td");
+        if (celdas.length >= 5) {
+          const tr = printWindow.document.createElement("tr");
+          tr.innerHTML = `
+            <td>${celdas[0].textContent}</td>
+            <td>${celdas[1].textContent}</td>
+            <td>${celdas[2].textContent}</td>
+            <td>${celdas[3].textContent}</td>
+            <td>${celdas[4].textContent}</td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 250);
+    }
+
+    // ============================================
+    // EXPORTAR PDF
+    // ============================================
+    function exportarPDF() {
+      const filas = document.querySelectorAll("#tablaCuerpo tr");
+      if (filas.length === 0 || filas[0].querySelector("td").textContent.includes("Cargando") || filas[0].querySelector("td").textContent.includes("No hay")) {
+        mostrarToast("No hay datos para exportar", "error");
+        return;
+      }
+
+      const mesTexto = document.getElementById("mes").options[document.getElementById("mes").selectedIndex].text;
+      const anioTexto = document.getElementById("anio").value;
+
+      const element = document.createElement("div");
+      element.style.padding = "20px";
+      element.style.fontFamily = "Arial, sans-serif";
+
+      element.innerHTML = `
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2563eb; padding-bottom: 20px;">
+          <h1 style="color: #1e3a8a; margin: 0 0 10px 0; font-size: 28px;">📅 Días Registrados</h1>
+          <p style="font-size: 14px; color: #475569; margin: 5px 0;">
+            <strong>Usuario:</strong> ${usuario.nombre} (${usuario.cedula})<br>
+            <strong>Filtro:</strong> ${mesTexto} ${anioTexto}<br>
+            <strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CR')}
+          </p>
+        </div>
+      `;
+
+      const tabla = document.createElement("table");
+      tabla.style.width = "100%";
+      tabla.style.borderCollapse = "collapse";
+      tabla.style.marginTop = "20px";
+      tabla.innerHTML = `
+        <thead>
+          <tr style="background: #2563eb; color: white;">
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: left;">Fecha</th>
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: left;">Día</th>
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: left;">Tipo</th>
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: left;">Turno</th>
+            <th style="border: 1px solid #1d4ed8; padding: 10px; text-align: left;">Comentario</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      `;
+
+      const tbody = tabla.querySelector("tbody");
+      filas.forEach(fila => {
+        const celdas = fila.querySelectorAll("td");
+        if (celdas.length >= 5) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td style="border: 1px solid #e2e8f0; padding: 8px;">${celdas[0].textContent}</td>
+            <td style="border: 1px solid #e2e8f0; padding: 8px;">${celdas[1].textContent}</td>
+            <td style="border: 1px solid #e2e8f0; padding: 8px;">${celdas[2].textContent}</td>
+            <td style="border: 1px solid #e2e8f0; padding: 8px;">${celdas[3].textContent}</td>
+            <td style="border: 1px solid #e2e8f0; padding: 8px;">${celdas[4].textContent}</td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+
+      element.appendChild(tabla);
+
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `dias_registrados_${usuario.cedula}_${mesTexto}_${anioTexto}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }
+
+    // ============================================
+    // TOASTS
+    // ============================================
+    function mostrarToast(mensaje, tipo = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const colores = {
+        success: 'bg-emerald-50 border-emerald-400 text-emerald-800',
+        error: 'bg-red-50 border-red-400 text-red-800',
+        info: 'bg-ccss-50 border-ccss-400 text-ccss-800'
+      };
+      const iconos = { success: '✅', error: '❌', info: 'ℹ️' };
+      
+      toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-xl border shadow-lg ${colores[tipo]} animate-[fadeIn_0.3s_ease-out]`;
+      toast.innerHTML = `<span>${iconos[tipo]}</span><span class="font-medium text-sm">${mensaje}</span>`;
+      
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // ============================================
+    // INICIALIZACIÓN
+    // ============================================
     document.addEventListener("DOMContentLoaded", () => {
       llenarAnios();
       setTimeout(cargarDias, 300);
-
+      lucide.createIcons();
+      
       document.getElementById("btnFiltrar").addEventListener("click", cargarDias);
       document.getElementById("mes").addEventListener("change", cargarDias);
       document.getElementById("anio").addEventListener("change", cargarDias);
       document.getElementById("btnImprimir").addEventListener("click", imprimirTabla);
       document.getElementById("btnExportarPDF").addEventListener("click", exportarPDF);
     });
-
-
   </script>
 </body>
 </html>

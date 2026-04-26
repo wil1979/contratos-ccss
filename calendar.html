@@ -3,52 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <meta name="description" content="Calendario laboral profesional con gestión de turnos, licencias, feriados y sincronización Firebase">
+  <meta name="description" content="Calendario laboral CCSS - Registro de turnos y estados">
   <meta name="theme-color" content="#2563eb">
-  <title>Calendario Laboral Pro | Firebase Edition</title>
+  <title>Calendario Laboral | CCSS Interino</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ccss: {
+              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
+              400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
+              800: '#1e40af', 900: '#1e3a8a', 950: '#172554',
+            }
+          }
+        }
+      }
+    }
+  </script>
   
   <style>
-    /* ============================================
-       VARIABLES CSS Y TEMAS
-       ============================================ */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * { font-family: 'Inter', sans-serif; }
+    
     :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --primary-light: #dbeafe;
-      --success: #059669;
-      --warning: #d97706;
-      --danger: #dc2626;
-      --info: #0891b2;
-      --purple: #7c3aed;
-      
-      --bg-body: #f8fafc;
-      --bg-card: #ffffff;
-      --bg-hover: #f1f5f9;
-      --bg-modal: rgba(0, 0, 0, 0.5);
-      
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --text-muted: #94a3b8;
-      
-      --border: #e2e8f0;
-      --border-focus: #3b82f6;
-      
-      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-      
-      --radius: 12px;
-      --radius-sm: 8px;
-      --radius-lg: 16px;
-      
-      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      
       --turno-normal: #dbeafe;
       --turno-normal-border: #2563eb;
       --turno-mixta: #fef3c7;
       --turno-mixta-border: #d97706;
       --turno-nocturna: #ede9fe;
       --turno-nocturna-border: #7c3aed;
+      --turno-festivo: #fce7f3;
+      --turno-festivo-border: #ec4899;
+      --turno-extra: #f0fdf4;
+      --turno-extra-border: #16a34a;
       
       --estado-laborado: #d1fae5;
       --estado-laborado-border: #059669;
@@ -64,1032 +56,273 @@
       --estado-vacaciones-border: #06b6d4;
       --estado-licencia: #f3f4f6;
       --estado-licencia-border: #6b7280;
+      --estado-licencia-pat: #fce7f3;
+      --estado-licencia-pat-border: #db2777;
+      --estado-permiso-est: #fef3c7;
+      --estado-permiso-est-border: #d97706;
+      --estado-permiso-per: #e0e7ff;
+      --estado-permiso-per-border: #4f46e5;
       --estado-feriado: #fef9c3;
       --estado-feriado-border: #ca8a04;
-    }
-
-    [data-theme="dark"] {
-      --bg-body: #0f172a;
-      --bg-card: #1e293b;
-      --bg-hover: #334155;
-      --text-primary: #f1f5f9;
-      --text-secondary: #cbd5e1;
-      --text-muted: #64748b;
-      --border: #334155;
-      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: var(--bg-body);
-      color: var(--text-primary);
-      line-height: 1.5;
-      min-height: 100vh;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .skip-link {
-      position: absolute;
-      top: -40px;
-      left: 0;
-      background: var(--primary);
-      color: white;
-      padding: 8px 16px;
-      z-index: 10000;
-      border-radius: 0 0 var(--radius) 0;
-      font-weight: 600;
-      text-decoration: none;
-      transition: top 0.3s;
-    }
-    .skip-link:focus { top: 0; }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border-width: 0;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0.75rem;
-    }
-    @media (min-width: 768px) { .container { padding: 1.5rem; } }
-
-    /* Header */
-    .app-header {
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border);
-      padding: 0.75rem 0;
-      margin-bottom: 1rem;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(10px);
-      background-color: rgba(255, 255, 255, 0.9);
-    }
-    [data-theme="dark"] .app-header { background-color: rgba(15, 23, 42, 0.9); }
-
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    .brand { display: flex; align-items: center; gap: 0.5rem; }
-    .brand-icon { font-size: 1.5rem; line-height: 1; }
-    .brand-title { font-size: 1.125rem; font-weight: 700; line-height: 1.2; }
-    .brand-subtitle { font-size: 0.6875rem; color: var(--text-muted); font-weight: 500; }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.375rem 0.75rem;
-      background: var(--bg-hover);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-    }
-    .user-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--purple));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: 0.75rem;
-      flex-shrink: 0;
-    }
-    .user-info { display: none; }
-    @media (min-width: 480px) { .user-info { display: block; } }
-    .user-name { font-weight: 600; font-size: 0.875rem; }
-    .user-role { font-size: 0.75rem; color: var(--text-muted); }
-
-    .sync-status {
-      display: flex;
-      align-items: center;
-      gap: 0.375rem;
-      padding: 0.25rem 0.625rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.6875rem;
-      font-weight: 600;
-      transition: var(--transition);
-    }
-    .sync-status.online {
-      background: var(--estado-laborado);
-      color: var(--estado-laborado-border);
-    }
-    .sync-status.offline {
-      background: var(--estado-no-laborado);
-      color: var(--estado-no-laborado-border);
-    }
-    .sync-status.syncing {
-      background: var(--estado-feriado);
-      color: var(--estado-feriado-border);
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
-    /* Controles */
-    .controls-bar {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-    @media (min-width: 768px) {
-      .controls-bar { flex-direction: row; align-items: center; justify-content: space-between; }
-    }
-
-    .nav-month {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--bg-card);
-      padding: 0.375rem;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .btn-icon {
-      width: 36px;
-      height: 36px;
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.125rem;
-      transition: var(--transition);
-      touch-action: manipulation;
-    }
-    .btn-icon:hover, .btn-icon:focus-visible {
-      background: var(--bg-hover);
-      color: var(--primary);
-      outline: 2px solid var(--border-focus);
-      outline-offset: 2px;
-    }
-    .btn-icon:active { transform: scale(0.95); }
-
-    .month-display {
-      min-width: 140px;
-      text-align: center;
-      font-weight: 700;
-      font-size: 1rem;
-      color: var(--text-primary);
-      padding: 0 0.25rem;
-    }
-
-    .view-filters {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .select-custom {
-      appearance: none;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.5rem 1.75rem 0.5rem 0.625rem;
-      font-size: 0.875rem;
-      color: var(--text-primary);
-      cursor: pointer;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23475569' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.5rem center;
-      transition: var(--transition);
-    }
-    .select-custom:focus-visible {
-      outline: 2px solid var(--border-focus);
-      outline-offset: 2px;
-      border-color: var(--primary);
-    }
-
-    .btn-toggle {
-      padding: 0.5rem 0.875rem;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      color: var(--text-secondary);
-      border-radius: var(--radius-sm);
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.375rem;
-      touch-action: manipulation;
-    }
-    .btn-toggle:hover, .btn-toggle:focus-visible {
-      border-color: var(--primary);
-      color: var(--primary);
-      outline: 2px solid var(--border-focus);
-      outline-offset: 2px;
-    }
-    .btn-toggle.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-
-    /* Calendario - Grid corregido */
-    .calendar-wrapper {
-      background: var(--bg-card);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      margin-bottom: 1.5rem;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 1px;
-      background: var(--border);
-    }
-
-    .day-header {
-      background: var(--bg-card);
-      padding: 0.5rem 0.125rem;
-      text-align: center;
-      font-weight: 600;
-      font-size: 0.625rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      line-height: 1.2;
-    }
-    .day-header abbr { text-decoration: none; border-bottom: none; }
-
-    @media (min-width: 640px) {
-      .day-header { padding: 0.75rem 0.25rem; font-size: 0.75rem; }
-    }
-    @media (min-width: 768px) {
-      .day-header { padding: 1rem; font-size: 0.875rem; }
+      --estado-banco: #f1f5f9;
+      --estado-banco-border: #475569;
     }
 
     .day-cell {
-      background: var(--bg-card);
-      min-height: 70px;
-      padding: 0.375rem;
-      position: relative;
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
-      flex-direction: column;
-      gap: 0.125rem;
-      touch-action: manipulation;
-      overflow: hidden;
+      min-height: 80px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    @media (min-width: 640px) {
-      .day-cell { min-height: 90px; padding: 0.5rem; }
-    }
-    @media (min-width: 768px) {
-      .day-cell { min-height: 110px; padding: 0.75rem; }
-    }
-
+    
+    @media (min-width: 768px) { .day-cell { min-height: 110px; } }
+    
     .day-cell:hover:not(.empty):not(.disabled) {
-      background: var(--bg-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      z-index: 2;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
+      z-index: 10;
+      border-color: #3b82f6;
     }
-    .day-cell:focus-visible {
-      outline: 2px solid var(--border-focus);
-      outline-offset: -2px;
-      z-index: 3;
-    }
-    .day-cell.empty {
-      background: var(--bg-body);
-      cursor: default;
-    }
-    .day-cell.disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      background: var(--bg-body);
-    }
+    
     .day-cell.today {
-      background: var(--primary-light);
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 2px solid #2563eb;
     }
+    
     .day-cell.today .day-number {
-      background: var(--primary);
+      background: #2563eb;
       color: white;
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
       font-weight: 700;
-      font-size: 0.75rem;
-    }
-    @media (min-width: 768px) {
-      .day-cell.today .day-number { width: 28px; height: 28px; font-size: 0.875rem; }
-    }
-
-    .day-number {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1;
-      margin-bottom: 0.125rem;
-    }
-    @media (min-width: 768px) {
-      .day-number { font-size: 0.875rem; }
-    }
-    .day-weekend .day-number { color: var(--danger); }
-
-    .day-indicators {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      flex: 1;
-      justify-content: flex-start;
-      min-width: 0;
+      font-size: 0.875rem;
     }
 
     .day-badge {
-      font-size: 0.5625rem;
-      padding: 1px 2px;
-      border-radius: 3px;
+      font-size: 0.625rem;
+      padding: 2px 4px;
+      border-radius: 4px;
       font-weight: 600;
       text-align: center;
       line-height: 1.3;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      border: 1px solid transparent;
     }
-    @media (min-width: 640px) {
-      .day-badge { font-size: 0.625rem; padding: 2px 4px; }
-    }
+    
     @media (min-width: 768px) {
       .day-badge { font-size: 0.6875rem; padding: 3px 6px; }
     }
 
-    .day-badge.turno-normal { 
-      background: var(--turno-normal); 
-      color: var(--turno-normal-border);
-      border: 1px solid var(--turno-normal-border);
-    }
-    .day-badge.turno-mixta { 
-      background: var(--turno-mixta); 
-      color: var(--turno-mixta-border);
-      border: 1px solid var(--turno-mixta-border);
-    }
-    .day-badge.turno-nocturna { 
-      background: var(--turno-nocturna); 
-      color: var(--turno-nocturna-border);
-      border: 1px solid var(--turno-nocturna-border);
-    }
-    .day-badge.estado-laborado { background: var(--estado-laborado); color: var(--estado-laborado-border); }
-    .day-badge.estado-no-laborado { background: var(--estado-no-laborado); color: var(--estado-no-laborado-border); }
-    .day-badge.estado-libre1 { background: var(--estado-libre1); color: var(--estado-libre1-border); }
-    .day-badge.estado-libre2 { background: var(--estado-libre2); color: var(--estado-libre2-border); }
-    .day-badge.estado-libre3 { background: var(--estado-libre3); color: var(--estado-libre3-border); }
-    .day-badge.estado-vacaciones { background: var(--estado-vacaciones); color: var(--estado-vacaciones-border); }
-    .day-badge.estado-licencia { background: var(--estado-licencia); color: var(--estado-licencia-border); }
-    .day-badge.estado-feriado { background: var(--estado-feriado); color: var(--estado-feriado-border); }
+    /* Estados */
+    .badge-laborado { background: var(--estado-laborado); color: var(--estado-laborado-border); border-color: var(--estado-laborado-border); }
+    .badge-no-laborado { background: var(--estado-no-laborado); color: var(--estado-no-laborado-border); border-color: var(--estado-no-laborado-border); }
+    .badge-libre1 { background: var(--estado-libre1); color: var(--estado-libre1-border); border-color: var(--estado-libre1-border); }
+    .badge-libre2 { background: var(--estado-libre2); color: var(--estado-libre2-border); border-color: var(--estado-libre2-border); }
+    .badge-libre3 { background: var(--estado-libre3); color: var(--estado-libre3-border); border-color: var(--estado-libre3-border); }
+    .badge-vacaciones { background: var(--estado-vacaciones); color: var(--estado-vacaciones-border); border-color: var(--estado-vacaciones-border); }
+    .badge-licencia { background: var(--estado-licencia); color: var(--estado-licencia-border); border-color: var(--estado-licencia-border); }
+    .badge-licencia-pat { background: var(--estado-licencia-pat); color: var(--estado-licencia-pat-border); border-color: var(--estado-licencia-pat-border); }
+    .badge-permiso-est { background: var(--estado-permiso-est); color: var(--estado-permiso-est-border); border-color: var(--estado-permiso-est-border); }
+    .badge-permiso-per { background: var(--estado-permiso-per); color: var(--estado-permiso-per-border); border-color: var(--estado-permiso-per-border); }
+    .badge-feriado { background: var(--estado-feriado); color: var(--estado-feriado-border); border-color: var(--estado-feriado-border); }
+    .badge-banco { background: var(--estado-banco); color: var(--estado-banco-border); border-color: var(--estado-banco-border); }
+    
+    /* Turnos */
+    .badge-turno-normal { background: var(--turno-normal); color: var(--turno-normal-border); border-color: var(--turno-normal-border); }
+    .badge-turno-mixta { background: var(--turno-mixta); color: var(--turno-mixta-border); border-color: var(--turno-mixta-border); }
+    .badge-turno-nocturna { background: var(--turno-nocturna); color: var(--turno-nocturna-border); border-color: var(--turno-nocturna-border); }
+    .badge-turno-festivo { background: var(--turno-festivo); color: var(--turno-festivo-border); border-color: var(--turno-festivo-border); }
+    .badge-turno-extra { background: var(--turno-extra); color: var(--turno-extra-border); border-color: var(--turno-extra-border); }
 
-    .day-comment-icon {
-      position: absolute;
-      bottom: 2px;
-      right: 2px;
-      font-size: 0.75rem;
-      opacity: 0.6;
+    .modal-enter { animation: modalEnter 0.3s ease-out; }
+    @keyframes modalEnter {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
-    @media (min-width: 768px) {
-      .day-comment-icon { bottom: 4px; right: 4px; font-size: 0.875rem; }
-    }
-
-    /* Vista Semanal */
-    .week-view { 
-      display: none; 
-      background: var(--bg-card); 
-      border-radius: var(--radius-lg); 
-      border: 1px solid var(--border); 
-      box-shadow: var(--shadow); 
-      overflow: hidden; 
-    }
-    .week-view.active { display: block; }
-    .week-header { 
-      padding: 1rem; 
-      border-bottom: 1px solid var(--border); 
-      font-weight: 700; 
-      font-size: 1rem; 
-      text-align: center; 
-      background: var(--bg-hover); 
-    }
-    @media (min-width: 768px) {
-      .week-header { font-size: 1.125rem; }
-    }
-    .week-grid { 
-      display: grid; 
-      grid-template-columns: 1fr; 
-      gap: 1px; 
-      background: var(--border); 
-    }
-    @media (min-width: 768px) { 
-      .week-grid { grid-template-columns: repeat(7, 1fr); } 
-    }
-    .week-day { 
-      background: var(--bg-card); 
-      padding: 1rem; 
-      min-height: 150px; 
-    }
-    .week-day-header { 
-      font-weight: 700; 
-      margin-bottom: 0.75rem; 
-      padding-bottom: 0.5rem; 
-      border-bottom: 2px solid var(--border); 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-    }
-    .week-day.today .week-day-header { 
-      border-bottom-color: var(--primary); 
-      color: var(--primary); 
-    }
-    .week-day-content { 
-      display: flex; 
-      flex-direction: column; 
-      gap: 0.5rem; 
-    }
-    .week-badge { 
-      padding: 0.5rem; 
-      border-radius: var(--radius-sm); 
-      font-size: 0.875rem; 
-      font-weight: 600; 
-      text-align: center; 
-    }
-    .week-comment { 
-      font-size: 0.875rem; 
-      color: var(--text-secondary); 
-      padding: 0.5rem; 
-      background: var(--bg-hover); 
-      border-radius: var(--radius-sm); 
-      border-left: 3px solid var(--primary); 
-    }
-
-    /* Estadísticas */
-    .stats-panel {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    @media (min-width: 640px) {
-      .stats-panel { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
-    }
-    @media (min-width: 1024px) {
-      .stats-panel { grid-template-columns: repeat(4, 1fr); }
-    }
-
-    .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 0.75rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.375rem;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-    }
-    @media (min-width: 768px) {
-      .stat-card { padding: 1rem; gap: 0.5rem; }
-    }
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 3px;
-      height: 100%;
-      background: var(--primary);
-    }
-    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-    .stat-label {
-      font-size: 0.6875rem;
-      color: var(--text-muted);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
-    .stat-value {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      line-height: 1;
-    }
-    @media (min-width: 768px) {
-      .stat-value { font-size: 1.5rem; }
-    }
-    .stat-detail {
-      font-size: 0.6875rem;
-      color: var(--text-secondary);
-    }
-    .stat-card.laborados::before { background: var(--success); }
-    .stat-card.no-laborados::before { background: var(--danger); }
-    .stat-card.libres::before { background: var(--warning); }
-    .stat-card.vacaciones::before { background: var(--info); }
-    .stat-card.licencias::before { background: var(--text-muted); }
-    .stat-card.horas::before { background: var(--purple); }
-
-    /* Leyenda */
-    .legend-section {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    @media (min-width: 768px) {
-      .legend-section { padding: 1.25rem; }
-    }
-    .legend-title { 
-      font-size: 0.9375rem; 
-      font-weight: 700; 
-      margin-bottom: 0.75rem; 
-    }
-    .legend-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
-    }
-    @media (min-width: 640px) {
-      .legend-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (min-width: 1024px) {
-      .legend-grid { grid-template-columns: repeat(4, 1fr); }
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8125rem;
-      color: var(--text-secondary);
-    }
-    .legend-color {
-      width: 14px;
-      height: 14px;
-      border-radius: 3px;
-      border: 2px solid;
-      flex-shrink: 0;
-    }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-modal);
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      z-index: 1000;
-      padding: 0;
-      backdrop-filter: blur(4px);
-    }
-    @media (min-width: 640px) {
-      .modal-overlay { align-items: center; padding: 1rem; }
-    }
-    .modal-overlay.active { display: flex; }
-    .modal-content {
-      background: var(--bg-card);
-      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-      width: 100%;
-      max-width: 500px;
-      max-height: 85vh;
-      overflow-y: auto;
-      box-shadow: var(--shadow-lg);
-      animation: modalIn 0.3s ease-out;
-    }
-    @media (min-width: 640px) {
-      .modal-content { border-radius: var(--radius-lg); max-height: 90vh; }
-    }
-    @keyframes modalIn {
-      from { opacity: 0; transform: translateY(100%); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @media (min-width: 640px) {
-      @keyframes modalIn {
-        from { opacity: 0; transform: scale(0.95) translateY(20px); }
-        to { opacity: 1; transform: scale(1) translateY(0); }
-      }
-    }
-    .modal-header {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      background: var(--bg-card);
-      z-index: 10;
-    }
-    .modal-title { font-size: 1rem; font-weight: 700; }
-    @media (min-width: 768px) {
-      .modal-title { font-size: 1.125rem; }
-    }
-    .modal-close {
-      width: 32px;
-      height: 32px;
-      border: none;
-      background: var(--bg-hover);
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      color: var(--text-secondary);
-      transition: var(--transition);
-    }
-    .modal-close:hover, .modal-close:focus-visible {
-      background: var(--estado-no-laborado);
-      color: var(--danger);
-      outline: 2px solid var(--danger);
-      outline-offset: 2px;
-    }
-    .modal-body { 
-      padding: 1rem; 
-      display: flex; 
-      flex-direction: column; 
-      gap: 1rem; 
-    }
-    @media (min-width: 768px) {
-      .modal-body { padding: 1.25rem; gap: 1.25rem; }
-    }
-    .form-group { display: flex; flex-direction: column; gap: 0.375rem; }
-    .form-label { font-size: 0.875rem; font-weight: 600; }
-    .form-label .required { color: var(--danger); margin-left: 2px; }
-    .form-hint { font-size: 0.75rem; color: var(--text-muted); }
-    .form-select, .form-textarea {
-      width: 100%;
-      padding: 0.625rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-size: 0.9375rem;
-      font-family: inherit;
-      transition: var(--transition);
-    }
-    .form-select:focus-visible, .form-textarea:focus-visible {
-      outline: 2px solid var(--border-focus);
-      outline-offset: 2px;
-      border-color: var(--primary);
-    }
-    .form-textarea { resize: vertical; min-height: 80px; }
-    .char-counter {
-      text-align: right;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-    .char-counter.warning { color: var(--warning); font-weight: 600; }
-    .char-counter.danger { color: var(--danger); font-weight: 700; }
-    .modal-footer {
-      padding: 1rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 0.5rem;
-      justify-content: flex-end;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.9375rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      border: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      touch-action: manipulation;
-      flex: 1;
-      justify-content: center;
-    }
-    @media (min-width: 640px) {
-      .btn { flex: 0 0 auto; padding: 0.625rem 1.25rem; }
-    }
-    .btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-dark); }
-    .btn-danger { background: var(--estado-no-laborado); color: var(--danger); }
-    .btn-danger:hover { background: var(--danger); color: white; }
-    .btn-secondary { background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border); }
-    .btn-secondary:hover { background: var(--border); }
-
-    /* Toasts */
-    .toast-container {
-      position: fixed;
-      top: 0.75rem;
-      right: 0.75rem;
-      left: 0.75rem;
-      z-index: 10000;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      pointer-events: none;
-    }
-    @media (min-width: 640px) {
-      .toast-container { left: auto; }
-    }
-    .toast {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 0.875rem 1rem;
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      animation: toastIn 0.3s ease-out;
-      pointer-events: all;
-    }
-    @keyframes toastIn {
-      from { transform: translateY(-100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .toast.success { border-left: 4px solid var(--success); }
-    .toast.error { border-left: 4px solid var(--danger); }
-    .toast.info { border-left: 4px solid var(--info); }
-
-    /* FABs */
-    .fab-container {
-      position: fixed;
-      bottom: 1rem;
-      right: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      z-index: 50;
-    }
-    .fab {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      border: none;
-      background: var(--primary);
-      color: white;
-      font-size: 1.25rem;
-      cursor: pointer;
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition);
-      touch-action: manipulation;
-    }
-    @media (min-width: 768px) {
-      .fab { width: 56px; height: 56px; font-size: 1.5rem; }
-    }
-    .fab:hover, .fab:focus-visible {
-      transform: scale(1.1) rotate(5deg);
-      outline: 3px solid var(--border-focus);
-      outline-offset: 2px;
-    }
-    .fab-secondary {
-      background: var(--bg-card);
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-      font-size: 1.125rem;
-      width: 44px;
-      height: 44px;
-    }
-    @media (min-width: 768px) {
-      .fab-secondary { width: 48px; height: 48px; font-size: 1.25rem; }
-    }
-
-    .hidden { display: none !important; }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
+    
+    .stat-card { transition: all 0.3s ease; }
+    .stat-card:hover { transform: translateY(-2px); }
+    
+    .sync-pulse { animation: syncPulse 2s infinite; }
+    @keyframes syncPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
 
     @media print {
-      .app-header, .controls-bar, .fab-container, .legend-section, .btn-icon, .btn-toggle, .sync-status { display: none !important; }
-      .calendar-wrapper { box-shadow: none; border: 1px solid #000; }
-      .day-cell { min-height: 60px; break-inside: avoid; }
+      .no-print { display: none !important; }
+      .calendar-wrapper { box-shadow: none !important; border: 1px solid #ddd !important; }
     }
   </style>
 </head>
-<body>
-  <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+<body class="bg-gradient-to-br from-ccss-50 via-white to-ccss-100 min-h-screen">
 
-  <header class="app-header">
-    <div class="container header-content">
-      <div class="brand">
-        <span class="brand-icon" aria-hidden="true">📅</span>
-        <div>
-          <div class="brand-title">Calendario Laboral Pro</div>
-          <div class="brand-subtitle">Firebase Edition • Sincronización en tiempo real</div>
+  <!-- Header -->
+  <nav class="bg-white/80 backdrop-blur-md border-b border-ccss-200 sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-3">
+          <button onclick="location.href='dashboard.html'" class="p-2 hover:bg-ccss-100 rounded-lg transition-colors text-ccss-600">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+          <div class="w-10 h-10 bg-gradient-to-br from-ccss-600 to-ccss-800 rounded-xl flex items-center justify-center shadow-lg shadow-ccss-500/30">
+            <i data-lucide="calendar-days" class="text-white w-6 h-6"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-ccss-900 leading-tight">Calendario Laboral</h1>
+            <p class="text-xs text-ccss-500 font-medium">Registro diario de actividades</p>
+          </div>
         </div>
-      </div>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <div class="sync-status syncing" id="syncStatus" role="status" aria-live="polite">
-          <span id="syncIcon">🔄</span>
-          <span id="syncText">Sync...</span>
-        </div>
-        <div class="user-profile" role="region" aria-label="Perfil de usuario">
-          <div class="user-avatar" id="userAvatar" aria-hidden="true">US</div>
-          <div class="user-info">
-            <div class="user-name" id="nombreUsuario">Cargando...</div>
-            <div class="user-role" id="rolUsuario">Usuario</div>
+        
+        <div class="flex items-center gap-3">
+          <div id="syncIndicator" class="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-lg border border-green-200">
+            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span class="text-xs font-medium text-green-700">Sincronizado</span>
+          </div>
+          <div class="text-right hidden sm:block">
+            <p class="text-sm font-semibold text-ccss-900" id="nombreUsuario">Usuario</p>
+            <p class="text-xs text-ccss-500" id="rolUsuario">Rol</p>
           </div>
         </div>
       </div>
     </div>
-  </header>
+  </nav>
 
-  <main id="main-content" class="container">
-    <nav class="controls-bar" aria-label="Controles del calendario">
-      <div class="nav-month">
-        <button class="btn-icon" id="btnMesAnterior" aria-label="Mes anterior">
-          <span aria-hidden="true">◀</span>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- Controls -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 no-print">
+      <div class="flex items-center gap-2 bg-white rounded-xl border border-ccss-200 shadow-sm p-1">
+        <button id="btnMesAnterior" class="p-2 hover:bg-ccss-50 rounded-lg transition-colors text-ccss-600">
+          <i data-lucide="chevron-left" class="w-5 h-5"></i>
         </button>
-        <div class="month-display" id="mesAnioActual" aria-live="polite">Cargando...</div>
-        <button class="btn-icon" id="btnMesSiguiente" aria-label="Mes siguiente">
-          <span aria-hidden="true">▶</span>
+        <div class="min-w-[160px] text-center">
+          <span id="mesAnioActual" class="text-lg font-bold text-ccss-900">Cargando...</span>
+        </div>
+        <button id="btnMesSiguiente" class="p-2 hover:bg-ccss-50 rounded-lg transition-colors text-ccss-600">
+          <i data-lucide="chevron-right" class="w-5 h-5"></i>
         </button>
       </div>
       
-      <div class="view-filters">
-        <select class="select-custom" id="selectMes" aria-label="Seleccionar mes">
-          <option value="0">Ene</option>
-          <option value="1">Feb</option>
-          <option value="2">Mar</option>
-          <option value="3">Abr</option>
-          <option value="4">May</option>
-          <option value="5">Jun</option>
-          <option value="6">Jul</option>
-          <option value="7">Ago</option>
-          <option value="8">Sep</option>
-          <option value="9">Oct</option>
-          <option value="10">Nov</option>
-          <option value="11">Dic</option>
+      <div class="flex items-center gap-2 flex-wrap">
+        <select id="selectMes" class="bg-white border border-ccss-200 rounded-lg px-3 py-2 text-sm font-medium text-ccss-700 focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent">
+          <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+          <option value="3">Abril</option><option value="4">Mayo</option><option value="5">Junio</option>
+          <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
+          <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
         </select>
         
-        <select class="select-custom" id="selectAnio" aria-label="Seleccionar año"></select>
+        <select id="selectAnio" class="bg-white border border-ccss-200 rounded-lg px-3 py-2 text-sm font-medium text-ccss-700 focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent"></select>
         
-        <button class="btn-toggle active" data-vista="mensual" aria-pressed="true">
-          <span aria-hidden="true">📅</span> <span class="sr-only">Vista </span>Mensual
-        </button>
-        <button class="btn-toggle" data-vista="semanal" aria-pressed="false">
-          <span aria-hidden="true">📆</span> <span class="sr-only">Vista </span>Semanal
-        </button>
+        <button id="btnVistaMensual" class="px-3 py-2 bg-ccss-600 text-white rounded-lg text-sm font-medium shadow-sm shadow-ccss-500/20">Mensual</button>
+        <button id="btnVistaSemanal" class="px-3 py-2 bg-white border border-ccss-200 text-ccss-600 rounded-lg text-sm font-medium hover:bg-ccss-50 transition-colors">Semanal</button>
       </div>
-    </nav>
+    </div>
 
-    <section class="stats-panel" aria-label="Resumen estadístico del mes">
-      <article class="stat-card laborados">
-        <span class="stat-label">Laborados</span>
-        <span class="stat-value" id="stat-laborados">0</span>
-        <span class="stat-detail" id="detalle-laborados">0 hrs</span>
-      </article>
-      <article class="stat-card no-laborados">
-        <span class="stat-label">No Laborados</span>
-        <span class="stat-value" id="stat-no-laborados">0</span>
-        <span class="stat-detail">Ausencias</span>
-      </article>
-      <article class="stat-card libres">
-        <span class="stat-label">Libres</span>
-        <span class="stat-value" id="stat-libres">0</span>
-        <span class="stat-detail" id="detalle-libres">Total</span>
-      </article>
-      <article class="stat-card vacaciones">
-        <span class="stat-label">Vacaciones</span>
-        <span class="stat-value" id="stat-vacaciones">0</span>
-        <span class="stat-detail">Días</span>
-      </article>
-      <article class="stat-card licencias">
-        <span class="stat-label">Licencias</span>
-        <span class="stat-value" id="stat-licencias">0</span>
-        <span class="stat-detail">Permisos</span>
-      </article>
-      <article class="stat-card horas">
-        <span class="stat-label">Horas Mes</span>
-        <span class="stat-value" id="stat-horas">0</span>
-        <span class="stat-detail" id="detalle-horas">Total</span>
-      </article>
-    </section>
-
-    <section id="vistaMensual" class="calendar-wrapper" aria-label="Vista mensual del calendario">
-      <div class="calendar-grid" id="calendarioGrid" role="grid" aria-label="Calendario mensual">
-        <div class="day-header" role="columnheader"><abbr title="Domingo">Dom</abbr></div>
-        <div class="day-header" role="columnheader"><abbr title="Lunes">Lun</abbr></div>
-        <div class="day-header" role="columnheader"><abbr title="Martes">Mar</abbr></div>
-        <div class="day-header" role="columnheader"><abbr title="Miércoles">Mié</abbr></div>
-        <div class="day-header" role="columnheader"><abbr title="Jueves">Jue</abbr></div>
-        <div class="day-header" role="columnheader"><abbr title="Viernes">Vie</abbr></div>
-        <div class="day-header" role="columnheader"><abbr title="Sábado">Sáb</abbr></div>
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+      <div class="stat-card bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-emerald-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Laborados</p>
+        <p class="text-2xl font-bold text-ccss-900" id="stat-laborados">0</p>
+        <p class="text-xs text-ccss-400" id="detalle-laborados">0 hrs</p>
       </div>
-    </section>
-
-    <section id="vistaSemanal" class="week-view" aria-label="Vista semanal del calendario">
-      <div class="week-header" id="tituloSemana">Semana del...</div>
-      <div class="week-grid" id="contenidoSemanal"></div>
-    </section>
-
-    <section class="legend-section" aria-label="Leyenda de tipos de día">
-      <h2 class="legend-title">Leyenda</h2>
-      <div class="legend-grid">
-        <div class="legend-item">
-          <div class="legend-color" style="background: var(--estado-laborado); border-color: var(--estado-laborado-border);"></div>
-          <span>✅ Laborado</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: var(--estado-no-laborado); border-color: var(--estado-no-laborado-border);"></div>
-          <span>❌ No Laborado</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: var(--estado-libre1); border-color: var(--estado-libre1-border);"></div>
-          <span>🔴 Libre Comp.</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: var(--estado-libre2); border-color: var(--estado-libre2-border);"></div>
-          <span>🟠 Libre Turno</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: var(--estado-libre3); border-color: var(--estado-libre3-border);"></div>
-          <span>🟣 Libre Adm.</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: var(--estado-vacaciones); border-color: var(--estado-vacaciones-border);"></div>
-          <span>🏖️ Vacaciones</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: var(--estado-licencia); border-color: var(--estado-licencia-border);"></div>
-          <span>🏥 Licencia</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: var(--estado-feriado); border-color: var(--estado-feriado-border);"></div>
-          <span>🎉 Feriado</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: var(--turno-normal); border-color: var(--turno-normal-border);"></div>
-          <span>☀️ Normal (8h)</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: var(--turno-mixta); border-color: var(--turno-mixta-border);"></div>
-          <span>🌤️ Mixta (7h)</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: var(--turno-nocturna); border-color: var(--turno-nocturna-border);"></div>
-          <span>🌙 Nocturna (10h)</span>
-        </div>
+      <div class="stat-card bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-red-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">No Laborados</p>
+        <p class="text-2xl font-bold text-ccss-900" id="stat-no-laborados">0</p>
+        <p class="text-xs text-ccss-400">Ausencias</p>
       </div>
-    </section>
+      <div class="stat-card bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-amber-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Libres</p>
+        <p class="text-2xl font-bold text-ccss-900" id="stat-libres">0</p>
+        <p class="text-xs text-ccss-400" id="detalle-libres">Total</p>
+      </div>
+      <div class="stat-card bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-cyan-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Vacaciones</p>
+        <p class="text-2xl font-bold text-ccss-900" id="stat-vacaciones">0</p>
+        <p class="text-xs text-ccss-400">Días</p>
+      </div>
+      <div class="stat-card bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-gray-400">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Licencias</p>
+        <p class="text-2xl font-bold text-ccss-900" id="stat-licencias">0</p>
+        <p class="text-xs text-ccss-400">Permisos</p>
+      </div>
+      <div class="stat-card bg-white rounded-xl p-4 border border-ccss-200 shadow-sm border-l-4 border-l-violet-500">
+        <p class="text-xs font-semibold text-ccss-500 uppercase tracking-wider">Horas Mes</p>
+        <p class="text-2xl font-bold text-ccss-900" id="stat-horas">0</p>
+        <p class="text-xs text-ccss-400" id="detalle-horas">Total</p>
+      </div>
+    </div>
+
+    <!-- Vista Mensual -->
+    <div id="vistaMensual" class="calendar-wrapper bg-white rounded-2xl border border-ccss-200 shadow-lg overflow-hidden mb-6">
+      <div class="grid grid-cols-7 gap-px bg-ccss-200" id="calendarioGrid">
+        <div class="bg-ccss-50 py-3 text-center text-xs font-bold text-ccss-600 uppercase tracking-wider">Dom</div>
+        <div class="bg-ccss-50 py-3 text-center text-xs font-bold text-ccss-600 uppercase tracking-wider">Lun</div>
+        <div class="bg-ccss-50 py-3 text-center text-xs font-bold text-ccss-600 uppercase tracking-wider">Mar</div>
+        <div class="bg-ccss-50 py-3 text-center text-xs font-bold text-ccss-600 uppercase tracking-wider">Mié</div>
+        <div class="bg-ccss-50 py-3 text-center text-xs font-bold text-ccss-600 uppercase tracking-wider">Jue</div>
+        <div class="bg-ccss-50 py-3 text-center text-xs font-bold text-ccss-600 uppercase tracking-wider">Vie</div>
+        <div class="bg-ccss-50 py-3 text-center text-xs font-bold text-ccss-600 uppercase tracking-wider">Sáb</div>
+      </div>
+    </div>
+
+    <!-- Vista Semanal (oculta por defecto) -->
+    <div id="vistaSemanal" class="hidden bg-white rounded-2xl border border-ccss-200 shadow-lg overflow-hidden mb-6">
+      <div class="bg-ccss-50 px-6 py-4 border-b border-ccss-200">
+        <h3 class="text-lg font-bold text-ccss-900 text-center" id="tituloSemana">Semana del...</h3>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-7 gap-px bg-ccss-200" id="contenidoSemanal"></div>
+    </div>
+
+    <!-- Legend -->
+    <div class="bg-white rounded-2xl border border-ccss-200 shadow-sm p-5 mb-6">
+      <h3 class="text-sm font-bold text-ccss-900 mb-3 flex items-center gap-2">
+        <i data-lucide="info" class="w-4 h-4 text-ccss-500"></i>
+        Leyenda
+      </h3>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs">
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-emerald-100 border border-emerald-600"></span><span class="text-ccss-600">Laborado</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-red-100 border border-red-600"></span><span class="text-ccss-600">No Laborado</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-orange-100 border border-orange-500"></span><span class="text-ccss-600">Libre Comp.</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-pink-100 border border-pink-500"></span><span class="text-ccss-600">Libre Turno</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-indigo-100 border border-indigo-500"></span><span class="text-ccss-600">Libre Adm.</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-cyan-100 border border-cyan-500"></span><span class="text-ccss-600">Vacaciones</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-gray-100 border border-gray-500"></span><span class="text-ccss-600">Licencia</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-yellow-100 border border-yellow-600"></span><span class="text-ccss-600">Feriado</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-600"></span><span class="text-ccss-600">Normal 8h</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-amber-100 border border-amber-600"></span><span class="text-ccss-600">Mixta 7h</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-violet-100 border border-violet-600"></span><span class="text-ccss-600">Nocturna 10h</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-green-100 border border-green-600"></span><span class="text-ccss-600">Extra</span></div>
+      </div>
+    </div>
   </main>
 
-  <div id="modalEdicion" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitulo" class="modal-title">Editar: <span id="fechaModal"></span></h2>
-        <button class="modal-close" id="btnCerrarModal" aria-label="Cerrar modal">
-          <span aria-hidden="true">✕</span>
+  <!-- Modal -->
+  <div id="modalEdicion" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md modal-enter shadow-2xl overflow-hidden">
+      <div class="bg-gradient-to-r from-ccss-600 to-ccss-700 px-6 py-4 flex justify-between items-center">
+        <h3 class="text-white font-bold text-lg flex items-center gap-2">
+          <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+          <span id="modalTitulo">Editar Día</span>
+        </h3>
+        <button id="btnCerrarModal" class="text-white/80 hover:text-white transition-colors">
+          <i data-lucide="x" class="w-6 h-6"></i>
         </button>
       </div>
       
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label" for="tipoDia">
-            Estado <span class="required" aria-hidden="true">*</span>
-          </label>
-          <select class="form-select" id="tipoDia" aria-required="true">
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-ccss-700 mb-1">Fecha</label>
+          <p id="fechaModal" class="text-lg font-bold text-ccss-900 bg-ccss-50 rounded-lg px-3 py-2 border border-ccss-200"></p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold text-ccss-700 mb-1">Estado <span class="text-red-500">*</span></label>
+          <select id="tipoDia" class="w-full px-3 py-2.5 border border-ccss-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900">
             <option value="">-- Seleccione --</option>
             <optgroup label="Laborales">
               <option value="laborado">✅ Laborado</option>
@@ -1100,7 +333,7 @@
               <option value="libre2">🟠 Por Turno</option>
               <option value="libre3">🟣 Administrativo</option>
             </optgroup>
-            <optgroup label="Licencias">
+            <optgroup label="Licencias y Permisos">
               <option value="vacaciones">🏖️ Vacaciones</option>
               <option value="licencia">🏥 Médica</option>
               <option value="licencia_paternidad">👶 Paternidad</option>
@@ -1114,55 +347,52 @@
           </select>
         </div>
 
-        <div class="form-group" id="grupoTurno">
-          <label class="form-label" for="tipoTurno">Turno</label>
-          <select class="form-select" id="tipoTurno">
+        <div id="grupoTurno">
+          <label class="block text-sm font-semibold text-ccss-700 mb-1">Turno</label>
+          <select id="tipoTurno" class="w-full px-3 py-2.5 border border-ccss-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900">
             <option value="">-- Ninguno --</option>
-            <option value="turno_normal">☀️ Normal 06:00-14:00</option>
-            <option value="turno_mixta">🌤️ Mixta 14:00-22:00</option>
-            <option value="turno_nocturna">🌙 Nocturna 22:00-06:00</option>
-            <option value="turno_festivo">🎄 Festivo </option>
+            <option value="turno_normal">☀️ Normal 06:00-14:00 (8h)</option>
+            <option value="turno_mixta">🌤️ Mixta 14:00-22:00 (7h)</option>
+            <option value="turno_nocturna">🌙 Nocturna 22:00-06:00 (10h)</option>
+            <option value="turno_festivo">🎄 Festivo (5h)</option>
             <option value="turno_extra">⚡ Extraordinarias</option>
           </select>
-          <span class="form-hint">Solo para días laborados</span>
+          <p class="text-xs text-ccss-400 mt-1">Solo aplica para días laborados</p>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="comentarioDia">Comentario</label>
-          <textarea class="form-textarea" id="comentarioDia" 
-            placeholder="Detalles del día (máx. 500 caracteres)..."
-            aria-describedby="contadorCaracteres hintComentario"></textarea>
-          <div id="contadorCaracteres" class="char-counter" aria-live="polite">0 / 500</div>
-          <span id="hintComentario" class="form-hint">Ej: Reunión, capacitación, etc.</span>
+        <div>
+          <label class="block text-sm font-semibold text-ccss-700 mb-1">Comentario</label>
+          <textarea id="comentarioDia" rows="3" maxlength="500" placeholder="Detalles adicionales..." 
+            class="w-full px-3 py-2.5 border border-ccss-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent resize-none bg-white text-ccss-900"></textarea>
+          <div class="flex justify-between mt-1">
+            <span class="text-xs text-ccss-400">Máx. 500 caracteres</span>
+            <span id="contadorCaracteres" class="text-xs text-ccss-500 font-medium">0 / 500</span>
+          </div>
         </div>
       </div>
       
-      <div class="modal-footer">
-        <button class="btn btn-danger" id="btnEliminarDia">
-          <span aria-hidden="true">🗑️</span> Eliminar
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-2 justify-end">
+        <button id="btnEliminarDia" class="px-4 py-2 bg-red-50 text-red-600 rounded-lg font-medium hover:bg-red-100 transition-colors flex items-center gap-1">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          Eliminar
         </button>
-        <button class="btn btn-secondary" id="btnCancelarModal">Cancelar</button>
-        <button class="btn btn-primary" id="btnGuardarDia">
-          <span aria-hidden="true">💾</span> Guardar
+        <button id="btnCancelarModal" class="px-4 py-2 bg-white border border-ccss-300 text-ccss-700 rounded-lg font-medium hover:bg-ccss-50 transition-colors">
+          Cancelar
+        </button>
+        <button id="btnGuardarDia" class="px-4 py-2 bg-ccss-600 text-white rounded-lg font-medium hover:bg-ccss-700 transition-colors shadow-sm shadow-ccss-500/20 flex items-center gap-1">
+          <i data-lucide="save" class="w-4 h-4"></i>
+          Guardar
         </button>
       </div>
     </div>
   </div>
 
-  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
-
-  <div class="fab-container">
-    <button class="fab fab-secondary" id="btnModoOscuro" aria-label="Alternar modo oscuro" title="Modo oscuro">
-      <span aria-hidden="true">🌙</span>
-    </button>
-    <a href="dashboard.html" class="fab" aria-label="Ir al inicio" title="Inicio">
-      <span aria-hidden="true">🏠</span>
-    </a>
-  </div>
+  <!-- Toast -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[100] space-y-2 pointer-events-none"></div>
 
   <script type="module">
     // ============================================
-    // FIREBASE IMPORTS
+    // FIREBASE
     // ============================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
     import { 
@@ -1171,7 +401,7 @@
       doc, 
       setDoc, 
       getDoc, 
-      onSnapshot, 
+      onSnapshot,
       enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
@@ -1187,11 +417,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    try {
-      enableIndexedDbPersistence(db);
-    } catch (err) {
-      console.warn("Persistencia offline no disponible:", err);
-    }
+    try { enableIndexedDbPersistence(db); } catch (err) { console.warn("Offline no disponible:", err); }
 
     // ============================================
     // CONFIGURACIÓN
@@ -1235,78 +461,80 @@
       dia_banco: { label: 'Día Banco', icon: '🏦', horas: false }
     };
 
-   const TURNOS = {
+    const TURNOS = {
       turno_normal: { label: 'Normal', horas: 8, rango: '06:00-14:00' },
       turno_mixta: { label: 'Mixta', horas: 7, rango: '14:00-22:00' },
       turno_nocturna: { label: 'Nocturna', horas: 10, rango: '22:00-06:00' },
       turno_festivo: { label: 'Festivo', horas: 5, rango: 'Variable' },
       turno_extra: { label: 'Extra', horas: 0, rango: 'Variable' }
     };
+
     // ============================================
     // ESTADO GLOBAL
     // ============================================
     let fechaActual = new Date();
     let datosCalendario = new Map();
     let vistaActual = 'mensual';
-    let modoOscuro = false;
     let unsubscribe = null;
     let usuario = null;
 
     // ============================================
-    // FUNCIONES DE FECHA CORREGIDAS (SIN ZONA HORARIA)
+    // 🔧 UTILIDADES DE FECHA CORREGIDAS (CRÍTICO)
     // ============================================
     
     /**
-     * Construye una fecha YYYY-MM-DD como string SIN usar objetos Date
-     * para evitar problemas de zona horaria.
+     * Construye fecha YYYY-MM-DD como string SIN usar Date
+     * EVITA COMPLETAMENTE el desfase de zona horaria
      */
-    function construirFechaString(anio, mes, dia) {
-      // mes: 0-11, dia: 1-31
-      const mm = String(mes + 1).padStart(2, '0');
-      const dd = String(dia).padStart(2, '0');
-      return `${anio}-${mm}-${dd}`;
+    function fechaAString(anio, mes, dia) {
+      return `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
     }
 
     /**
-     * Parsea una fecha string YYYY-MM-DD a componentes SIN crear Date
+     * Obtiene fecha actual como string YYYY-MM-DD sin desfase
      */
-    function parsearFechaString(fechaString) {
-      const [anio, mes, dia] = fechaString.split('-').map(Number);
-      return { anio, mes: mes - 1, dia }; // mes 0-based
+    function hoyString() {
+      const ahora = new Date();
+      return fechaAString(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+    }
+
+    /**
+     * Parsea fecha string a componentes SIN crear Date
+     */
+    function parseFechaString(fechaStr) {
+      const [a, m, d] = fechaStr.split('-').map(Number);
+      return { anio: a, mes: m - 1, dia: d };
     }
 
     /**
      * Verifica si una fecha string es hoy
      */
-    function esHoy(fechaString) {
-      const hoy = new Date();
-      const hoyStr = construirFechaString(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-      return fechaString === hoyStr;
+    function esHoy(fechaStr) {
+      return fechaStr === hoyString();
     }
 
     /**
-     * Verifica si una fecha string es fin de semana
+     * Obtiene día de la semana (0-6) de una fecha string
+     * Usa Date SOLO con componentes numéricos individuales
      */
-    function esFinDeSemanaString(fechaString) {
-      const { anio, mes, dia } = parsearFechaString(fechaString);
-      const date = new Date(anio, mes, dia);
-      const diaSemana = date.getDay();
-      return diaSemana === 0 || diaSemana === 6;
-    }
-
-    /**
-     * Obtiene el día de la semana (0-6) de una fecha string
-     */
-    function getDiaSemana(fechaString) {
-      const { anio, mes, dia } = parsearFechaString(fechaString);
+    function getDiaSemana(fechaStr) {
+      const { anio, mes, dia } = parseFechaString(fechaStr);
       return new Date(anio, mes, dia).getDay();
     }
 
     /**
-     * Verifica si una fecha es editable
+     * Verifica si es fin de semana
      */
-    function esEditableString(fechaString) {
-      const { anio, mes, dia } = parsearFechaString(fechaString);
+    function esFinDeSemana(fechaStr) {
+      const ds = getDiaSemana(fechaStr);
+      return ds === 0 || ds === 6;
+    }
+
+    /**
+     * Verifica si fecha es editable según rangos configurados
+     */
+    function esEditable(fechaStr) {
+      const { anio, mes, dia } = parseFechaString(fechaStr);
       const fecha = new Date(anio, mes, dia);
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
@@ -1315,8 +543,8 @@
       return fecha >= minFecha && fecha <= maxFecha;
     }
 
-    function esFeriado(fechaString) {
-      return CONFIG.FERIADOS_2026.includes(fechaString);
+    function esFeriado(fechaStr) {
+      return CONFIG.FERIADOS_2026.includes(fechaStr);
     }
 
     // ============================================
@@ -1324,22 +552,13 @@
     // ============================================
     function verificarSesion() {
       try {
-        const usuarioGuardado = localStorage.getItem("usuarioActivo");
-        if (usuarioGuardado) {
-          usuario = JSON.parse(usuarioGuardado);
-        } else {
-          usuario = {
-            cedula: "DEMO123",
-            nombre: "Usuario Demo",
-            rol: "Administrador"
-          };
-        }
-        
+        const guardado = localStorage.getItem("usuarioActivo");
+        if (!guardado) { window.location.href = "login.html"; return; }
+        usuario = JSON.parse(guardado);
         document.getElementById('nombreUsuario').textContent = usuario.nombre || 'Usuario';
         document.getElementById('rolUsuario').textContent = usuario.rol || 'Usuario';
-        document.getElementById('userAvatar').textContent = (usuario.nombre || 'U').substring(0, 2).toUpperCase();
       } catch (e) {
-        console.error("Error al cargar usuario:", e);
+        console.error("Error sesión:", e);
         window.location.href = "login.html";
       }
     }
@@ -1348,30 +567,16 @@
     // SINCRONIZACIÓN FIREBASE
     // ============================================
     function actualizarEstadoSync(estado) {
-      const statusEl = document.getElementById('syncStatus');
-      const iconEl = document.getElementById('syncIcon');
-      const textEl = document.getElementById('syncText');
-      
-      statusEl.className = 'sync-status ' + estado;
-      
-      switch(estado) {
-        case 'online':
-          iconEl.textContent = '☁️';
-          textEl.textContent = 'Sync';
-          break;
-        case 'offline':
-          iconEl.textContent = '⚠️';
-          textEl.textContent = 'Offline';
-          break;
-        case 'syncing':
-          iconEl.textContent = '🔄';
-          textEl.textContent = 'Sync...';
-          break;
-        case 'error':
-          iconEl.textContent = '❌';
-          textEl.textContent = 'Error';
-          break;
-      }
+      const el = document.getElementById('syncIndicator');
+      const estados = {
+        online: { clase: 'bg-green-50 border-green-200', punto: 'bg-green-500', texto: 'text-green-700', label: 'Sincronizado' },
+        offline: { clase: 'bg-amber-50 border-amber-200', punto: 'bg-amber-500', texto: 'text-amber-700', label: 'Offline' },
+        syncing: { clase: 'bg-ccss-50 border-ccss-200', punto: 'bg-ccss-500 sync-pulse', texto: 'text-ccss-700', label: 'Sincronizando...' },
+        error: { clase: 'bg-red-50 border-red-200', punto: 'bg-red-500', texto: 'text-red-700', label: 'Error' }
+      };
+      const cfg = estados[estado] || estados.online;
+      el.className = `flex items-center gap-2 px-3 py-1.5 rounded-lg border ${cfg.clase}`;
+      el.innerHTML = `<div class="w-2 h-2 rounded-full ${cfg.punto}"></div><span class="text-xs font-medium ${cfg.texto}">${cfg.label}</span>`;
     }
 
     function escucharCambiosMes(mes, anio) {
@@ -1391,7 +596,7 @@
           if (docSnap.exists()) {
             const data = docSnap.data();
             Object.keys(data).forEach(fecha => {
-              if (data[fecha] && fecha !== 'metadata' && fecha.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              if (data[fecha] && fecha !== 'metadata' && /^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
                 const datosDia = data[fecha];
                 if (!datosDia.usuario || datosDia.usuario.cedula === usuario.cedula) {
                   datosCalendario.set(fecha, {
@@ -1405,40 +610,36 @@
             });
           }
           
-          if (vistaActual === 'mensual') {
-            generarCalendario();
-          } else {
-            generarVistaSemanal();
-          }
+          if (vistaActual === 'mensual') generarCalendario();
+          else generarVistaSemanal();
+          
           actualizarEstadisticas();
         },
         (error) => {
-          console.error("Error en sync:", error);
+          console.error("Error sync:", error);
           actualizarEstadoSync('error');
           mostrarToast('Error de sincronización: ' + error.message, 'error');
         }
       );
     }
 
-    async function guardarEnFirebase(fechaString, tipo, turno, comentario) {
+    async function guardarEnFirebase(fechaStr, tipo, turno, comentario) {
       try {
-        // Validar formato de fecha
-        if (!fechaString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          throw new Error('Formato de fecha inválido: ' + fechaString);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
+          throw new Error('Formato de fecha inválido: ' + fechaStr);
         }
         
-        const { anio, mes } = parsearFechaString(fechaString);
+        const { anio, mes } = parseFechaString(fechaStr);
         const docId = `${usuario.cedula}_${anio}_${mes}`;
         const docRef = doc(db, "calendar", docId);
         
         actualizarEstadoSync('syncing');
         
         const docSnap = await getDoc(docRef);
-        let datosMes = {};
-        if (docSnap.exists()) datosMes = docSnap.data();
+        let datosMes = docSnap.exists() ? docSnap.data() : {};
         
         if (tipo) {
-          datosMes[fechaString] = {
+          datosMes[fechaStr] = {
             tipo,
             turno: turno || null,
             comentario: comentario || null,
@@ -1450,7 +651,7 @@
             ultimaActualizacion: new Date().toISOString()
           };
         } else {
-          delete datosMes[fechaString];
+          delete datosMes[fechaStr];
         }
         
         datosMes.metadata = {
@@ -1471,13 +672,13 @@
       }
     }
 
-    async function eliminarDeFirebase(fechaString) {
+    async function eliminarDeFirebase(fechaStr) {
       try {
-        if (!fechaString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          throw new Error('Formato de fecha inválido: ' + fechaString);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
+          throw new Error('Formato de fecha inválido: ' + fechaStr);
         }
         
-        const { anio, mes } = parsearFechaString(fechaString);
+        const { anio, mes } = parseFechaString(fechaStr);
         const docId = `${usuario.cedula}_${anio}_${mes}`;
         const docRef = doc(db, "calendar", docId);
         
@@ -1486,7 +687,7 @@
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           let datosMes = docSnap.data();
-          delete datosMes[fechaString];
+          delete datosMes[fechaStr];
           datosMes.metadata = {
             usuarioCedula: usuario.cedula,
             ultimaModificacion: new Date().toISOString(),
@@ -1512,16 +713,20 @@
     function mostrarToast(mensaje, tipo = 'success', duracion = 3000) {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
-      toast.className = `toast ${tipo}`;
-      toast.setAttribute('role', 'status');
-      
+      const colores = {
+        success: 'bg-emerald-50 border-emerald-400 text-emerald-800',
+        error: 'bg-red-50 border-red-400 text-red-800',
+        info: 'bg-ccss-50 border-ccss-400 text-ccss-800'
+      };
       const iconos = { success: '✅', error: '❌', info: 'ℹ️' };
-      toast.innerHTML = `<span aria-hidden="true">${iconos[tipo] || 'ℹ️'}</span><span>${mensaje}</span>`;
+      
+      toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-xl border shadow-lg ${colores[tipo]} animate-[fadeIn_0.3s_ease-out]`;
+      toast.innerHTML = `<span>${iconos[tipo]}</span><span class="font-medium text-sm">${mensaje}</span>`;
       
       container.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = '0';
-        toast.style.transform = 'translateY(-100%)';
+        toast.style.transform = 'translateX(100%)';
         setTimeout(() => toast.remove(), 300);
       }, duracion);
     }
@@ -1562,57 +767,53 @@
       const mes = fechaActual.getMonth();
       const anio = fechaActual.getFullYear();
       
-      // Primer día del mes: usamos UTC para evitar desfases
-      const primerDiaDate = new Date(Date.UTC(anio, mes, 1));
-      const diaInicio = primerDiaDate.getUTCDay(); // 0=Dom, 1=Lun, ...
+      // 🔧 CORRECCIÓN CRÍTICA: Usar UTC para cálculo de días del mes
+      // Esto evita que el primer día del mes se desplace por zona horaria
+      const primerDiaUTC = new Date(Date.UTC(anio, mes, 1));
+      const diaInicio = primerDiaUTC.getUTCDay();
       
-      // Último día del mes
-      const ultimoDiaDate = new Date(Date.UTC(anio, mes + 1, 0));
-      const totalDias = ultimoDiaDate.getUTCDate();
+      const ultimoDiaUTC = new Date(Date.UTC(anio, mes + 1, 0));
+      const totalDias = ultimoDiaUTC.getUTCDate();
       
       const grid = document.getElementById('calendarioGrid');
       
-      // Eliminar celdas de días anteriores (mantener los 7 headers)
-      const celdasExistentes = grid.querySelectorAll('.day-cell, .day-cell-empty');
-      celdasExistentes.forEach(celda => celda.remove());
+      // Mantener headers, eliminar solo celdas de días
+      const celdas = grid.querySelectorAll('.day-cell, .day-cell-empty');
+      celdas.forEach(c => c.remove());
       
       // Celdas vacías antes del primer día
       for (let i = 0; i < diaInicio; i++) {
-        grid.appendChild(crearCeldaVacia());
+        const celda = document.createElement('div');
+        celda.className = 'day-cell-empty bg-gray-50 min-h-[80px] md:min-h-[110px]';
+        grid.appendChild(celda);
       }
       
       // Celdas de días del mes
       for (let dia = 1; dia <= totalDias; dia++) {
-        const fechaString = construirFechaString(anio, mes, dia);
-        grid.appendChild(crearCeldaDia(dia, fechaString));
+        const fechaStr = fechaAString(anio, mes, dia);
+        grid.appendChild(crearCeldaDia(dia, fechaStr));
       }
       
       // Completar última semana
       const totalCeldas = diaInicio + totalDias;
-      const celdasFaltantes = (7 - (totalCeldas % 7)) % 7;
-      for (let i = 0; i < celdasFaltantes; i++) {
-        grid.appendChild(crearCeldaVacia());
+      const faltantes = (7 - (totalCeldas % 7)) % 7;
+      for (let i = 0; i < faltantes; i++) {
+        const celda = document.createElement('div');
+        celda.className = 'day-cell-empty bg-gray-50 min-h-[80px] md:min-h-[110px]';
+        grid.appendChild(celda);
       }
       
       actualizarEstadisticas();
     }
 
-    function crearCeldaVacia() {
-      const celda = document.createElement('div');
-      celda.className = 'day-cell day-cell-empty';
-      celda.setAttribute('role', 'gridcell');
-      celda.setAttribute('aria-label', 'Día vacío');
-      return celda;
-    }
-
-    function crearCeldaDia(diaNumero, fechaString) {
-      const esHoyFlag = esHoy(fechaString);
-      const editable = esEditableString(fechaString);
-      const finDeSemana = esFinDeSemanaString(fechaString);
-      const feriado = esFeriado(fechaString);
-      const diaSemana = getDiaSemana(fechaString);
+    function crearCeldaDia(diaNumero, fechaStr) {
+      const hoyFlag = esHoy(fechaStr);
+      const editable = esEditable(fechaStr);
+      const finDeSemana = esFinDeSemana(fechaStr);
+      const feriado = esFeriado(fechaStr);
+      const diaSemana = getDiaSemana(fechaStr);
       
-      const datosDia = datosCalendario.get(fechaString) || {};
+      const datosDia = datosCalendario.get(fechaStr) || {};
       const tipoDia = datosDia.tipo || '';
       const turno = datosDia.turno || '';
       const comentario = datosDia.comentario || '';
@@ -1621,58 +822,46 @@
       if (!tipoDia && feriado) tipoFinal = 'feriado';
       
       const celda = document.createElement('div');
-      celda.className = 'day-cell';
-      celda.setAttribute('role', 'gridcell');
-      celda.setAttribute('tabindex', editable ? '0' : '-1');
-      celda.dataset.fecha = fechaString;
+      celda.className = 'day-cell bg-white p-2 md:p-3 relative cursor-pointer border-r border-b border-ccss-100';
+      celda.dataset.fecha = fechaStr;
       
-      if (esHoyFlag) celda.classList.add('today');
-      if (finDeSemana) celda.classList.add('day-weekend');
-      if (!editable) celda.classList.add('disabled');
+      if (hoyFlag) celda.classList.add('today');
+      if (!editable) celda.classList.add('opacity-50', 'cursor-not-allowed');
+      if (finDeSemana && !tipoDia) celda.classList.add('bg-red-50/30');
       
-      let html = `<div class="day-number">${diaNumero}</div>`;
-      html += '<div class="day-indicators" aria-hidden="true">';
+      let html = `<div class="day-number text-sm font-semibold ${finDeSemana && !hoyFlag ? 'text-red-500' : 'text-ccss-900'} mb-1">${diaNumero}</div>`;
+      html += '<div class="flex flex-col gap-0.5 min-w-0">';
       
       if (tipoFinal && TIPOS_DIA[tipoFinal]) {
         const info = TIPOS_DIA[tipoFinal];
-        celda.classList.add(`estado-${tipoFinal}`);
-        html += `<div class="day-badge estado-${tipoFinal}">${info.icon} ${info.label}</div>`;
+        html += `<div class="day-badge badge-${tipoFinal}">${info.icon} ${info.label}</div>`;
       }
       
       if (turno && TURNOS[turno]) {
-        html += `<div class="day-badge ${turno}">☀️ ${TURNOS[turno].label}</div>`;
+        html += `<div class="day-badge badge-${turno}">${TURNOS[turno].label}</div>`;
       }
       
       if (feriado && !tipoDia) {
-        html += `<div class="day-badge estado-feriado">🎉 Feriado</div>`;
+        html += `<div class="day-badge badge-feriado">🎉 Feriado</div>`;
       }
       
       html += '</div>';
       
       if (comentario) {
-        html += `<div class="day-comment-icon" title="${comentario.replace(/"/g, '&quot;')}">💬</div>`;
+        html += `<div class="absolute bottom-1 right-1 text-xs opacity-60" title="${comentario.replace(/"/g, '&quot;')}">💬</div>`;
       }
       
       celda.innerHTML = html;
       
-      // ARIA label
+      // ARIA
       let ariaLabel = `${DIAS_SEMANA[diaSemana]} ${diaNumero}`;
       if (tipoFinal && TIPOS_DIA[tipoFinal]) ariaLabel += `, ${TIPOS_DIA[tipoFinal].label}`;
       if (turno && TURNOS[turno]) ariaLabel += `, Turno ${TURNOS[turno].label}`;
-      if (feriado && !tipoDia) ariaLabel += ', Feriado';
       if (comentario) ariaLabel += `, ${comentario}`;
-      if (!editable) ariaLabel += ', No editable';
-      
       celda.setAttribute('aria-label', ariaLabel);
       
       if (editable) {
-        celda.addEventListener('click', () => abrirModal(fechaString, diaNumero));
-        celda.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            abrirModal(fechaString, diaNumero);
-          }
-        });
+        celda.addEventListener('click', () => abrirModal(fechaStr, diaNumero));
       }
       
       return celda;
@@ -1685,54 +874,50 @@
       const contenido = document.getElementById('contenidoSemanal');
       const titulo = document.getElementById('tituloSemana');
       
-      // Calcular inicio de semana (domingo) de fechaActual
       const curr = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), fechaActual.getDate());
       const diaSemana = curr.getDay();
       const primerDiaSemana = new Date(curr);
       primerDiaSemana.setDate(curr.getDate() - diaSemana);
       
-      const opcionesFecha = { day: 'numeric', month: 'short' };
+      const opciones = { day: 'numeric', month: 'short' };
       const ultimoDiaSemana = new Date(primerDiaSemana);
       ultimoDiaSemana.setDate(primerDiaSemana.getDate() + 6);
       
-      titulo.textContent = `${primerDiaSemana.toLocaleDateString('es-ES', opcionesFecha)} - ${ultimoDiaSemana.toLocaleDateString('es-ES', opcionesFecha)}`;
+      titulo.textContent = `${primerDiaSemana.toLocaleDateString('es-ES', opciones)} - ${ultimoDiaSemana.toLocaleDateString('es-ES', opciones)}`;
       
       let html = '';
       for (let i = 0; i < 7; i++) {
         const diaDate = new Date(primerDiaSemana);
         diaDate.setDate(primerDiaSemana.getDate() + i);
         
-        const fechaString = construirFechaString(diaDate.getFullYear(), diaDate.getMonth(), diaDate.getDate());
-        const datosDia = datosCalendario.get(fechaString) || {};
+        // 🔧 CORRECCIÓN: Usar fechaAString para evitar desfase
+        const fechaStr = fechaAString(diaDate.getFullYear(), diaDate.getMonth(), diaDate.getDate());
+        const datosDia = datosCalendario.get(fechaStr) || {};
         const tipoDia = datosDia.tipo || '';
         const turno = datosDia.turno || '';
         const comentario = datosDia.comentario || '';
-        const esHoyFlag = esHoy(fechaString);
+        const hoyFlag = esHoy(fechaStr);
         
         let estadoHtml = '';
         if (tipoDia && TIPOS_DIA[tipoDia]) {
-          const info = TIPOS_DIA[tipoDia];
-          estadoHtml += `<div class="week-badge estado-${tipoDia}">${info.icon} ${info.label}</div>`;
+          estadoHtml += `<div class="day-badge badge-${tipoDia} text-sm py-1">${TIPOS_DIA[tipoDia].icon} ${TIPOS_DIA[tipoDia].label}</div>`;
         }
         if (turno && TURNOS[turno]) {
-          estadoHtml += `<div class="week-badge ${turno}">⏰ ${TURNOS[turno].label}</div>`;
+          estadoHtml += `<div class="day-badge badge-${turno} text-sm py-1">⏰ ${TURNOS[turno].label}</div>`;
         }
-        if (!tipoDia && esFeriado(fechaString)) {
-          estadoHtml += `<div class="week-badge estado-feriado">🎉 Feriado</div>`;
-        }
-        if (!tipoDia && !esFeriado(fechaString) && !(diaDate.getDay() === 0 || diaDate.getDay() === 6)) {
-          estadoHtml += `<div class="week-badge" style="background: var(--bg-hover); color: var(--text-muted);">⚪ Sin registrar</div>`;
+        if (!tipoDia && esFeriado(fechaStr)) {
+          estadoHtml += `<div class="day-badge badge-feriado text-sm py-1">🎉 Feriado</div>`;
         }
         
         html += `
-          <div class="week-day ${esHoyFlag ? 'today' : ''}">
-            <div class="week-day-header">
-              <span>${DIAS_SEMANA[diaDate.getDay()].substring(0, 3)} ${diaDate.getDate()}</span>
-              ${esHoyFlag ? '<span style="color: var(--primary); font-size: 0.75rem;">HOY</span>' : ''}
+          <div class="bg-white p-4 min-h-[150px] ${hoyFlag ? 'ring-2 ring-ccss-500' : ''}">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b-2 ${hoyFlag ? 'border-ccss-500 text-ccss-600' : 'border-ccss-200'}">
+              <span class="font-bold">${DIAS_SEMANA[diaDate.getDay()].substring(0, 3)} ${diaDate.getDate()}</span>
+              ${hoyFlag ? '<span class="text-xs font-bold text-ccss-600">HOY</span>' : ''}
             </div>
-            <div class="week-day-content">
-              ${estadoHtml}
-              ${comentario ? `<div class="week-comment">💬 ${comentario}</div>` : ''}
+            <div class="space-y-2">
+              ${estadoHtml || '<span class="text-sm text-ccss-400 italic">Sin registrar</span>'}
+              ${comentario ? `<div class="text-xs text-ccss-600 bg-ccss-50 p-2 rounded border-l-2 border-ccss-400 mt-2">💬 ${comentario}</div>` : ''}
             </div>
           </div>
         `;
@@ -1744,22 +929,22 @@
       if (vista === vistaActual) return;
       vistaActual = vista;
       
-      document.querySelectorAll('.btn-toggle').forEach(btn => {
-        const esActivo = btn.dataset.vista === vista;
-        btn.classList.toggle('active', esActivo);
-        btn.setAttribute('aria-pressed', esActivo);
-      });
-      
+      const btnMensual = document.getElementById('btnVistaMensual');
+      const btnSemanal = document.getElementById('btnVistaSemanal');
       const vistaMensual = document.getElementById('vistaMensual');
       const vistaSemanal = document.getElementById('vistaSemanal');
       
       if (vista === 'mensual') {
+        btnMensual.className = 'px-3 py-2 bg-ccss-600 text-white rounded-lg text-sm font-medium shadow-sm shadow-ccss-500/20';
+        btnSemanal.className = 'px-3 py-2 bg-white border border-ccss-200 text-ccss-600 rounded-lg text-sm font-medium hover:bg-ccss-50 transition-colors';
         vistaMensual.classList.remove('hidden');
-        vistaSemanal.classList.remove('active');
+        vistaSemanal.classList.add('hidden');
         generarCalendario();
       } else {
+        btnSemanal.className = 'px-3 py-2 bg-ccss-600 text-white rounded-lg text-sm font-medium shadow-sm shadow-ccss-500/20';
+        btnMensual.className = 'px-3 py-2 bg-white border border-ccss-200 text-ccss-600 rounded-lg text-sm font-medium hover:bg-ccss-50 transition-colors';
         vistaMensual.classList.add('hidden');
-        vistaSemanal.classList.add('active');
+        vistaSemanal.classList.remove('hidden');
         generarVistaSemanal();
       }
     }
@@ -1781,10 +966,11 @@
         }
       });
       
+      // Feriados implícitos del mes
       const mes = fechaActual.getMonth();
       const anio = fechaActual.getFullYear();
       CONFIG.FERIADOS_2026.forEach(fechaStr => {
-        const { anio: fa, mes: fm } = parsearFechaString(fechaStr);
+        const { anio: fa, mes: fm } = parseFechaString(fechaStr);
         if (fm === mes && fa === anio && !datosCalendario.has(fechaStr)) {
           stats.feriado++;
         }
@@ -1807,52 +993,45 @@
     // ============================================
     // MODAL
     // ============================================
-    function abrirModal(fechaString, diaNumero) {
+    function abrirModal(fechaStr, diaNumero) {
       const modal = document.getElementById('modalEdicion');
-      const fechaModal = document.getElementById('fechaModal');
-      const tipoDia = document.getElementById('tipoDia');
-      const tipoTurno = document.getElementById('tipoTurno');
-      const comentario = document.getElementById('comentarioDia');
+      const { anio, mes } = parseFechaString(fechaStr);
       
-      const { anio, mes } = parsearFechaString(fechaString);
-      fechaModal.textContent = `${diaNumero} ${MESES[mes].substring(0, 3)} ${anio}`;
+      document.getElementById('fechaModal').textContent = `${diaNumero} de ${MESES[mes]} ${anio}`;
       
-      const datosExistentes = datosCalendario.get(fechaString) || {};
-      tipoDia.value = datosExistentes.tipo || '';
-      tipoTurno.value = datosExistentes.turno || '';
-      comentario.value = datosExistentes.comentario || '';
+      const datosExistentes = datosCalendario.get(fechaStr) || {};
+      document.getElementById('tipoDia').value = datosExistentes.tipo || '';
+      document.getElementById('tipoTurno').value = datosExistentes.turno || '';
+      document.getElementById('comentarioDia').value = datosExistentes.comentario || '';
       
       actualizarContador();
       
-      modal.dataset.fecha = fechaString;
-      modal.classList.add('active');
+      modal.dataset.fecha = fechaStr;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
       document.body.style.overflow = 'hidden';
-      setTimeout(() => tipoDia.focus(), 100);
+      setTimeout(() => document.getElementById('tipoDia').focus(), 100);
     }
 
     function cerrarModal() {
       const modal = document.getElementById('modalEdicion');
-      modal.classList.remove('active');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
       document.body.style.overflow = '';
-      
-      const fechaString = modal.dataset.fecha;
-      const celda = document.querySelector(`[data-fecha="${fechaString}"]`);
-      if (celda) celda.focus();
     }
 
     function actualizarContador() {
       const comentario = document.getElementById('comentarioDia');
       const contador = document.getElementById('contadorCaracteres');
-      const longitud = comentario.value.length;
-      contador.textContent = `${longitud} / ${CONFIG.MAX_COMENTARIO}`;
-      contador.className = 'char-counter';
-      if (longitud > CONFIG.MAX_COMENTARIO * 0.9) contador.classList.add('danger');
-      else if (longitud > CONFIG.MAX_COMENTARIO * 0.75) contador.classList.add('warning');
+      const len = comentario.value.length;
+      contador.textContent = `${len} / ${CONFIG.MAX_COMENTARIO}`;
+      contador.className = 'text-xs font-medium ' + 
+        (len > CONFIG.MAX_COMENTARIO ? 'text-red-500' : len > CONFIG.MAX_COMENTARIO * 0.9 ? 'text-amber-500' : 'text-ccss-500');
     }
 
     async function guardarDia() {
       const modal = document.getElementById('modalEdicion');
-      const fechaString = modal.dataset.fecha;
+      const fechaStr = modal.dataset.fecha;
       const tipo = document.getElementById('tipoDia').value;
       const turno = document.getElementById('tipoTurno').value;
       const comentario = document.getElementById('comentarioDia').value;
@@ -1867,42 +1046,24 @@
         return;
       }
       
-      const resultado = await guardarEnFirebase(fechaString, tipo, turno, comentario);
+      const resultado = await guardarEnFirebase(fechaStr, tipo, turno, comentario);
       if (resultado) {
         cerrarModal();
-        mostrarToast('Guardado y sincronizado', 'success');
+        mostrarToast('Guardado correctamente', 'success');
       }
     }
 
     async function eliminarDia() {
       const modal = document.getElementById('modalEdicion');
-      const fechaString = modal.dataset.fecha;
+      const fechaStr = modal.dataset.fecha;
       
       if (confirm('¿Eliminar este registro?')) {
-        const resultado = await eliminarDeFirebase(fechaString);
+        const resultado = await eliminarDeFirebase(fechaStr);
         if (resultado) {
           cerrarModal();
-          mostrarToast('Eliminado', 'info');
+          mostrarToast('Registro eliminado', 'info');
         }
       }
-    }
-
-    // ============================================
-    // MODO OSCURO
-    // ============================================
-    function toggleModoOscuro() {
-      modoOscuro = !modoOscuro;
-      document.documentElement.setAttribute('data-theme', modoOscuro ? 'dark' : 'light');
-      localStorage.setItem('modoOscuro', modoOscuro);
-      
-      const btn = document.getElementById('btnModoOscuro');
-      btn.innerHTML = modoOscuro ? '<span aria-hidden="true">☀️</span>' : '<span aria-hidden="true">🌙</span>';
-      btn.setAttribute('aria-label', modoOscuro ? 'Modo claro' : 'Modo oscuro');
-    }
-
-    function restaurarModoOscuro() {
-      const guardado = localStorage.getItem('modoOscuro') === 'true';
-      if (guardado) toggleModoOscuro();
     }
 
     // ============================================
@@ -1910,9 +1071,9 @@
     // ============================================
     document.addEventListener('DOMContentLoaded', () => {
       verificarSesion();
-      restaurarModoOscuro();
       inicializarSelectores();
       escucharCambiosMes(fechaActual.getMonth(), fechaActual.getFullYear());
+      lucide.createIcons();
       
       // Navegación
       document.getElementById('btnMesAnterior').addEventListener('click', () => {
@@ -1937,9 +1098,8 @@
         escucharCambiosMes(fechaActual.getMonth(), fechaActual.getFullYear());
       });
       
-      document.querySelectorAll('.btn-toggle').forEach(btn => {
-        btn.addEventListener('click', () => cambiarVista(btn.dataset.vista));
-      });
+      document.getElementById('btnVistaMensual').addEventListener('click', () => cambiarVista('mensual'));
+      document.getElementById('btnVistaSemanal').addEventListener('click', () => cambiarVista('semanal'));
       
       // Modal
       document.getElementById('btnGuardarDia').addEventListener('click', guardarDia);
@@ -1953,18 +1113,8 @@
       });
       
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && document.getElementById('modalEdicion').classList.contains('active')) {
-          cerrarModal();
-        }
+        if (e.key === 'Escape') cerrarModal();
       });
-      
-      document.addEventListener('keydown', (e) => {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-        if (e.key === 'ArrowLeft') document.getElementById('btnMesAnterior').click();
-        else if (e.key === 'ArrowRight') document.getElementById('btnMesSiguiente').click();
-      });
-      
-      document.getElementById('btnModoOscuro').addEventListener('click', toggleModoOscuro);
     });
 
     window.addEventListener('beforeunload', () => {
