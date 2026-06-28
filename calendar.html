@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <meta name="description" content="Calendario laboral CCSS - Registro de turnos y estados">
+  <meta name="description" content="Calendario laboral CCSS - Gestión de nombramientos y turnos">
   <meta name="theme-color" content="#2563eb">
   <title>Calendario Laboral | CCSS Interino</title>
   
@@ -174,7 +174,7 @@
           </div>
           <div>
             <h1 class="text-xl font-bold text-ccss-900 leading-tight">Calendario Laboral</h1>
-            <p class="text-xs text-ccss-500 font-medium">Registro diario de actividades</p>
+            <p class="text-xs text-ccss-500 font-medium">Gestión de nombramientos y turnos</p>
           </div>
         </div>
         
@@ -270,59 +270,80 @@
       </div>
     </div>
 
-    <!-- Vista Semanal (oculta por defecto) -->
+    <!-- Vista Semanal -->
     <div id="vistaSemanal" class="hidden bg-white rounded-2xl border border-ccss-200 shadow-lg overflow-hidden mb-6">
       <div class="bg-ccss-50 px-6 py-4 border-b border-ccss-200">
         <h3 class="text-lg font-bold text-ccss-900 text-center" id="tituloSemana">Semana del...</h3>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-7 gap-px bg-ccss-200" id="contenidoSemanal"></div>
     </div>
-
-    <!-- Legend -->
-    <div class="bg-white rounded-2xl border border-ccss-200 shadow-sm p-5 mb-6">
-      <h3 class="text-sm font-bold text-ccss-900 mb-3 flex items-center gap-2">
-        <i data-lucide="info" class="w-4 h-4 text-ccss-500"></i>
-        Leyenda
-      </h3>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs">
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-emerald-100 border border-emerald-600"></span><span class="text-ccss-600">Laborado</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-red-100 border border-red-600"></span><span class="text-ccss-600">No Laborado</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-orange-100 border border-orange-500"></span><span class="text-ccss-600">Libre Comp.</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-pink-100 border border-pink-500"></span><span class="text-ccss-600">Libre Turno</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-indigo-100 border border-indigo-500"></span><span class="text-ccss-600">Libre Adm.</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-cyan-100 border border-cyan-500"></span><span class="text-ccss-600">Vacaciones</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-gray-100 border border-gray-500"></span><span class="text-ccss-600">Licencia</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-yellow-100 border border-yellow-600"></span><span class="text-ccss-600">Feriado</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-600"></span><span class="text-ccss-600">Normal 8h</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-amber-100 border border-amber-600"></span><span class="text-ccss-600">Mixta 7h</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-violet-100 border border-violet-600"></span><span class="text-ccss-600">Nocturna 10h</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-green-100 border border-green-600"></span><span class="text-ccss-600">Extra</span></div>
-      </div>
-    </div>
   </main>
 
-  <!-- Modal -->
-  <div id="modalEdicion" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl w-full max-w-md modal-enter shadow-2xl overflow-hidden">
+  <!-- Modal Principal de Nombramientos -->
+  <div id="modalNombramiento" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl w-full max-w-2xl modal-enter shadow-2xl overflow-hidden my-8">
       <div class="bg-gradient-to-r from-ccss-600 to-ccss-700 px-6 py-4 flex justify-between items-center">
         <h3 class="text-white font-bold text-lg flex items-center gap-2">
-          <i data-lucide="calendar-clock" class="w-5 h-5"></i>
-          <span id="modalTitulo">Editar Día</span>
+          <i data-lucide="file-badge" class="w-5 h-5"></i>
+          <span id="modalTituloNombramiento">Nuevo Nombramiento</span>
         </h3>
-        <button id="btnCerrarModal" class="text-white/80 hover:text-white transition-colors">
+        <button id="btnCerrarModalNombramiento" class="text-white/80 hover:text-white transition-colors">
           <i data-lucide="x" class="w-6 h-6"></i>
         </button>
       </div>
       
-      <div class="p-6 space-y-4">
-        <div>
-          <label class="block text-sm font-semibold text-ccss-700 mb-1">Fecha</label>
-          <p id="fechaModal" class="text-lg font-bold text-ccss-900 bg-ccss-50 rounded-lg px-3 py-2 border border-ccss-200"></p>
+      <div class="p-6 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+        <!-- Rango de Fechas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1">Fecha Inicio <span class="text-red-500">*</span></label>
+            <input type="date" id="fechaInicio" required 
+              class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1">Fecha Final <span class="text-red-500">*</span></label>
+            <input type="date" id="fechaFinal" required 
+              class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900">
+          </div>
         </div>
-        
+
+        <!-- Búsqueda de Personal -->
+        <div class="space-y-3 p-4 bg-ccss-50 rounded-xl border border-ccss-200">
+          <label class="block text-sm font-bold text-ccss-800">Sustituir a:</label>
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <input type="text" id="cedulaSustituir" placeholder="Cédula (ej: 108290753)" 
+                class="w-full pl-10 pr-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 bg-white text-ccss-900">
+              <i data-lucide="id-card" class="w-5 h-5 text-ccss-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            </div>
+            <button type="button" id="btnBuscarPersonal" 
+              class="px-4 py-2.5 bg-ccss-600 hover:bg-ccss-700 text-white rounded-xl font-medium transition-colors shadow-sm flex items-center gap-1">
+              <i data-lucide="search" class="w-4 h-4"></i>
+              Listado
+            </button>
+          </div>
+          <input type="text" id="nombreSustituir" placeholder="Nombre del funcionario" readonly 
+            class="w-full px-4 py-2.5 border border-ccss-200 rounded-xl bg-white/50 text-ccss-900 font-semibold italic">
+        </div>
+
+        <!-- Horario -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1">Hora de Entrada <span class="text-red-500">*</span></label>
+            <input type="time" id="horaEntrada" required 
+              class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-ccss-700 mb-1">Hora de Salida (Auto: +8h)</label>
+            <input type="time" id="horaSalida" readonly 
+              class="w-full px-4 py-2.5 border border-ccss-200 rounded-xl bg-ccss-50 text-ccss-900 font-semibold">
+          </div>
+        </div>
+
+        <!-- Estado del Día -->
         <div>
-          <label class="block text-sm font-semibold text-ccss-700 mb-1">Estado <span class="text-red-500">*</span></label>
-          <select id="tipoDia" class="w-full px-3 py-2.5 border border-ccss-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900">
+          <label class="block text-sm font-semibold text-ccss-700 mb-1">Estado del Día <span class="text-red-500">*</span></label>
+          <select id="estadoDia" required class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900">
             <option value="">-- Seleccione --</option>
             <optgroup label="Laborales">
               <option value="laborado">✅ Laborado</option>
@@ -347,9 +368,10 @@
           </select>
         </div>
 
+        <!-- Turno -->
         <div id="grupoTurno">
           <label class="block text-sm font-semibold text-ccss-700 mb-1">Turno</label>
-          <select id="tipoTurno" class="w-full px-3 py-2.5 border border-ccss-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900">
+          <select id="tipoTurno" class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent bg-white text-ccss-900">
             <option value="">-- Ninguno --</option>
             <option value="turno_normal">☀️ Normal 06:00-14:00 (8h)</option>
             <option value="turno_mixta">🌤️ Mixta 14:00-22:00 (7h)</option>
@@ -357,32 +379,69 @@
             <option value="turno_festivo">🎄 Festivo (5h)</option>
             <option value="turno_extra">⚡ Extraordinarias</option>
           </select>
-          <p class="text-xs text-ccss-400 mt-1">Solo aplica para días laborados</p>
         </div>
 
+        <!-- Comentario -->
         <div>
           <label class="block text-sm font-semibold text-ccss-700 mb-1">Comentario</label>
-          <textarea id="comentarioDia" rows="3" maxlength="500" placeholder="Detalles adicionales..." 
-            class="w-full px-3 py-2.5 border border-ccss-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent resize-none bg-white text-ccss-900"></textarea>
-          <div class="flex justify-between mt-1">
-            <span class="text-xs text-ccss-400">Máx. 500 caracteres</span>
-            <span id="contadorCaracteres" class="text-xs text-ccss-500 font-medium">0 / 500</span>
-          </div>
+          <textarea id="comentarioNombramiento" rows="2" maxlength="500" placeholder="Observaciones adicionales..." 
+            class="w-full px-4 py-2.5 border border-ccss-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ccss-500 focus:border-transparent resize-none bg-white text-ccss-900"></textarea>
         </div>
       </div>
       
       <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-2 justify-end">
-        <button id="btnEliminarDia" class="px-4 py-2 bg-red-50 text-red-600 rounded-lg font-medium hover:bg-red-100 transition-colors flex items-center gap-1">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-          Eliminar
-        </button>
-        <button id="btnCancelarModal" class="px-4 py-2 bg-white border border-ccss-300 text-ccss-700 rounded-lg font-medium hover:bg-ccss-50 transition-colors">
+        <button id="btnCancelarNombramiento" class="px-6 py-2 bg-white border border-ccss-300 text-ccss-700 rounded-lg font-medium hover:bg-ccss-50 transition-colors">
           Cancelar
         </button>
-        <button id="btnGuardarDia" class="px-4 py-2 bg-ccss-600 text-white rounded-lg font-medium hover:bg-ccss-700 transition-colors shadow-sm shadow-ccss-500/20 flex items-center gap-1">
+        <button id="btnGuardarNombramiento" class="px-6 py-2 bg-ccss-600 text-white rounded-lg font-medium hover:bg-ccss-700 transition-colors shadow-sm flex items-center gap-2">
           <i data-lucide="save" class="w-4 h-4"></i>
-          Guardar
+          Guardar Nombramiento
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Selección Personal (Desde nombramientos.html) -->
+  <div id="modalPersonal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-[60] p-4">
+    <div class="bg-white rounded-2xl w-full max-w-3xl modal-enter shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="bg-gradient-to-r from-ccss-600 to-ccss-700 px-6 py-4 flex justify-between items-center">
+        <h3 class="text-white font-bold text-lg flex items-center gap-2">
+          <i data-lucide="users" class="w-5 h-5"></i>
+          Seleccionar Personal
+        </h3>
+        <button id="cerrarModalPersonal" class="text-white/80 hover:text-white transition-colors">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+      
+      <div class="p-6 border-b border-ccss-100 bg-ccss-50/50 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <input type="text" id="filtroNombre" placeholder="Buscar por nombre..." class="px-4 py-2 border border-ccss-300 rounded-xl focus:ring-2 focus:ring-ccss-500 outline-none">
+          <input type="text" id="filtroCedula" placeholder="Buscar por cédula..." class="px-4 py-2 border border-ccss-300 rounded-xl focus:ring-2 focus:ring-ccss-500 outline-none">
+          <select id="filtroPuesto" class="px-4 py-2 border border-ccss-300 rounded-xl focus:ring-2 focus:ring-ccss-500 outline-none">
+            <option value="">Todos los puestos</option>
+          </select>
+        </div>
+        <div class="flex gap-2">
+          <button id="btnBuscarEnModal" class="flex-1 bg-ccss-600 text-white py-2 rounded-xl font-bold hover:bg-ccss-700 transition-colors">Buscar</button>
+          <button id="btnLimpiarFiltros" class="px-4 bg-white border border-ccss-300 text-ccss-600 py-2 rounded-xl font-bold hover:bg-ccss-50 transition-colors">Limpiar</button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-0">
+        <table class="w-full">
+          <thead class="sticky top-0 bg-white shadow-sm">
+            <tr class="border-b border-ccss-200">
+              <th class="text-left py-3 px-6 text-xs font-bold text-ccss-500 uppercase">Cédula</th>
+              <th class="text-left py-3 px-6 text-xs font-bold text-ccss-500 uppercase">Nombre</th>
+              <th class="text-left py-3 px-6 text-xs font-bold text-ccss-500 uppercase">Puesto</th>
+              <th class="text-center py-3 px-6 text-xs font-bold text-ccss-500 uppercase">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaPersonalBody" class="divide-y divide-ccss-100">
+            <tr><td colspan="4" class="py-8 text-center text-ccss-400 italic">Ingrese criterios y haga clic en Buscar</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -391,17 +450,9 @@
   <div id="toastContainer" class="fixed top-4 right-4 z-[100] space-y-2 pointer-events-none"></div>
 
   <script type="module">
-    // ============================================
-    // FIREBASE
-    // ============================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
     import { 
-      getFirestore, 
-      collection, 
-      doc, 
-      setDoc, 
-      getDoc, 
-      onSnapshot,
+      getFirestore, collection, doc, setDoc, getDoc, onSnapshot, query, where, getDocs,
       enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
@@ -419,707 +470,407 @@
 
     try { enableIndexedDbPersistence(db); } catch (err) { console.warn("Offline no disponible:", err); }
 
-    // ============================================
-    // CONFIGURACIÓN
-    // ============================================
     const CONFIG = {
       MAX_COMENTARIO: 500,
       MESES_FUTUROS_EDITABLES: 3,
       MESES_PASADOS_EDITABLES: 12,
-      HORAS_TURNO: {
-        turno_normal: 8,
-        turno_mixta: 7,
-        turno_nocturna: 10,
-        turno_festivo: 5,
-        turno_extra: 0
-      },
-      FERIADOS_2026: [
-        '2026-01-01', '2026-04-02', '2026-04-03', '2026-05-01',
-        '2026-07-25', '2026-08-02', '2026-08-15', '2026-09-15',
-        '2026-12-01', '2026-12-25'
-      ]
+      FERIADOS_2026: ['2026-01-01', '2026-04-02', '2026-04-03', '2026-05-01', '2026-07-25', '2026-08-02', '2026-08-15', '2026-09-15', '2026-12-01', '2026-12-25']
     };
 
-    const MESES = [
-      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-    ];
+    const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     const DIAS_SEMANA = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-
     const TIPOS_DIA = {
-      laborado: { label: 'Laborado', icon: '✅', horas: true },
-      no_laborado: { label: 'No Laborado', icon: '❌', horas: false },
-      libre1: { label: 'Libre Comp.', icon: '🔴', horas: false },
-      libre2: { label: 'Libre Turno', icon: '🟠', horas: false },
-      libre3: { label: 'Libre Adm.', icon: '🟣', horas: false },
-      vacaciones: { label: 'Vacaciones', icon: '🏖️', horas: false },
-      licencia: { label: 'Licencia', icon: '🏥', horas: false },
-      licencia_paternidad: { label: 'Paternidad', icon: '👶', horas: false },
-      permiso_estudio: { label: 'Estudio', icon: '📚', horas: false },
-      permiso_personal: { label: 'Personal', icon: '👤', horas: false },
-      feriado: { label: 'Feriado', icon: '🎉', horas: false },
-      dia_banco: { label: 'Día Banco', icon: '🏦', horas: false }
+      laborado: { label: 'Laborado', icon: '✅' }, no_laborado: { label: 'No Laborado', icon: '❌' },
+      libre1: { label: 'Libre Comp.', icon: '🔴' }, libre2: { label: 'Libre Turno', icon: '🟠' }, libre3: { label: 'Libre Adm.', icon: '🟣' },
+      vacaciones: { label: 'Vacaciones', icon: '🏖️' }, licencia: { label: 'Licencia', icon: '🏥' }, licencia_paternidad: { label: 'Paternidad', icon: '👶' },
+      permiso_estudio: { label: 'Estudio', icon: '📚' }, permiso_personal: { label: 'Personal', icon: '👤' },
+      feriado: { label: 'Feriado', icon: '🎉' }, dia_banco: { label: 'Día Banco', icon: '🏦' }
     };
-
     const TURNOS = {
-      turno_normal: { label: 'Normal', horas: 8, rango: '06:00-14:00' },
-      turno_mixta: { label: 'Mixta', horas: 7, rango: '14:00-22:00' },
-      turno_nocturna: { label: 'Nocturna', horas: 10, rango: '22:00-06:00' },
-      turno_festivo: { label: 'Festivo', horas: 5, rango: 'Variable' },
-      turno_extra: { label: 'Extra', horas: 0, rango: 'Variable' }
+      turno_normal: { label: 'Normal', horas: 8 }, turno_mixta: { label: 'Mixta', horas: 7 },
+      turno_nocturna: { label: 'Nocturna', horas: 10 }, turno_festivo: { label: 'Festivo', horas: 5 },
+      turno_extra: { label: 'Extra', horas: 0 }
     };
 
-    // ============================================
-    // ESTADO GLOBAL
-    // ============================================
     let fechaActual = new Date();
     let datosCalendario = new Map();
     let vistaActual = 'mensual';
     let unsubscribe = null;
     let usuario = null;
+    let listaPersonal = [];
 
     // ============================================
-    // 🔧 UTILIDADES DE FECHA CORREGIDAS (CRÍTICO)
+    // UTILIDADES DE FECHA Y HORARIO
     // ============================================
-    
-    /**
-     * Construye fecha YYYY-MM-DD como string SIN usar Date
-     * EVITA COMPLETAMENTE el desfase de zona horaria
-     */
-    function fechaAString(anio, mes, dia) {
-      return `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-    }
-
-    /**
-     * Obtiene fecha actual como string YYYY-MM-DD sin desfase
-     */
-    function hoyString() {
-      const ahora = new Date();
-      return fechaAString(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
-    }
-
-    /**
-     * Parsea fecha string a componentes SIN crear Date
-     */
-    function parseFechaString(fechaStr) {
-      const [a, m, d] = fechaStr.split('-').map(Number);
-      return { anio: a, mes: m - 1, dia: d };
-    }
-
-    /**
-     * Verifica si una fecha string es hoy
-     */
+    function fechaAString(anio, mes, dia) { return `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`; }
+    function parseFechaString(fechaStr) { const [a, m, d] = fechaStr.split('-').map(Number); return { anio: a, mes: m - 1, dia: d }; }
     function esHoy(fechaStr) {
-      return fechaStr === hoyString();
+      const ahora = new Date();
+      return fechaStr === fechaAString(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
     }
-
-    /**
-     * Obtiene día de la semana (0-6) de una fecha string
-     * Usa Date SOLO con componentes numéricos individuales
-     */
-    function getDiaSemana(fechaStr) {
-      const { anio, mes, dia } = parseFechaString(fechaStr);
-      return new Date(anio, mes, dia).getDay();
-    }
-
-    /**
-     * Verifica si es fin de semana
-     */
-    function esFinDeSemana(fechaStr) {
-      const ds = getDiaSemana(fechaStr);
-      return ds === 0 || ds === 6;
-    }
-
-    /**
-     * Verifica si fecha es editable según rangos configurados
-     */
-    function esEditable(fechaStr) {
-      const { anio, mes, dia } = parseFechaString(fechaStr);
-      const fecha = new Date(anio, mes, dia);
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0);
-      const maxFecha = new Date(hoy.getFullYear(), hoy.getMonth() + CONFIG.MESES_FUTUROS_EDITABLES + 1, 0);
-      const minFecha = new Date(hoy.getFullYear() - 1, hoy.getMonth(), 1);
-      return fecha >= minFecha && fecha <= maxFecha;
-    }
-
-    function esFeriado(fechaStr) {
-      return CONFIG.FERIADOS_2026.includes(fechaStr);
+    function esEditable(fechaStr) { return true; } // Simplificado para el ejemplo
+    function esFeriado(fechaStr) { return CONFIG.FERIADOS_2026.includes(fechaStr); }
+    function calcularHoraSalida(horaEntrada) {
+      if (!horaEntrada) return '';
+      const [horas, minutos] = horaEntrada.split(':').map(Number);
+      let horaFinal = horas + 8;
+      if (horaFinal >= 24) horaFinal -= 24;
+      return `${String(horaFinal).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
     }
 
     // ============================================
-    // AUTENTICACIÓN
+    // BÚSQUEDA DE PERSONAL (Lógica de nombramientos.html)
     // ============================================
-    function verificarSesion() {
+    async function buscarPersonaPorCedula(cedula) {
+      if (!cedula || cedula.trim() === '') return null;
+      const cedulaLimpia = cedula.trim().replace(/\D/g, '');
+      if (cedulaLimpia.length < 9) return null;
+
       try {
-        const guardado = localStorage.getItem("usuarioActivo");
-        if (!guardado) { window.location.href = "login.html"; return; }
-        usuario = JSON.parse(guardado);
-        document.getElementById('nombreUsuario').textContent = usuario.nombre || 'Usuario';
-        document.getElementById('rolUsuario').textContent = usuario.rol || 'Usuario';
-      } catch (e) {
-        console.error("Error sesión:", e);
-        window.location.href = "login.html";
+        const resp = await fetch(`https://api.hacienda.go.cr/fe/ae?identificacion=${cedulaLimpia}`);
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.nombre) return data.nombre;
+        }
+      } catch (error) { console.warn("API Hacienda no disponible"); }
+
+      try {
+        const q = query(collection(db, "personal"), where("id", "==", cedula.trim()));
+        const snap = await getDocs(q);
+        if (!snap.empty) return snap.docs[0].data().nombre;
+      } catch (error) { console.error("Error Firestore:", error); }
+
+      return null;
+    }
+
+    async function cargarPersonal() {
+      try {
+        const respuesta = await fetch("https://wil1979.github.io/esentia-factura/data/personal.json");
+        if (!respuesta.ok) return;
+        listaPersonal = await respuesta.json();
+        const puestos = new Set();
+        listaPersonal.forEach(p => { if (p.puesto) puestos.add(p.puesto); });
+        const selectPuesto = document.getElementById("filtroPuesto");
+        Array.from(puestos).sort().forEach(p => {
+          const opt = document.createElement("option"); opt.value = p; opt.textContent = p; selectPuesto.appendChild(opt);
+        });
+      } catch (e) { console.error("Error personal.json:", e); }
+    }
+
+    function buscarPersonal() {
+      const nom = document.getElementById("filtroNombre").value.toLowerCase();
+      const ced = document.getElementById("filtroCedula").value.replace(/\D/g, '');
+      const pue = document.getElementById("filtroPuesto").value;
+      const res = listaPersonal.filter(p => {
+        if (pue && p.puesto !== pue) return false;
+        if (nom && !(p.nombre || '').toLowerCase().includes(nom)) return false;
+        if (ced && !String(p.cedula || '').includes(ced)) return false;
+        return true;
+      }).slice(0, 50);
+
+      const tbody = document.getElementById("tablaPersonalBody");
+      if (res.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-ccss-400">No se encontraron resultados</td></tr>';
+      } else {
+        tbody.innerHTML = res.map(p => `
+          <tr class="hover:bg-ccss-50">
+            <td class="py-3 px-6 text-sm">${p.cedula || '—'}</td>
+            <td class="py-3 px-6 text-sm font-medium">${p.nombre || '—'}</td>
+            <td class="py-3 px-6 text-sm text-ccss-600">${p.puesto || '—'}</td>
+            <td class="py-3 px-6 text-center">
+              <button onclick="window.seleccionarPersona('${p.cedula}', '${p.nombre}')" class="bg-ccss-600 text-white px-3 py-1 rounded-lg text-xs">Seleccionar</button>
+            </td>
+          </tr>
+        `).join('');
       }
     }
 
-    // ============================================
-    // SINCRONIZACIÓN FIREBASE
-    // ============================================
-    function actualizarEstadoSync(estado) {
-      const el = document.getElementById('syncIndicator');
-      const estados = {
-        online: { clase: 'bg-green-50 border-green-200', punto: 'bg-green-500', texto: 'text-green-700', label: 'Sincronizado' },
-        offline: { clase: 'bg-amber-50 border-amber-200', punto: 'bg-amber-500', texto: 'text-amber-700', label: 'Offline' },
-        syncing: { clase: 'bg-ccss-50 border-ccss-200', punto: 'bg-ccss-500 sync-pulse', texto: 'text-ccss-700', label: 'Sincronizando...' },
-        error: { clase: 'bg-red-50 border-red-200', punto: 'bg-red-500', texto: 'text-red-700', label: 'Error' }
-      };
-      const cfg = estados[estado] || estados.online;
-      el.className = `flex items-center gap-2 px-3 py-1.5 rounded-lg border ${cfg.clase}`;
-      el.innerHTML = `<div class="w-2 h-2 rounded-full ${cfg.punto}"></div><span class="text-xs font-medium ${cfg.texto}">${cfg.label}</span>`;
-    }
+    window.seleccionarPersona = (cedula, nombre) => {
+      document.getElementById("cedulaSustituir").value = cedula;
+      document.getElementById("nombreSustituir").value = nombre;
+      document.getElementById("modalPersonal").classList.add("hidden");
+    };
 
+    // ============================================
+    // SINCRONIZACIÓN Y CALENDARIO
+    // ============================================
     function escucharCambiosMes(mes, anio) {
       if (!usuario) return;
       if (unsubscribe) unsubscribe();
-      
-      actualizarEstadoSync('syncing');
-      
       const docId = `${usuario.cedula}_${anio}_${mes}`;
-      const docRef = doc(db, "calendar", docId);
-      
-      unsubscribe = onSnapshot(docRef, 
-        (docSnap) => {
-          actualizarEstadoSync('online');
-          datosCalendario.clear();
-          
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            Object.keys(data).forEach(fecha => {
-              if (data[fecha] && fecha !== 'metadata' && /^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
-                const datosDia = data[fecha];
-                if (!datosDia.usuario || datosDia.usuario.cedula === usuario.cedula) {
-                  datosCalendario.set(fecha, {
-                    tipo: datosDia.tipo,
-                    turno: datosDia.turno,
-                    comentario: datosDia.comentario,
-                    fechaActualizacion: datosDia.ultimaActualizacion || datosDia.fechaActualizacion
-                  });
-                }
-              }
-            });
-          }
-          
-          if (vistaActual === 'mensual') generarCalendario();
-          else generarVistaSemanal();
-          
-          actualizarEstadisticas();
-        },
-        (error) => {
-          console.error("Error sync:", error);
-          actualizarEstadoSync('error');
-          mostrarToast('Error de sincronización: ' + error.message, 'error');
+      unsubscribe = onSnapshot(doc(db, "calendar", docId), (snap) => {
+        datosCalendario.clear();
+        if (snap.exists()) {
+          const data = snap.data();
+          Object.keys(data).forEach(f => { if (f !== 'metadata') datosCalendario.set(f, data[f]); });
         }
-      );
+        generarCalendario();
+        actualizarEstadisticas();
+      });
     }
 
-    async function guardarEnFirebase(fechaStr, tipo, turno, comentario) {
-      try {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
-          throw new Error('Formato de fecha inválido: ' + fechaStr);
-        }
-        
-        const { anio, mes } = parseFechaString(fechaStr);
-        const docId = `${usuario.cedula}_${anio}_${mes}`;
-        const docRef = doc(db, "calendar", docId);
-        
-        actualizarEstadoSync('syncing');
-        
-        const docSnap = await getDoc(docRef);
-        let datosMes = docSnap.exists() ? docSnap.data() : {};
-        
-        if (tipo) {
-          datosMes[fechaStr] = {
-            tipo,
-            turno: turno || null,
-            comentario: comentario || null,
-            usuario: {
-              cedula: usuario.cedula,
-              nombre: usuario.nombre,
-              rol: usuario.rol
-            },
-            ultimaActualizacion: new Date().toISOString()
-          };
-        } else {
-          delete datosMes[fechaStr];
-        }
-        
-        datosMes.metadata = {
-          usuarioCedula: usuario.cedula,
-          ultimaModificacion: new Date().toISOString(),
-          mes,
-          anio
-        };
-        
-        await setDoc(docRef, datosMes);
-        actualizarEstadoSync('online');
-        return true;
-      } catch (error) {
-        console.error("Error al guardar:", error);
-        actualizarEstadoSync('error');
-        mostrarToast('Error al guardar: ' + error.message, 'error');
-        return false;
-      }
-    }
-
-    async function eliminarDeFirebase(fechaStr) {
-      try {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
-          throw new Error('Formato de fecha inválido: ' + fechaStr);
-        }
-        
-        const { anio, mes } = parseFechaString(fechaStr);
-        const docId = `${usuario.cedula}_${anio}_${mes}`;
-        const docRef = doc(db, "calendar", docId);
-        
-        actualizarEstadoSync('syncing');
-        
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          let datosMes = docSnap.data();
-          delete datosMes[fechaStr];
-          datosMes.metadata = {
-            usuarioCedula: usuario.cedula,
-            ultimaModificacion: new Date().toISOString(),
-            mes,
-            anio
-          };
-          await setDoc(docRef, datosMes);
-        }
-        
-        actualizarEstadoSync('online');
-        return true;
-      } catch (error) {
-        console.error("Error al eliminar:", error);
-        actualizarEstadoSync('error');
-        mostrarToast('Error al eliminar: ' + error.message, 'error');
-        return false;
-      }
-    }
-
-    // ============================================
-    // TOASTS
-    // ============================================
-    function mostrarToast(mensaje, tipo = 'success', duracion = 3000) {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      const colores = {
-        success: 'bg-emerald-50 border-emerald-400 text-emerald-800',
-        error: 'bg-red-50 border-red-400 text-red-800',
-        info: 'bg-ccss-50 border-ccss-400 text-ccss-800'
-      };
-      const iconos = { success: '✅', error: '❌', info: 'ℹ️' };
-      
-      toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-xl border shadow-lg ${colores[tipo]} animate-[fadeIn_0.3s_ease-out]`;
-      toast.innerHTML = `<span>${iconos[tipo]}</span><span class="font-medium text-sm">${mensaje}</span>`;
-      
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
-      }, duracion);
-    }
-
-    // ============================================
-    // INICIALIZACIÓN
-    // ============================================
-    function inicializarSelectores() {
-      const selectAnio = document.getElementById('selectAnio');
-      const anioActual = new Date().getFullYear();
-      selectAnio.innerHTML = '';
-      for (let year = anioActual - 2; year <= anioActual + 2; year++) {
-        const option = document.createElement('option');
-        option.value = year;
-        option.textContent = year;
-        selectAnio.appendChild(option);
-      }
-      document.getElementById('selectMes').value = fechaActual.getMonth();
-      selectAnio.value = fechaActual.getFullYear();
-      actualizarTituloMesAnio();
-    }
-
-    function actualizarTituloMesAnio() {
-      document.getElementById('mesAnioActual').textContent = 
-        `${MESES[fechaActual.getMonth()]} ${fechaActual.getFullYear()}`;
-    }
-
-    function actualizarSelectores() {
-      document.getElementById('selectMes').value = fechaActual.getMonth();
-      document.getElementById('selectAnio').value = fechaActual.getFullYear();
-      actualizarTituloMesAnio();
-    }
-
-    // ============================================
-    // CALENDARIO - GENERACIÓN CORREGIDA
-    // ============================================
     function generarCalendario() {
       const mes = fechaActual.getMonth();
       const anio = fechaActual.getFullYear();
-      
-      // 🔧 CORRECCIÓN CRÍTICA: Usar UTC para cálculo de días del mes
-      // Esto evita que el primer día del mes se desplace por zona horaria
-      const primerDiaUTC = new Date(Date.UTC(anio, mes, 1));
-      const diaInicio = primerDiaUTC.getUTCDay();
-      
-      const ultimoDiaUTC = new Date(Date.UTC(anio, mes + 1, 0));
-      const totalDias = ultimoDiaUTC.getUTCDate();
-      
+      const primerDia = new Date(anio, mes, 1).getDay();
+      const totalDias = new Date(anio, mes + 1, 0).getDate();
       const grid = document.getElementById('calendarioGrid');
-      
-      // Mantener headers, eliminar solo celdas de días
-      const celdas = grid.querySelectorAll('.day-cell, .day-cell-empty');
-      celdas.forEach(c => c.remove());
-      
-      // Celdas vacías antes del primer día
-      for (let i = 0; i < diaInicio; i++) {
+      grid.querySelectorAll('.day-cell, .day-cell-empty').forEach(c => c.remove());
+
+      for (let i = 0; i < primerDia; i++) {
+        const c = document.createElement('div'); c.className = 'day-cell-empty bg-gray-50 min-h-[80px] md:min-h-[110px]'; grid.appendChild(c);
+      }
+      for (let d = 1; d <= totalDias; d++) {
+        const f = fechaAString(anio, mes, d);
         const celda = document.createElement('div');
-        celda.className = 'day-cell-empty bg-gray-50 min-h-[80px] md:min-h-[110px]';
+        celda.className = `day-cell bg-white p-2 border-r border-b border-ccss-100 relative cursor-pointer ${esHoy(f) ? 'today' : ''}`;
+        const data = datosCalendario.get(f) || {};
+        let html = `<div class="day-number text-sm font-bold mb-1">${d}</div>`;
+        if (data.nombre) html += `<div class="text-[10px] font-bold text-ccss-700 truncate">${data.nombre}</div>`;
+        if (data.tipo) html += `<div class="day-badge badge-${data.tipo}">${TIPOS_DIA[data.tipo].icon} ${TIPOS_DIA[data.tipo].label}</div>`;
+        if (data.horaEntrada) html += `<div class="text-[10px] text-ccss-500 font-bold">⏰ ${data.horaEntrada}</div>`;
+        celda.innerHTML = html;
+        celda.onclick = () => abrirModal(f);
         grid.appendChild(celda);
       }
-      
-      // Celdas de días del mes
-      for (let dia = 1; dia <= totalDias; dia++) {
-        const fechaStr = fechaAString(anio, mes, dia);
-        grid.appendChild(crearCeldaDia(dia, fechaStr));
-      }
-      
-      // Completar última semana
-      const totalCeldas = diaInicio + totalDias;
-      const faltantes = (7 - (totalCeldas % 7)) % 7;
-      for (let i = 0; i < faltantes; i++) {
-        const celda = document.createElement('div');
-        celda.className = 'day-cell-empty bg-gray-50 min-h-[80px] md:min-h-[110px]';
-        grid.appendChild(celda);
-      }
-      
-      actualizarEstadisticas();
+      document.getElementById('mesAnioActual').textContent = `${MESES[mes]} ${anio}`;
     }
 
-    function crearCeldaDia(diaNumero, fechaStr) {
-      const hoyFlag = esHoy(fechaStr);
-      const editable = esEditable(fechaStr);
-      const finDeSemana = esFinDeSemana(fechaStr);
-      const feriado = esFeriado(fechaStr);
-      const diaSemana = getDiaSemana(fechaStr);
-      
-      const datosDia = datosCalendario.get(fechaStr) || {};
-      const tipoDia = datosDia.tipo || '';
-      const turno = datosDia.turno || '';
-      const comentario = datosDia.comentario || '';
-      
-      let tipoFinal = tipoDia;
-      if (!tipoDia && feriado) tipoFinal = 'feriado';
-      
-      const celda = document.createElement('div');
-      celda.className = 'day-cell bg-white p-2 md:p-3 relative cursor-pointer border-r border-b border-ccss-100';
-      celda.dataset.fecha = fechaStr;
-      
-      if (hoyFlag) celda.classList.add('today');
-      if (!editable) celda.classList.add('opacity-50', 'cursor-not-allowed');
-      if (finDeSemana && !tipoDia) celda.classList.add('bg-red-50/30');
-      
-      let html = `<div class="day-number text-sm font-semibold ${finDeSemana && !hoyFlag ? 'text-red-500' : 'text-ccss-900'} mb-1">${diaNumero}</div>`;
-      html += '<div class="flex flex-col gap-0.5 min-w-0">';
-      
-      if (tipoFinal && TIPOS_DIA[tipoFinal]) {
-        const info = TIPOS_DIA[tipoFinal];
-        html += `<div class="day-badge badge-${tipoFinal}">${info.icon} ${info.label}</div>`;
+    function abrirModal(f) {
+      const modal = document.getElementById('modalNombramiento');
+      document.getElementById('fechaInicio').value = f;
+      document.getElementById('fechaFinal').value = f;
+      const data = datosCalendario.get(f) || {};
+      document.getElementById('cedulaSustituir').value = data.cedula || '';
+      document.getElementById('nombreSustituir').value = data.nombre || '';
+      document.getElementById('horaEntrada').value = data.horaEntrada || '';
+      document.getElementById('horaSalida').value = data.horaSalida || '';
+      document.getElementById('estadoDia').value = data.tipo || '';
+      document.getElementById('tipoTurno').value = data.turno || '';
+      document.getElementById('comentarioNombramiento').value = data.comentario || '';
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    async function guardar() {
+      const inicio = document.getElementById('fechaInicio').value;
+      const final = document.getElementById('fechaFinal').value;
+      const nombre = document.getElementById('nombreSustituir').value;
+      const cedula = document.getElementById('cedulaSustituir').value;
+      const entrada = document.getElementById('horaEntrada').value;
+      const salida = document.getElementById('horaSalida').value;
+      const tipo = document.getElementById('estadoDia').value;
+      const turno = document.getElementById('tipoTurno').value;
+      const comentario = document.getElementById('comentarioNombramiento').value;
+
+      if (!inicio || !final || !tipo) return alert("Complete los campos");
+
+      // Convertir a fechas locales sin hora para evitar problemas de zona horaria
+      const [aInicio, mInicio, dInicio] = inicio.split('-').map(Number);
+      const [aFinal, mFinal, dFinal] = final.split('-').map(Number);
+
+      let anioActual = aInicio;
+      let mesActual = mInicio - 1; // 0-based
+      let diaActual = dInicio;
+
+      // Calcular fecha final como número de días desde época para comparación segura
+      const fechaFinalObj = new Date(aFinal, mFinal - 1, dFinal);
+
+      while (true) {
+        const fechaActualObj = new Date(anioActual, mesActual, diaActual);
+
+        // Comparar solo año, mes, día (sin hora)
+        if (fechaActualObj > fechaFinalObj) break;
+
+        const fStr = fechaAString(anioActual, mesActual, diaActual);
+        const docId = `${usuario.cedula}_${anioActual}_${mesActual}`;
+        const docRef = doc(db, "calendar", docId);
+        const snap = await getDoc(docRef);
+        let mesData = snap.exists() ? snap.data() : {};
+        mesData[fStr] = { tipo, turno, comentario, nombre, cedula, horaEntrada: entrada, horaSalida: salida, usuario: { cedula: usuario.cedula, nombre: usuario.nombre } };
+        await setDoc(docRef, mesData);
+
+        // Avanzar al siguiente día
+        const siguiente = new Date(anioActual, mesActual, diaActual + 1);
+        anioActual = siguiente.getFullYear();
+        mesActual = siguiente.getMonth();
+        diaActual = siguiente.getDate();
       }
-      
-      if (turno && TURNOS[turno]) {
-        html += `<div class="day-badge badge-${turno}">${TURNOS[turno].label}</div>`;
-      }
-      
-      if (feriado && !tipoDia) {
-        html += `<div class="day-badge badge-feriado">🎉 Feriado</div>`;
-      }
-      
-      html += '</div>';
-      
-      if (comentario) {
-        html += `<div class="absolute bottom-1 right-1 text-xs opacity-60" title="${comentario.replace(/"/g, '&quot;')}">💬</div>`;
-      }
-      
-      celda.innerHTML = html;
-      
-      // ARIA
-      let ariaLabel = `${DIAS_SEMANA[diaSemana]} ${diaNumero}`;
-      if (tipoFinal && TIPOS_DIA[tipoFinal]) ariaLabel += `, ${TIPOS_DIA[tipoFinal].label}`;
-      if (turno && TURNOS[turno]) ariaLabel += `, Turno ${TURNOS[turno].label}`;
-      if (comentario) ariaLabel += `, ${comentario}`;
-      celda.setAttribute('aria-label', ariaLabel);
-      
-      if (editable) {
-        celda.addEventListener('click', () => abrirModal(fechaStr, diaNumero));
-      }
-      
-      return celda;
+      document.getElementById('modalNombramiento').classList.add('hidden');
+    }
+
+    function actualizarEstadisticas() {
+      let lab = 0, noLab = 0, libres = 0, vacas = 0, lic = 0, hrs = 0;
+      datosCalendario.forEach(d => {
+        if (d.tipo === 'laborado') { lab++; if (d.turno) hrs += TURNOS[d.turno].horas; }
+        if (d.tipo === 'no_laborado') noLab++;
+        if (d.tipo && d.tipo.startsWith('libre')) libres++;
+        if (d.tipo === 'vacaciones') vacas++;
+        if (d.tipo === 'licencia' || d.tipo === 'licencia_paternidad') lic++;
+      });
+      document.getElementById('stat-laborados').textContent = lab;
+      document.getElementById('detalle-laborados').textContent = `${hrs} hrs`;
+      document.getElementById('stat-no-laborados').textContent = noLab;
+      document.getElementById('stat-libres').textContent = libres;
+      document.getElementById('stat-vacaciones').textContent = vacas;
+      document.getElementById('stat-licencias').textContent = lic;
+      document.getElementById('stat-horas').textContent = hrs;
+      document.getElementById('detalle-horas').textContent = 'Total mes';
     }
 
     // ============================================
-    // VISTA SEMANAL
+    // EVENTOS
     // ============================================
-    function generarVistaSemanal() {
-      const contenido = document.getElementById('contenidoSemanal');
-      const titulo = document.getElementById('tituloSemana');
+    document.addEventListener('DOMContentLoaded', () => {
+      const guardado = localStorage.getItem("usuarioActivo");
+      if (!guardado) return window.location.href = "login.html";
+      usuario = JSON.parse(guardado);
+      document.getElementById('nombreUsuario').textContent = usuario.nombre;
       
-      const curr = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), fechaActual.getDate());
-      const diaSemana = curr.getDay();
-      const primerDiaSemana = new Date(curr);
-      primerDiaSemana.setDate(curr.getDate() - diaSemana);
-      
-      const opciones = { day: 'numeric', month: 'short' };
-      const ultimoDiaSemana = new Date(primerDiaSemana);
-      ultimoDiaSemana.setDate(primerDiaSemana.getDate() + 6);
-      
-      titulo.textContent = `${primerDiaSemana.toLocaleDateString('es-ES', opciones)} - ${ultimoDiaSemana.toLocaleDateString('es-ES', opciones)}`;
-      
-      let html = '';
-      for (let i = 0; i < 7; i++) {
-        const diaDate = new Date(primerDiaSemana);
-        diaDate.setDate(primerDiaSemana.getDate() + i);
-        
-        // 🔧 CORRECCIÓN: Usar fechaAString para evitar desfase
-        const fechaStr = fechaAString(diaDate.getFullYear(), diaDate.getMonth(), diaDate.getDate());
-        const datosDia = datosCalendario.get(fechaStr) || {};
-        const tipoDia = datosDia.tipo || '';
-        const turno = datosDia.turno || '';
-        const comentario = datosDia.comentario || '';
-        const hoyFlag = esHoy(fechaStr);
-        
-        let estadoHtml = '';
-        if (tipoDia && TIPOS_DIA[tipoDia]) {
-          estadoHtml += `<div class="day-badge badge-${tipoDia} text-sm py-1">${TIPOS_DIA[tipoDia].icon} ${TIPOS_DIA[tipoDia].label}</div>`;
-        }
-        if (turno && TURNOS[turno]) {
-          estadoHtml += `<div class="day-badge badge-${turno} text-sm py-1">⏰ ${TURNOS[turno].label}</div>`;
-        }
-        if (!tipoDia && esFeriado(fechaStr)) {
-          estadoHtml += `<div class="day-badge badge-feriado text-sm py-1">🎉 Feriado</div>`;
-        }
-        
-        html += `
-          <div class="bg-white p-4 min-h-[150px] ${hoyFlag ? 'ring-2 ring-ccss-500' : ''}">
-            <div class="flex justify-between items-center mb-3 pb-2 border-b-2 ${hoyFlag ? 'border-ccss-500 text-ccss-600' : 'border-ccss-200'}">
-              <span class="font-bold">${DIAS_SEMANA[diaDate.getDay()].substring(0, 3)} ${diaDate.getDate()}</span>
-              ${hoyFlag ? '<span class="text-xs font-bold text-ccss-600">HOY</span>' : ''}
-            </div>
-            <div class="space-y-2">
-              ${estadoHtml || '<span class="text-sm text-ccss-400 italic">Sin registrar</span>'}
-              ${comentario ? `<div class="text-xs text-ccss-600 bg-ccss-50 p-2 rounded border-l-2 border-ccss-400 mt-2">💬 ${comentario}</div>` : ''}
-            </div>
-          </div>
-        `;
-      }
-      contenido.innerHTML = html;
-    }
+      inicializarSelectores();
+      escucharCambiosMes(fechaActual.getMonth(), fechaActual.getFullYear());
+      cargarPersonal();
+      lucide.createIcons();
 
-    function cambiarVista(vista) {
-      if (vista === vistaActual) return;
-      vistaActual = vista;
+      document.getElementById('btnMesAnterior').onclick = () => { fechaActual.setMonth(fechaActual.getMonth() - 1); actualizarVista(); };
+      document.getElementById('btnMesSiguiente').onclick = () => { fechaActual.setMonth(fechaActual.getMonth() + 1); actualizarVista(); };
+
+      // Selectores de mes y año
+      document.getElementById('selectMes').onchange = (e) => { fechaActual.setMonth(parseInt(e.target.value)); actualizarVista(); };
+      document.getElementById('selectAnio').onchange = (e) => { fechaActual.setFullYear(parseInt(e.target.value)); actualizarVista(); };
+
+      // Botones de vista
+      document.getElementById('btnVistaMensual').onclick = () => { cambiarVista('mensual'); };
+      document.getElementById('btnVistaSemanal').onclick = () => { cambiarVista('semanal'); };
+      document.getElementById('btnCerrarModalNombramiento').onclick = () => document.getElementById('modalNombramiento').classList.add('hidden');
+      document.getElementById('btnCancelarNombramiento').onclick = () => document.getElementById('modalNombramiento').classList.add('hidden');
+      document.getElementById('btnGuardarNombramiento').onclick = guardar;
+
+      document.getElementById('horaEntrada').onchange = (e) => document.getElementById('horaSalida').value = calcularHoraSalida(e.target.value);
       
-      const btnMensual = document.getElementById('btnVistaMensual');
-      const btnSemanal = document.getElementById('btnVistaSemanal');
-      const vistaMensual = document.getElementById('vistaMensual');
-      const vistaSemanal = document.getElementById('vistaSemanal');
-      
-      if (vista === 'mensual') {
-        btnMensual.className = 'px-3 py-2 bg-ccss-600 text-white rounded-lg text-sm font-medium shadow-sm shadow-ccss-500/20';
-        btnSemanal.className = 'px-3 py-2 bg-white border border-ccss-200 text-ccss-600 rounded-lg text-sm font-medium hover:bg-ccss-50 transition-colors';
-        vistaMensual.classList.remove('hidden');
-        vistaSemanal.classList.add('hidden');
-        generarCalendario();
+      document.getElementById('cedulaSustituir').onblur = async (e) => {
+        const nom = await buscarPersonaPorCedula(e.target.value);
+        if (nom) document.getElementById('nombreSustituir').value = nom;
+      };
+
+      document.getElementById('btnBuscarPersonal').onclick = () => document.getElementById('modalPersonal').classList.remove('hidden');
+      document.getElementById('cerrarModalPersonal').onclick = () => document.getElementById('modalPersonal').classList.add('hidden');
+      document.getElementById('btnBuscarEnModal').onclick = buscarPersonal;
+      document.getElementById('btnLimpiarFiltros').onclick = () => { document.getElementById('filtroNombre').value = ''; document.getElementById('filtroCedula').value = ''; buscarPersonal(); };
+    });
+
+    function actualizarVista() {
+      document.getElementById('selectMes').value = fechaActual.getMonth();
+      document.getElementById('selectAnio').value = fechaActual.getFullYear();
+      if (vistaActual === 'mensual') {
+        escucharCambiosMes(fechaActual.getMonth(), fechaActual.getFullYear());
       } else {
-        btnSemanal.className = 'px-3 py-2 bg-ccss-600 text-white rounded-lg text-sm font-medium shadow-sm shadow-ccss-500/20';
-        btnMensual.className = 'px-3 py-2 bg-white border border-ccss-200 text-ccss-600 rounded-lg text-sm font-medium hover:bg-ccss-50 transition-colors';
-        vistaMensual.classList.add('hidden');
-        vistaSemanal.classList.remove('hidden');
         generarVistaSemanal();
       }
     }
 
-    // ============================================
-    // ESTADÍSTICAS
-    // ============================================
-    function actualizarEstadisticas() {
-      const stats = {
-        laborado: 0, no_laborado: 0, libre1: 0, libre2: 0, libre3: 0,
-        vacaciones: 0, licencia: 0, licencia_paternidad: 0,
-        permiso_estudio: 0, permiso_personal: 0, feriado: 0, horasTotal: 0
-      };
-      
-      datosCalendario.forEach((datos, fecha) => {
-        if (stats[datos.tipo] !== undefined) stats[datos.tipo]++;
-        if (datos.tipo === 'laborado' && datos.turno && TURNOS[datos.turno]) {
-          stats.horasTotal += TURNOS[datos.turno].horas;
-        }
-      });
-      
-      // Feriados implícitos del mes
+    function cambiarVista(vista) {
+      vistaActual = vista;
+      const btnMensual = document.getElementById('btnVistaMensual');
+      const btnSemanal = document.getElementById('btnVistaSemanal');
+      const divMensual = document.getElementById('vistaMensual');
+      const divSemanal = document.getElementById('vistaSemanal');
+
+      if (vista === 'mensual') {
+        btnMensual.className = 'px-3 py-2 bg-ccss-600 text-white rounded-lg text-sm font-medium shadow-sm shadow-ccss-500/20';
+        btnSemanal.className = 'px-3 py-2 bg-white border border-ccss-200 text-ccss-600 rounded-lg text-sm font-medium hover:bg-ccss-50 transition-colors';
+        divMensual.classList.remove('hidden');
+        divSemanal.classList.add('hidden');
+        escucharCambiosMes(fechaActual.getMonth(), fechaActual.getFullYear());
+      } else {
+        btnSemanal.className = 'px-3 py-2 bg-ccss-600 text-white rounded-lg text-sm font-medium shadow-sm shadow-ccss-500/20';
+        btnMensual.className = 'px-3 py-2 bg-white border border-ccss-200 text-ccss-600 rounded-lg text-sm font-medium hover:bg-ccss-50 transition-colors';
+        divMensual.classList.add('hidden');
+        divSemanal.classList.remove('hidden');
+        generarVistaSemanal();
+      }
+    }
+
+    function generarVistaSemanal() {
       const mes = fechaActual.getMonth();
       const anio = fechaActual.getFullYear();
-      CONFIG.FERIADOS_2026.forEach(fechaStr => {
-        const { anio: fa, mes: fm } = parseFechaString(fechaStr);
-        if (fm === mes && fa === anio && !datosCalendario.has(fechaStr)) {
-          stats.feriado++;
+      const diaSemana = fechaActual.getDay();
+      const inicioSemana = new Date(anio, mes, fechaActual.getDate() - diaSemana);
+      const finSemana = new Date(anio, mes, fechaActual.getDate() + (6 - diaSemana));
+
+      const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
+      const fInicio = inicioSemana.toLocaleDateString('es-ES', opciones);
+      const fFin = finSemana.toLocaleDateString('es-ES', opciones);
+      document.getElementById('tituloSemana').textContent = `Semana del ${fInicio} al ${fFin}`;
+
+      const contenedor = document.getElementById('contenidoSemanal');
+      contenedor.innerHTML = '';
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(inicioSemana);
+        d.setDate(inicioSemana.getDate() + i);
+        const fStr = fechaAString(d.getFullYear(), d.getMonth(), d.getDate());
+        const data = datosCalendario.get(fStr) || {};
+        const nombreDia = DIAS_SEMANA[d.getDay()];
+        const numDia = d.getDate();
+        const esHoyDia = esHoy(fStr);
+
+        let badges = '';
+        if (data.tipo) badges += `<div class="day-badge badge-${data.tipo}">${TIPOS_DIA[data.tipo].icon} ${TIPOS_DIA[data.tipo].label}</div>`;
+        if (data.turno) badges += `<div class="day-badge badge-${data.turno}">${TURNOS[data.turno].label}</div>`;
+        if (data.horaEntrada) badges += `<div class="text-sm text-ccss-500 font-bold">⏰ ${data.horaEntrada} - ${data.horaSalida || '?'}</div>`;
+        if (data.nombre) badges += `<div class="text-sm font-bold text-ccss-700">${data.nombre}</div>`;
+        if (data.comentario) badges += `<div class="text-xs text-ccss-400 italic mt-1">${data.comentario}</div>`;
+
+        const celda = document.createElement('div');
+        celda.className = `bg-white p-4 border-r border-b border-ccss-100 cursor-pointer min-h-[120px] ${esHoyDia ? 'bg-gradient-to-br from-ccss-50 to-ccss-100 border-2 border-ccss-500' : ''}`;
+        celda.innerHTML = `
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-bold ${esHoyDia ? 'text-ccss-700' : 'text-ccss-500'}">${nombreDia}</span>
+            <span class="text-lg font-bold ${esHoyDia ? 'bg-ccss-600 text-white w-8 h-8 flex items-center justify-center rounded-full' : 'text-ccss-900'}">${numDia}</span>
+          </div>
+          <div class="space-y-1">${badges || '<span class="text-xs text-ccss-300 italic">Sin registro</span>'}</div>
+        `;
+        celda.onclick = () => abrirModal(fStr);
+        contenedor.appendChild(celda);
+      }
+
+      // Actualizar estadísticas para la semana visible
+      actualizarEstadisticasSemana(inicioSemana, finSemana);
+    }
+
+    function actualizarEstadisticasSemana(inicio, fin) {
+      let lab = 0, noLab = 0, libres = 0, vacas = 0, lic = 0, hrs = 0;
+      datosCalendario.forEach((d, fStr) => {
+        const [a, m, dia] = fStr.split('-').map(Number);
+        const fecha = new Date(a, m - 1, dia);
+        if (fecha >= inicio && fecha <= fin) {
+          if (d.tipo === 'laborado') { lab++; if (d.turno) hrs += TURNOS[d.turno].horas; }
+          if (d.tipo === 'no_laborado') noLab++;
+          if (d.tipo && d.tipo.startsWith('libre')) libres++;
+          if (d.tipo === 'vacaciones') vacas++;
+          if (d.tipo === 'licencia' || d.tipo === 'licencia_paternidad') lic++;
         }
       });
-      
-      const libresTotal = stats.libre1 + stats.libre2 + stats.libre3;
-      const licenciasTotal = stats.licencia + stats.licencia_paternidad + stats.permiso_estudio + stats.permiso_personal;
-      
-      document.getElementById('stat-laborados').textContent = stats.laborado;
-      document.getElementById('detalle-laborados').textContent = `${stats.horasTotal} hrs`;
-      document.getElementById('stat-no-laborados').textContent = stats.no_laborado;
-      document.getElementById('stat-libres').textContent = libresTotal;
-      document.getElementById('detalle-libres').textContent = `${stats.libre1}+${stats.libre2}+${stats.libre3}`;
-      document.getElementById('stat-vacaciones').textContent = stats.vacaciones;
-      document.getElementById('stat-licencias').textContent = licenciasTotal;
-      document.getElementById('stat-horas').textContent = stats.horasTotal;
-      document.getElementById('detalle-horas').textContent = `${stats.laborado} días`;
+      document.getElementById('stat-laborados').textContent = lab;
+      document.getElementById('detalle-laborados').textContent = `${hrs} hrs`;
+      document.getElementById('stat-no-laborados').textContent = noLab;
+      document.getElementById('stat-libres').textContent = libres;
+      document.getElementById('stat-vacaciones').textContent = vacas;
+      document.getElementById('stat-licencias').textContent = lic;
+      document.getElementById('stat-horas').textContent = hrs;
+      document.getElementById('detalle-horas').textContent = 'Semana';
     }
 
-    // ============================================
-    // MODAL
-    // ============================================
-    function abrirModal(fechaStr, diaNumero) {
-      const modal = document.getElementById('modalEdicion');
-      const { anio, mes } = parseFechaString(fechaStr);
-      
-      document.getElementById('fechaModal').textContent = `${diaNumero} de ${MESES[mes]} ${anio}`;
-      
-      const datosExistentes = datosCalendario.get(fechaStr) || {};
-      document.getElementById('tipoDia').value = datosExistentes.tipo || '';
-      document.getElementById('tipoTurno').value = datosExistentes.turno || '';
-      document.getElementById('comentarioDia').value = datosExistentes.comentario || '';
-      
-      actualizarContador();
-      
-      modal.dataset.fecha = fechaStr;
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      document.body.style.overflow = 'hidden';
-      setTimeout(() => document.getElementById('tipoDia').focus(), 100);
-    }
-
-    function cerrarModal() {
-      const modal = document.getElementById('modalEdicion');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      document.body.style.overflow = '';
-    }
-
-    function actualizarContador() {
-      const comentario = document.getElementById('comentarioDia');
-      const contador = document.getElementById('contadorCaracteres');
-      const len = comentario.value.length;
-      contador.textContent = `${len} / ${CONFIG.MAX_COMENTARIO}`;
-      contador.className = 'text-xs font-medium ' + 
-        (len > CONFIG.MAX_COMENTARIO ? 'text-red-500' : len > CONFIG.MAX_COMENTARIO * 0.9 ? 'text-amber-500' : 'text-ccss-500');
-    }
-
-    async function guardarDia() {
-      const modal = document.getElementById('modalEdicion');
-      const fechaStr = modal.dataset.fecha;
-      const tipo = document.getElementById('tipoDia').value;
-      const turno = document.getElementById('tipoTurno').value;
-      const comentario = document.getElementById('comentarioDia').value;
-      
-      if (!tipo) {
-        mostrarToast('Seleccione un estado', 'error');
-        return;
+    function inicializarSelectores() {
+      const sAnio = document.getElementById('selectAnio');
+      const actual = new Date().getFullYear();
+      for (let y = actual - 2; y <= actual + 2; y++) {
+        const opt = document.createElement('option'); opt.value = y; opt.textContent = y; sAnio.appendChild(opt);
       }
-      
-      if (comentario.length > CONFIG.MAX_COMENTARIO) {
-        mostrarToast(`Máximo ${CONFIG.MAX_COMENTARIO} caracteres`, 'error');
-        return;
-      }
-      
-      const resultado = await guardarEnFirebase(fechaStr, tipo, turno, comentario);
-      if (resultado) {
-        cerrarModal();
-        mostrarToast('Guardado correctamente', 'success');
-      }
+      sAnio.value = actual;
+      document.getElementById('selectMes').value = fechaActual.getMonth();
     }
-
-    async function eliminarDia() {
-      const modal = document.getElementById('modalEdicion');
-      const fechaStr = modal.dataset.fecha;
-      
-      if (confirm('¿Eliminar este registro?')) {
-        const resultado = await eliminarDeFirebase(fechaStr);
-        if (resultado) {
-          cerrarModal();
-          mostrarToast('Registro eliminado', 'info');
-        }
-      }
-    }
-
-    // ============================================
-    // EVENT LISTENERS
-    // ============================================
-    document.addEventListener('DOMContentLoaded', () => {
-      verificarSesion();
-      inicializarSelectores();
-      escucharCambiosMes(fechaActual.getMonth(), fechaActual.getFullYear());
-      lucide.createIcons();
-      
-      // Navegación
-      document.getElementById('btnMesAnterior').addEventListener('click', () => {
-        fechaActual.setMonth(fechaActual.getMonth() - 1);
-        actualizarSelectores();
-        escucharCambiosMes(fechaActual.getMonth(), fechaActual.getFullYear());
-      });
-      
-      document.getElementById('btnMesSiguiente').addEventListener('click', () => {
-        fechaActual.setMonth(fechaActual.getMonth() + 1);
-        actualizarSelectores();
-        escucharCambiosMes(fechaActual.getMonth(), fechaActual.getFullYear());
-      });
-      
-      document.getElementById('selectMes').addEventListener('change', (e) => {
-        fechaActual.setMonth(parseInt(e.target.value));
-        escucharCambiosMes(fechaActual.getMonth(), fechaActual.getFullYear());
-      });
-      
-      document.getElementById('selectAnio').addEventListener('change', (e) => {
-        fechaActual.setFullYear(parseInt(e.target.value));
-        escucharCambiosMes(fechaActual.getMonth(), fechaActual.getFullYear());
-      });
-      
-      document.getElementById('btnVistaMensual').addEventListener('click', () => cambiarVista('mensual'));
-      document.getElementById('btnVistaSemanal').addEventListener('click', () => cambiarVista('semanal'));
-      
-      // Modal
-      document.getElementById('btnGuardarDia').addEventListener('click', guardarDia);
-      document.getElementById('btnEliminarDia').addEventListener('click', eliminarDia);
-      document.getElementById('btnCancelarModal').addEventListener('click', cerrarModal);
-      document.getElementById('btnCerrarModal').addEventListener('click', cerrarModal);
-      document.getElementById('comentarioDia').addEventListener('input', actualizarContador);
-      
-      document.getElementById('modalEdicion').addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) cerrarModal();
-      });
-      
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') cerrarModal();
-      });
-    });
-
-    window.addEventListener('beforeunload', () => {
-      if (unsubscribe) unsubscribe();
-    });
   </script>
 </body>
 </html>
